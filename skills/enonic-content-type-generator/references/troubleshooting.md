@@ -111,3 +111,20 @@ The directory name and file name (without `.xml`) must match exactly.
 - `<occurrences>` on an `<item-set>` — controls how many instances of the set
 - `<occurrences>` on an `<option-set>` — controls how many instances of the whole option set
 - `<options minimum="..." maximum="...">` — controls how many options can be selected within one option-set instance
+
+### DateTime Stores Without Timezone
+
+**Symptom:** DateTime values lose timezone information when saved, or API returns `LocalDateTime` instead of `Instant`.
+
+**Fix:** By default DateTime stores values without timezone. Add `<timezone>true</timezone>` in the config to store timezone-aware values:
+```xml
+<config>
+  <timezone>true</timezone>
+</config>
+```
+
+### ImageSelector `allowContentType` Ignored
+
+**Symptom:** `<allowContentType>` in an ImageSelector config has no effect.
+
+**Fix:** ImageSelector does not support `allowContentType` — it is always limited to `media:image`. Use `allowPath` to restrict which images are selectable. If you need to select non-image media, use `MediaSelector` instead.

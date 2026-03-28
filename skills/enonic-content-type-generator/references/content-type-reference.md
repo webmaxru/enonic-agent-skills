@@ -59,6 +59,57 @@ Always use `base:structured` unless the content type has a specific reason to in
 | `TextArea` | String | Multi-line plain text |
 | `HtmlArea` | String | Rich-text editor (HTML) |
 
+#### TextLine Config
+
+```xml
+<input name="socialsecuritynumber" type="TextLine">
+  <label>My SSN</label>
+  <config>
+    <max-length>11</max-length>
+    <show-counter>true</show-counter>
+    <regexp>\b\d{3}-\d{2}-\d{4}\b</regexp>
+  </config>
+</input>
+```
+
+- `max-length` — maximum allowed characters (default: unlimited)
+- `show-counter` — show text length counter (default: hidden)
+- `regexp` — regular expression for validation
+
+#### TextArea Config
+
+```xml
+<input name="mytextarea" type="TextArea">
+  <label>My TextArea</label>
+  <config>
+    <max-length>500</max-length>
+    <show-counter>true</show-counter>
+  </config>
+</input>
+```
+
+- `max-length` — maximum allowed characters (default: unlimited)
+- `show-counter` — show text length counter (default: hidden)
+
+#### HtmlArea Config
+
+```xml
+<input name="myhtmlarea" type="HtmlArea">
+  <label>My HtmlArea</label>
+  <config>
+    <exclude>*</exclude>
+    <include>JustifyLeft JustifyRight | Bold Italic</include>
+    <allowHeadings>h2 h4 h6</allowHeadings>
+  </config>
+</input>
+```
+
+- `exclude` — remove tools from toolbar (use `*` to remove all)
+- `include` — add tools to toolbar (separate with space, group with `|`)
+- `allowHeadings` — space-separated list of allowed heading tags (`h1` through `h6`; all allowed by default)
+
+Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight | BulletedList NumberedList Outdent Indent | FindAndReplace SpecialChar Anchor Image Macro Link Unlink | Table | PasteModeSwitcher`
+
 ### Numeric Inputs
 
 | Type | Value Type | Description |
@@ -66,13 +117,58 @@ Always use `base:structured` unless the content type has a specific reason to in
 | `Long` | Long | Integer number |
 | `Double` | Double | Decimal number |
 
+#### Long Config
+
+```xml
+<input name="degrees" type="Long">
+  <label>Degrees</label>
+  <config>
+    <min>0</min>
+    <max>360</max>
+  </config>
+</input>
+```
+
+- `min` — minimum allowed value
+- `max` — maximum allowed value
+
+#### Double Config
+
+```xml
+<input name="angle" type="Double">
+  <label>Angle (rad)</label>
+  <config>
+    <min>0</min>
+    <max>3.14159</max>
+  </config>
+</input>
+```
+
+- `min` — minimum allowed value
+- `max` — maximum allowed value
+
 ### Date/Time Inputs
 
 | Type | Value Type | Description |
 |---|---|---|
 | `Date` | LocalDate | Date only (no time) |
-| `DateTime` | LocalDateTime / Instant | Date and time (optional timezone via config) |
+| `DateTime` | LocalDateTime / Instant | Date and time (local by default; timezone via config) |
 | `Time` | LocalTime | Time only |
+
+#### DateTime Config
+
+```xml
+<input name="mydatetime" type="DateTime">
+  <label>My DateTime</label>
+  <config>
+    <timezone>true</timezone>
+  </config>
+  <default>2011-09-12</default>
+</input>
+```
+
+- `timezone` — set to `true` to store value with timezone (produces `Instant`); default is `false` (produces `LocalDateTime`)
+- `default` supports ISO 8601 format (`yyyy-MM-ddThh:mm`, with optional timezone offset) or relative expressions (e.g., `+1year -12hours`, `now`)
 
 ### Selection Inputs
 
@@ -84,6 +180,51 @@ Always use `base:structured` unless the content type has a specific reason to in
 | `ContentSelector` | Reference (content ID) | Select existing content items |
 | `ContentTypeFilter` | String | Select a content type |
 | `CustomSelector` | String | Custom service-backed selector |
+
+#### CheckBox Config
+
+```xml
+<input name="mycheckbox" type="CheckBox">
+  <label>My Checkbox</label>
+  <default>checked</default>
+  <config>
+    <alignment>right</alignment>
+  </config>
+</input>
+```
+
+- `alignment` — placement relative to label: `left` (default), `right`, `top`, `bottom`
+- `default` — use `checked` to pre-select; default is unchecked
+
+#### ContentTypeFilter Config
+
+```xml
+<input name="myctyfilter" type="ContentTypeFilter">
+  <label>My ContentTypeFilter</label>
+  <config>
+    <context>true</context>
+  </config>
+</input>
+```
+
+- `context` — `true` limits content types to applications configured for the current site (default: `false`)
+
+#### CustomSelector Config
+
+```xml
+<input name="mycustomselector" type="CustomSelector">
+  <label>My Custom Selector</label>
+  <config>
+    <service>my-custom-selector</service>
+    <param value="genre">classic</param>
+    <galleryMode>true</galleryMode>
+  </config>
+</input>
+```
+
+- `service` — name of a JavaScript service at `/resources/services/[name]/[name].js`; can reference another app with `com.myapp:servicename`
+- `param` — optional name-value parameters passed to the service as query params (repeatable)
+- `galleryMode` — `true` displays options as a three-column image gallery
 
 ### Media Inputs
 
@@ -156,9 +297,18 @@ Always use `base:structured` unless the content type has a specific reason to in
   <config>
     <allowContentType>myapp:article</allowContentType>
     <allowPath>${site}/*</allowPath>
+    <treeMode>true</treeMode>
+    <hideToggleIcon>true</hideToggleIcon>
   </config>
 </input>
 ```
+
+- `allowContentType` — restrict selectable content types (repeatable; supports `${app}:name` shorthand)
+- `allowPath` — restrict content by path (repeatable; supports `${site}/*`, `./*`, `../*`)
+- `treeMode` — `true` shows content tree instead of flat list (default: `false`)
+- `hideToggleIcon` — `true` hides the flat/tree toggle icon (default: `false`)
+
+By default, ContentSelector only displays content from the same site.
 
 ### ImageSelector Config Example
 
@@ -166,9 +316,32 @@ Always use `base:structured` unless the content type has a specific reason to in
 <input name="images" type="ImageSelector">
   <label>Images</label>
   <occurrences minimum="0" maximum="0"/>
-  <config/>
+  <config>
+    <allowPath>${site}/*</allowPath>
+    <treeMode>true</treeMode>
+    <hideToggleIcon>true</hideToggleIcon>
+  </config>
 </input>
 ```
+
+ImageSelector supports the same config options as ContentSelector **except** `allowContentType` (it is always limited to `media:image`). By default, ImageSelector displays all images from the root.
+
+### MediaSelector Config Example
+
+```xml
+<input name="mymedia" type="MediaSelector">
+  <label>My Media</label>
+  <occurrences minimum="0" maximum="1"/>
+  <config>
+    <allowContentType>media:archive</allowContentType>
+    <allowPath>${site}/*</allowPath>
+    <treeMode>true</treeMode>
+    <hideToggleIcon>true</hideToggleIcon>
+  </config>
+</input>
+```
+
+MediaSelector supports the same config options as ContentSelector, but `allowContentType` is limited to `media:*` types. By default, MediaSelector displays all media from the root.
 
 ## Item Sets
 

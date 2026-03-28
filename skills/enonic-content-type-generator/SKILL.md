@@ -32,8 +32,11 @@ description: Generates Enonic XP content type XML schema definitions from natura
    - Set the `type` attribute to the exact Enonic XP input type name (case-sensitive).
    - Add `<label>`, `<occurrences>`, `<help-text>`, `<default>`, and `<config>` as required.
 7. For ComboBox and RadioButton inputs, include all options inside `<config>`.
-8. For ContentSelector and ImageSelector inputs, include `<config>` with `allowContentType` and `allowPath` if specified.
-9. If examples are needed for reference, read `references/examples.md`.
+8. For ContentSelector, ImageSelector, and MediaSelector inputs, include `<config>` with `allowContentType`, `allowPath`, `treeMode`, and `hideToggleIcon` as specified.
+9. For TextLine and TextArea, add `<config>` with `max-length`, `show-counter`, or `regexp` if validation constraints are requested.
+10. For Long and Double, add `<config>` with `min` and `max` if range constraints are requested.
+11. For DateTime, add `<config>` with `<timezone>true</timezone>` if timezone-aware storage is requested.
+12. If examples are needed for reference, read `references/examples.md`.
 
 **Step 4: Write the File**
 1. Construct the target path: `[projectRoot]/src/main/resources/site/content-types/[name]/[name].xml`
