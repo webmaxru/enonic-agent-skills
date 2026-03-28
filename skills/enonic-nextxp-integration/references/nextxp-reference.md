@@ -43,6 +43,7 @@ Standard Next.XP project layout after scaffolding from `nextxp-template`:
 .env                                  # Environment variables
 src/
     proxy.ts                          # Middleware routing by locale
+    utils.ts                          # Token/path validation helpers
     components/
         _mappings.ts                  # Central component registry
         queries/                      # Guillotine GraphQL query functions
@@ -50,6 +51,7 @@ src/
         pages/                        # React page components
         parts/                        # React part components
         layouts/                      # React layout components
+        macros/                       # Macro components for rich text
     phrases/
         en.json                       # i18n phrase files
     app/
@@ -61,11 +63,11 @@ src/
             not-found.tsx             # 404 handler
         api/
             preview/
-                route.tsx             # Preview mode API route
+                route.ts              # Preview mode API route
             renderable/
-                route.tsx             # Renderable check API route
+                route.ts              # Renderable check API route
             revalidate/
-                route.tsx             # ISR revalidation API route
+                route.ts              # ISR revalidation API route
 ```
 
 ## Component Registry API
@@ -117,6 +119,8 @@ ComponentRegistry.addLayout(`${APP_NAME}:two-column`, {
 });
 ```
 
+Layout components receive `LayoutProps` (not `PageProps`) and access regions via `props.layout.regions`.
+
 ### Common Query
 
 Data shared across all components on the page:
@@ -126,6 +130,19 @@ ComponentRegistry.setCommonQuery([commonQuery, commonVariables]);
 ```
 
 Remove if not needed to optimize performance.
+
+### Macro Mapping
+
+```typescript
+import FactBox from './macros/FactBox';
+
+ComponentRegistry.addMacro(`${APP_NAME}:factbox`, {
+    view: FactBox,
+    configQuery: '{ header }'
+});
+```
+
+Register macros before any component that uses `RichTextView`.
 
 ## Guillotine GraphQL Query Patterns
 
@@ -236,11 +253,34 @@ Key adapter imports:
 - `FetchContentResult` — props type for content type views.
 - `PageProps` — props type for page components.
 - `PartProps` — props type for part components.
+- `LayoutProps` — props type for layout components.
+- `MacroProps` — props type for macro components.
 - `getUrl(path, meta)` — resolves URLs for both standalone and preview modes.
 - `getAsset(path, meta)` — resolves static asset URLs.
 - `I18n.localize(key)` — localized string lookup from phrase files.
+- `I18n.getLocale()` — returns current locale in server-side components.
+- `I18n.setLocale(locale)` — sets the locale for the current request (called in layouts).
 - `APP_NAME` — fully qualified app name from env config.
 - `APP_NAME_UNDERSCORED` — app name with dots replaced by underscores for GraphQL introspection.
+- `PORTAL_COMPONENT_ATTRIBUTE` — HTML attribute for page editor component identification.
+- `CATCH_ALL` — wildcard content type name for debug/fallback views.
+- `richTextQuery(fieldName)` — generates GraphQL query fragment for rich text fields.
+- `validateData(data)` — validates `FetchContentResult` before rendering.
+- `getRequestLocaleInfo({contentPath, headers})` — extracts locale from request for middleware.
+
+Server-side imports (from `@enonic/nextjs-adapter/server`):
+- `fetchContent(params)` — fetches content and resolves component mappings.
+- `fetchContentPathsForAllLocales(basePath)` — generates paths for SSG.
+
+Client-side imports (from `@enonic/nextjs-adapter/client`):
+- `useLocaleContext()` — React hook returning `{locale, localize}` for client-side components.
+
+View imports:
+- `MainView` from `@enonic/nextjs-adapter/views/MainView` — renders the full page.
+- `RegionsView` from `@enonic/nextjs-adapter/views/Region` — renders all regions of a page.
+- `RegionView` from `@enonic/nextjs-adapter/views/Region` — renders a single named region (used in layouts).
+- `RichTextView` from `@enonic/nextjs-adapter/views/RichTextView` — renders rich text fields with embedded images, links, and macros.
+- `PropsView` from `@enonic/nextjs-adapter/views/PropsView` — debug view that displays raw props.
 
 ## Page Components with Regions
 
@@ -275,6 +315,125 @@ const MainPage = (props: PageProps) => {
 export default MainPage;
 ```
 
+## Layout Components with Regions
+
+Layouts are like parts but with regions, allowing nested component structures:
+
+```typescript
+import type {LayoutProps} from '@enonic/nextjs-adapter';
+import {RegionView} from '@enonic/nextjs-adapter/views/Region';
+
+const TwoColumnLayout = (props: LayoutProps) => {
+    const regions = props.layout.regions;
+    const {common, meta} = props;
+
+    return (
+        <div style={{display: 'flex', gap: '10px'}}>
+            <RegionView name="left" components={regions['left']?.components} common={common} meta={meta}/>
+            <RegionView name="right" components={regions['right']?.components} common={common} meta={meta}/>
+        </div>
+    );
+};
+
+export default TwoColumnLayout;
+```
+
+Use `RegionView` (singular, named export) for individual regions within layouts, and `RegionsView` (default export) for page-level rendering.
+
+## Rich Text Rendering
+
+Rich text fields (HtmlArea) may contain images, links, tables, and macros that need special processing.
+
+### richTextQuery Helper
+
+Use `richTextQuery(fieldName)` to generate the GraphQL fragment for rich text fields:
+
+```typescript
+import {APP_NAME_UNDERSCORED, richTextQuery} from '@enonic/nextjs-adapter';
+
+const getPersonWithBio = () => `
+query($path:ID!){
+  guillotine {
+    get(key:$path) {
+      displayName
+      ... on ${APP_NAME_UNDERSCORED}_Person {
+        data {
+          ${richTextQuery('bio')}
+          photos {
+            ... on media_Image {
+              imageUrl: imageUrl(type: absolute, scale: "width(500)")
+            }
+          }
+        }
+      }
+    }
+  }
+}`;
+```
+
+The `richTextQuery` helper generates the necessary sub-query to fetch rich text metadata (links, images, macros). It depends on registered macros, so the query must be a function (not a static string) to ensure macros are registered first.
+
+### RichTextView Component
+
+Render rich text fields with `RichTextView`:
+
+```typescript
+import RichTextView from '@enonic/nextjs-adapter/views/RichTextView';
+
+const PersonWithBio = (props: FetchContentResult) => {
+    const {displayName, data} = props.data?.get as any;
+    const {bio} = data;
+    const meta = props.meta;
+
+    return (
+        <>
+            <h2>{displayName}</h2>
+            <RichTextView data={bio} meta={meta}/>
+        </>
+    );
+};
+```
+
+## Macro Components
+
+Macros are custom components embedded within rich text fields.
+
+### Macro Registration
+
+Register macros with `ComponentRegistry.addMacro()`:
+
+```typescript
+import {ComponentRegistry, APP_NAME} from '@enonic/nextjs-adapter';
+import FactBox from './macros/FactBox';
+
+ComponentRegistry.addMacro(`${APP_NAME}:factbox`, {
+    view: FactBox,
+    configQuery: '{ header }'
+});
+```
+
+- `configQuery` fetches macro form values (available as `config` prop in the component).
+- The macro body is implicitly passed as `children`.
+- Macros must be registered before any component that uses `RichTextView`.
+
+### Macro Component
+
+```typescript
+import type {MacroProps} from '@enonic/nextjs-adapter';
+
+const FactBox = ({name, children, config, meta}: MacroProps) => {
+    const header = config.header?.length ? config.header : 'Fact Box';
+    return (
+        <ins>
+            <strong>{header}</strong>
+            {children}
+        </ins>
+    );
+};
+
+export default FactBox;
+```
+
 ## Preview Mode Architecture
 
 ### Flow
@@ -294,6 +453,133 @@ export default MainPage;
 - **Draft branch**: Used automatically when Content Studio preview is active. Shows unpublished content.
 - **Master branch**: Used by the public Next.js frontend. Only published content is visible.
 - Publishing content in Content Studio moves it from draft to master.
+
+## Static Site Generation (SSG) and Incremental Static Regeneration (ISR)
+
+The main catch-all page handler supports SSG with ISR:
+
+```typescript
+import {FetchContentResult, validateData} from "@enonic/nextjs-adapter";
+import {fetchContent, fetchContentPathsForAllLocales} from "@enonic/nextjs-adapter/server";
+import MainView from '@enonic/nextjs-adapter/views/MainView';
+import "../../../components/_mappings";
+import {Metadata} from 'next';
+import {draftMode} from 'next/headers';
+
+export const revalidate = 3600
+
+export type PageProps = {
+    locale: string,
+    contentPath?: string[],
+}
+
+export default async function Page({params}: { params: Promise<PageProps> }) {
+    const {isEnabled: draft} = await draftMode();
+    const resolvedParams = await params;
+
+    const data: FetchContentResult = await fetchContent({
+        ...resolvedParams,
+        contentPath: resolvedParams.contentPath || []
+    });
+
+    validateData(data);
+    return <MainView {...data}/>;
+};
+
+export async function generateMetadata({params}: { params: Promise<PageProps> }): Promise<Metadata> {
+    const resolvedParams = await params;
+    const {common} = await fetchContent({
+        ...resolvedParams,
+        contentPath: resolvedParams.contentPath || []
+    });
+    return { title: common?.get?.displayName || 'Not found' };
+}
+
+export async function generateStaticParams(props: { params: PageProps }): Promise<any[]> {
+    return await fetchContentPathsForAllLocales('\${site}/');
+}
+```
+
+Key points:
+- `revalidate = 3600` enables ISR with a 1-hour cache period.
+- `params` is `Promise<PageProps>` in Next.js 15+ and must be awaited.
+- `validateData(data)` checks fetch results before rendering.
+- `generateStaticParams` pre-renders pages at build time for SSG.
+- The Next.XP app triggers revalidation automatically when content is published.
+- Start Next.js in production mode with `npm run prod` (builds then starts) for SSG.
+
+## Internationalization (i18n)
+
+### Locale Configuration
+
+Multiple locales are configured via `ENONIC_MAPPINGS`:
+
+```
+ENONIC_MAPPINGS=en:intro/hmdb,no:intro-no/hmdb
+```
+
+The first entry becomes the `defaultLocale`. Each entry maps a locale code to an Enonic project and site path.
+
+### Locale in Layouts
+
+Set the locale for server-side rendering in the root layout:
+
+```typescript
+import {I18n, PORTAL_COMPONENT_ATTRIBUTE} from '@enonic/nextjs-adapter';
+
+export default async function LocaleLayout({params, children}) {
+    const resolvedParams = await params;
+    await I18n.setLocale(resolvedParams.locale);
+    // ...
+}
+```
+
+### Server-Side Locale Access
+
+```typescript
+import {I18n} from '@enonic/nextjs-adapter';
+
+const locale = I18n.getLocale();
+const localizedText = I18n.localize('text.key');
+```
+
+### Client-Side Locale Access
+
+```typescript
+'use client';
+import {useLocaleContext} from '@enonic/nextjs-adapter/client';
+
+export default function ClientComponent() {
+    const {locale, localize} = useLocaleContext();
+    const text = localize('text.key');
+}
+```
+
+### Middleware Locale Detection
+
+The proxy middleware detects locale from the request path or `Accept-Language` header:
+
+```typescript
+import {getRequestLocaleInfo} from '@enonic/nextjs-adapter';
+
+export function proxy(req: NextRequest) {
+    const {locale, locales} = getRequestLocaleInfo({
+        contentPath: req.nextUrl.pathname,
+        headers: req.headers
+    });
+    // redirect to locale-prefixed path if needed
+}
+```
+
+## Base Mappings
+
+Import `@enonic/nextjs-adapter/baseMappings` in `_mappings.ts` to register built-in component type renderers:
+
+```typescript
+import "@enonic/nextjs-adapter/baseMappings";
+```
+
+This should be imported before custom component registrations.
 
 ## Deployment
 

@@ -22,8 +22,9 @@ description: Guides setup, development, and troubleshooting of the Next.js and E
    - `ENONIC_MAPPINGS` — locale-to-project/site mapping (e.g., `en:intro/hmdb`).
    - `ENONIC_API` — base URL for the Guillotine API endpoint (e.g., `http://127.0.0.1:8080/site`).
 3. Install the `@enonic/nextjs-adapter` package if not already present: `npm install @enonic/nextjs-adapter`.
-4. Verify the Next.js project was scaffolded from the `nextxp-template` or contains the expected file structure: `src/components/_mappings.ts`, `src/app/[locale]/[[...contentPath]]/page.tsx`, and API routes under `src/app/api/`.
-5. Read `references/compatibility.md` to confirm version requirements between `@enonic/nextjs-adapter`, Next.js, and Enonic XP.
+4. Import `@enonic/nextjs-adapter/baseMappings` at the top of `src/components/_mappings.ts` to register built-in component renderers.
+5. Verify the Next.js project was scaffolded from the `nextxp-template` or contains the expected file structure: `src/components/_mappings.ts`, `src/app/[locale]/[[...contentPath]]/page.tsx`, and API routes under `src/app/api/`.
+5. Read `references/compatibility.md` to confirm version requirements between `@enonic/nextjs-adapter` (v4.x), Next.js (16+), React (19), and Enonic XP.
 
 **Step 3: Map content types to React components**
 1. Read `references/nextxp-reference.md` for the component registry API and mapping patterns.
@@ -36,16 +37,19 @@ description: Guides setup, development, and troubleshooting of the Next.js and E
    a. Define the component XML in the Enonic app under `src/main/resources/site/pages/`, `parts/`, or `layouts/`.
    b. Create a corresponding React component in `src/components/pages/`, `parts/`, or `layouts/`.
    c. Register using `ComponentRegistry.addPage()`, `ComponentRegistry.addPart()`, or `ComponentRegistry.addLayout()`.
-5. Use `APP_NAME` and `APP_NAME_UNDERSCORED` imports from `@enonic/nextjs-adapter` to keep content type references dynamic.
+5. For layouts, use `LayoutProps` type and `RegionView` (singular, named export) for individual regions instead of `RegionsView`.
+6. Use `APP_NAME` and `APP_NAME_UNDERSCORED` imports from `@enonic/nextjs-adapter` to keep content type references dynamic.
 
 **Step 4: Configure Guillotine data fetching**
 1. Read `references/nextxp-reference.md` for the Guillotine query structure and variable passing.
 2. Write GraphQL queries that use `$path:ID!` as the primary variable for content retrieval via `guillotine { get(key:$path) { ... } }`.
 3. Use type introspection to access content-type-specific fields: `... on AppName_ContentTypeName { data { ... } }`.
-4. For parts and configurable components, export a query object with `query(path, context, config)` and `variables(path, context, config)` functions.
-5. Use processors (optional async functions) to post-process query results before passing to the view.
-6. Use `ComponentRegistry.setCommonQuery()` for data shared across all page components. Remove the common query if not needed to optimize performance.
-7. Use `getUrl()` and `getAsset()` helper functions from the adapter for URL handling that works in both standalone and Content Studio preview modes.
+4. For rich text fields (HtmlArea), use `richTextQuery(fieldName)` from the adapter instead of querying the field directly. Render with `RichTextView` from `@enonic/nextjs-adapter/views/RichTextView`.
+5. For parts and configurable components, export a query object with `query(path, context, config)` and `variables(path, context, config)` functions.
+6. Use processors (optional async functions) to post-process query results before passing to the view.
+7. Use `ComponentRegistry.setCommonQuery()` for data shared across all page components. Remove the common query if not needed to optimize performance.
+8. Use `getUrl()` and `getAsset()` helper functions from the adapter for URL handling that works in both standalone and Content Studio preview modes.
+9. For macros in rich text, register them with `ComponentRegistry.addMacro()` before other components that use `RichTextView`. See `references/nextxp-reference.md` for the macro registration API.
 
 **Step 5: Enable Content Studio preview mode**
 1. Read `references/nextxp-reference.md` for full preview architecture details.
