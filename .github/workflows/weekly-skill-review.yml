@@ -1,0 +1,38 @@
+name: Weekly Enonic Skill Review
+
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Every Monday at 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+jobs:
+  discover-skills:
+    runs-on: ubuntu-latest
+    outputs:
+      skills: ${{ steps.list.outputs.skills }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: List skill directories
+        id: list
+        run: |
+          skills=$(ls -d skills/*/ 2>/dev/null | xargs -I{} basename {} | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          echo "skills=$skills" >> "$GITHUB_OUTPUT"
+
+  review-skill:
+    needs: discover-skills
+    if: needs.discover-skills.outputs.skills != '[]'
+    strategy:
+      matrix:
+        skill: ${{ fromJson(needs.discover-skills.outputs.skills) }}
+      fail-fast: false
+      max-parallel: 2
+    uses: ./.github/workflows/skill-review-worker.lock.yml
+    with:
+      skill-name: ${{ matrix.skill }}
+    secrets: inherit

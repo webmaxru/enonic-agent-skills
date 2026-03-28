@@ -46,6 +46,12 @@ env/
 # Generated artifacts
 artifacts/
 
+# Test infrastructure (local sandbox, projects, logs)
+.test-infra/
+
+# GH-AW compiler scratch space
+.github/aw/
+
 
 # APM dependencies
 apm_modules/
