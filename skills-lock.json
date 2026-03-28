@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "skills": {
+    "agent-package-manager": {
+      "source": "webmaxru/agent-skills",
+      "sourceType": "github",
+      "computedHash": "8855cb263c33d59c6b4e25230b8b57cb0259ad17cd3ed07b1911b61285d30357"
+    },
+    "enonic-api-reference": {
+      "source": "webmaxru/enonic-agent-skills",
+      "sourceType": "github",
+      "computedHash": "694b1ea71b49dfc3b5bdba9a86a4196f1bd4cdd044006f815bcd98c8770b8b69"
+    },
+    "enonic-content-migration": {
+      "source": "webmaxru/enonic-agent-skills",
+      "sourceType": "github",
+      "computedHash": "bcc01b4260bbad2c654d8e30f4ce1bc667b6f134b3a0a45084ec860341e649fe"
+    },
+    "enonic-content-type-generator": {
+      "source": "webmaxru/enonic-agent-skills",
+      "sourceType": "github",
+      "computedHash": "b1aca45d74542558a0d7607afc032a16685860f3971a28b8a41908e46947ec8c"
+    },
+    "enonic-controller-generator": {
+      "source": "webmaxru/enonic-agent-skills",
+      "sourceType": "github",
+      "computedHash": "fbc557bda47514771b52293476076f51fa11a1804cb654d0b55f3de06d444b0b"
+    },
+    "enonic-guillotine-query-builder": {
+      "source": "webmaxru/enonic-agent-skills",
+      "sourceType": "github",
+      "computedHash": "4c52d9bdc2fc7fc2132ae4fa7564a35d686c385e32fdf8517d22eb11d33bb61b"
+    },
+    "enonic-nextxp-integration": {
+      "source": "webmaxru/enonic-agent-skills",
+      "sourceType": "github",
+      "computedHash": "e886533c8b36733583e9f4f4224c3e3ddf5ca63cf5a11ca0598d38d8c15e44ea"
+    },
+    "enonic-sandbox-manager": {
+      "source": "webmaxru/enonic-agent-skills",
+      "sourceType": "github",
+      "computedHash": "b2d68af9c6a953ef96ff22b81ed895892fa230f57f9e0ac1fc919106579c8b23"
+    },
+    "enonic-webhook-integrator": {
+      "source": "webmaxru/enonic-agent-skills",
+      "sourceType": "github",
+      "computedHash": "e404e64e8a5c1f05809a5e8ef137f9d278968c21c6e5b6716b84d174391bb4e4"
+    },
+    "github-agentic-workflows": {
+      "source": "webmaxru/agent-skills",
+      "sourceType": "github",
+      "computedHash": "037c69806ccb952c3a56475bba241f9c1208efdf0ae305a698cf9c587aa6a14d"
+    }
+  }
+}

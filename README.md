@@ -1,8 +1,8 @@
+# Enonic XP Agent Skills
+
 <p align="center">
   <img src="assets/repo-banner.svg" alt="Enonic XP Agent Skills" width="100%" />
 </p>
-
-# Enonic XP Agent Skills
 
 A maintained collection of agent skills for [Enonic XP](https://developer.enonic.com/docs) CMS development. These skills cover the core Enonic XP development surface: server-side APIs, content modeling, content migration, Guillotine GraphQL queries, Next.js headless integration, controller generation, webhook/event integrations, and local development environment management.
 
