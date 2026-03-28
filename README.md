@@ -17,7 +17,7 @@ The repository follows the [agentskills.io](https://agentskills.io) style: lean 
   - [Enonic Next.XP Integration Skill](#enonic-nextxp-integration-skill)
   - [Enonic Sandbox Manager Skill](#enonic-sandbox-manager-skill)
   - [Enonic Webhook Integrator Skill](#enonic-webhook-integrator-skill)
-  - [Enonic XP Controller Generator Skill](#enonic-xp-controller-generator-skill)
+  - [Enonic Controller Generator Skill](#enonic-controller-generator-skill)
 - [Repository Conventions](#repository-conventions)
 - [Common Workflows](#common-workflows)
 
@@ -292,20 +292,20 @@ Its support files are split by purpose:
 - `assets/http-service.template.ts` for a reusable inbound webhook service scaffold
 - `scripts/find-enonic-targets.mjs` for deterministic scanning of Enonic XP project markers
 
-### Enonic XP Controller Generator Skill
+### Enonic Controller Generator Skill
 
-`skills/enonic-xp-controller-generator` generates Enonic XP controller files (TypeScript/JavaScript) and paired XML descriptors for pages, parts, and layouts.
+`skills/enonic-controller-generator` generates Enonic XP controller files (TypeScript/JavaScript) and paired XML descriptors for pages, parts, and layouts.
 
 Install with APM:
 
 ```bash
-apm install webmaxru/enonic-agent-skills/skills/enonic-xp-controller-generator
+apm install webmaxru/enonic-agent-skills/skills/enonic-controller-generator
 ```
 
 Install with npm:
 
 ```bash
-npx skills add webmaxru/enonic-agent-skills --skill enonic-xp-controller-generator
+npx skills add webmaxru/enonic-agent-skills --skill enonic-controller-generator
 ```
 
 It covers:
