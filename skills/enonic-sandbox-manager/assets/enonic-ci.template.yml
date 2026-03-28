@@ -1,0 +1,84 @@
+# Enonic XP CI/CD Pipeline
+# Builds and deploys an Enonic XP application on push to main.
+#
+# Required secrets:
+#   ENONIC_CRED_FILE_B64 — base64-encoded service account key JSON (XP 7.15+)
+#   ENONIC_REMOTE_URL    — management API URL of the target XP instance
+#
+# Usage: copy this file to .github/workflows/enonic-ci.yml in your project repo
+#        and adjust the env vars below.
+
+name: Enonic XP Build & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  XP_VERSION: "7.14.0"       # XP distribution version for the sandbox
+  APP_NAME: "com.example.myapp"  # Application key
+  JAVA_VERSION: "17"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Install Enonic CLI
+        run: npm install -g @enonic/cli
+
+      - name: Create sandbox
+        run: enonic sandbox create ci-sandbox -v ${{ env.XP_VERSION }} --skip-template -f
+
+      - name: Link project to sandbox
+        run: enonic project sandbox ci-sandbox -f
+
+      - name: Build project
+        run: enonic project build -f
+
+      - name: Run tests
+        run: enonic project test -f
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: enonic-app
+          path: build/libs/*.jar
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: enonic-app
+          path: ./artifacts
+
+      - name: Install Enonic CLI
+        run: npm install -g @enonic/cli
+
+      - name: Write credential file
+        run: echo "${{ secrets.ENONIC_CRED_FILE_B64 }}" | base64 -d > /tmp/cred.json
+
+      - name: Deploy to XP
+        env:
+          ENONIC_CLI_REMOTE_URL: ${{ secrets.ENONIC_REMOTE_URL }}
+        run: |
+          JAR_FILE=$(ls ./artifacts/*.jar | head -1)
+          enonic app install --cred-file /tmp/cred.json --file "$JAR_FILE" -f
+
+      - name: Cleanup credentials
+        if: always()
+        run: rm -f /tmp/cred.json
