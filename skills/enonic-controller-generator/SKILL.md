@@ -69,6 +69,7 @@ description: Generates Enonic XP controller files (TypeScript/JavaScript) and pa
    - `com.enonic.xp:lib-content:${xpVersion}` — if the controller uses content queries.
    - `com.enonic.lib:lib-thymeleaf:2.0.0` — if using Thymeleaf rendering.
    - `com.enonic.lib:lib-mustache:2.1.0` — if using Mustache rendering.
+   - `com.enonic.lib:lib-asset:${libVersion}` — if the controller generates asset URLs (replaces the deprecated `portalLib.assetUrl` in XP 7.15+).
 
 **Step 9: Validate Output**
 1. Verify the descriptor file name matches the parent directory name exactly.
