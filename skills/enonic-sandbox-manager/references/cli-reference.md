@@ -109,11 +109,13 @@ enonic create [project-name] [-r <starter>] [-s <sandbox>] [--prod] [--skip-star
 | Flag | Description |
 |------|-------------|
 | `project-name` | Project name (also used as folder name) |
-| `-r, --repo` | Starter repository: `<enonic-repo>`, `<org>/<repo>`, or full URL |
+| `-r, --repo, --repository` | Starter repository: `<enonic-repo>`, `<org>/<repo>`, or full URL |
 | `-s, --sandbox` | Existing sandbox name to link |
-| `--prod` | Run XP in production mode |
+| `--prod` | Run XP in non-development (production) mode |
 | `--skip-start` | Do not start sandbox after creation |
 | `-f, --force` | Non-interactive mode |
+
+Default `destination` and `version` will equal the project name and `1.0.0-SNAPSHOT` respectively.
 
 Examples:
 - `enonic create foo` — interactive wizard
@@ -181,7 +183,7 @@ enonic project deploy [sandbox-name] [--prod] [--debug] [-c] [--skip-start] [-f]
 ### enonic project install
 
 ```
-enonic project install [-a <auth>] [--cred-file <path>] [-f]
+enonic project install [-a <auth>] [--cred-file <path>] [--client-key <path>] [--client-cert <path>] [-f]
 ```
 
 Build and install to a running XP instance via management API.
@@ -246,13 +248,15 @@ These commands require access to the XP management API (default: `localhost:4848
 | `ENONIC_CLI_HTTP_PROXY` | Proxy server URL |
 | `ENONIC_CLI_HOME_PATH` | Override CLI home directory |
 | `ENONIC_CLI_CRED_FILE` | Service account key file path (XP 7.15+) |
+| `ENONIC_CLI_CLIENT_KEY` | Private key file for client certificate (mTLS) authentication |
+| `ENONIC_CLI_CLIENT_CERT` | Client certificate file for mTLS authentication |
 
 ### App Commands
 
 ```
-enonic app install [--url <url>] [--file <path>] [--cred-file <path>] [-f]
-enonic app start <app-key> [--cred-file <path>] [-f]
-enonic app stop <app-key> [--cred-file <path>] [-f]
+enonic app install [--url <url>] [--file <path>] [--cred-file <path>] [--client-key <path>] [--client-cert <path>] [-f]
+enonic app start <app-key> [--cred-file <path>] [--client-key <path>] [--client-cert <path>] [-f]
+enonic app stop <app-key> [--cred-file <path>] [--client-key <path>] [--client-cert <path>] [-f]
 ```
 
 ### System Info

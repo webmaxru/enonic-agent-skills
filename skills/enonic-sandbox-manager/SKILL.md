@@ -59,7 +59,7 @@ description: Guides developers through Enonic CLI commands for sandbox managemen
    - **Install from file:** `enonic app install --file <path-to-jar>`
    - **Start app:** `enonic app start <app-key>`
    - **Stop app:** `enonic app stop <app-key>`
-3. Authentication is required for XP commands. Use `--cred-file <path>` (XP 7.15+) or set `ENONIC_CLI_REMOTE_USER` and `ENONIC_CLI_REMOTE_PASS` environment variables.
+3. Authentication is required for XP commands. Use `--cred-file <path>` (XP 7.15+), `--client-key <path>` + `--client-cert <path>` for mTLS (XP 7.15+), or set `ENONIC_CLI_REMOTE_USER` and `ENONIC_CLI_REMOTE_PASS` environment variables.
 
 **Step 7: CI/CD Pipeline Generation**
 1. Read `assets/enonic-ci.template.yml` for the GitHub Actions workflow template.
