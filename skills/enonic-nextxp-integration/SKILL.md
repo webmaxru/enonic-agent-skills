@@ -1,6 +1,10 @@
 ---
 name: enonic-nextxp-integration
 description: Guides setup, development, and troubleshooting of the Next.js and Enonic XP headless integration (Next.XP framework). Covers Enonic adapter configuration, content type to React component mapping, Guillotine GraphQL data fetching, Content Studio preview mode, and draft/master branch switching. Use when building a Next.js frontend powered by Enonic XP, configuring the Next.XP adapter, mapping content types to components, fetching Enonic content via Guillotine in Next.js, or debugging Content Studio preview. Don't use for traditional server-side Enonic XP rendering, standalone Guillotine queries without Next.js, non-Next.js frontend frameworks with Enonic, or React4XP embedded rendering.
+license: MIT
+metadata:
+  author: webmaxru
+  version: "1.1"
 ---
 
 # Next.js + Enonic XP Headless Integration (Next.XP)

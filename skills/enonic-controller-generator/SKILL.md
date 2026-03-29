@@ -1,6 +1,10 @@
 ---
 name: enonic-controller-generator
 description: Generates Enonic XP controller files (TypeScript/JavaScript) and paired XML descriptors for pages, parts, and layouts. Covers lib-portal imports, HTTP handler exports, region definitions, Thymeleaf/Mustache rendering, and response processors. Use when scaffolding page controllers with regions, part controllers with config access, layout controllers with multi-region support, or response processors for Enonic XP sites. Do not use for content type schemas, headless Next.js/React frontends, GraphQL Guillotine queries, or non-Enonic web frameworks.
+license: MIT
+metadata:
+  author: webmaxru
+  version: "1.1"
 ---
 
 # Enonic XP Controller Generator

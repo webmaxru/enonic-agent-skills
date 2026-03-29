@@ -1,6 +1,10 @@
 ---
 name: enonic-guillotine-query-builder
 description: Composes, debugs, and optimizes Guillotine GraphQL queries for Enonic XP headless content delivery. Covers query construction, variable usage, filtering, aggregation, pagination, sorting, and TypeScript type generation from the auto-generated Guillotine schema. Use when writing or troubleshooting Guillotine queries, querying custom content types through GraphQL, or generating typed interfaces from Guillotine responses. Don't use for content type XML definitions, non-Enonic GraphQL APIs (Apollo, Hasura), server-side lib-content queries, or Guillotine deployment and CORS configuration.
+license: MIT
+metadata:
+  author: webmaxru
+  version: "1.1"
 ---
 
 # Enonic Guillotine Query Builder

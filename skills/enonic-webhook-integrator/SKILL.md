@@ -1,6 +1,10 @@
 ---
 name: enonic-webhook-integrator
 description: Sets up Enonic XP event listeners, webhook configurations, and external system integrations triggered by content lifecycle events. Covers lib-event listener registration, node event filtering, outbound webhook configuration via com.enonic.xp.webhooks.cfg, custom HTTP service controllers for inbound webhooks, task-based async processing with lib-task, and outbound HTTP calls with lib-httpClient. Use when listening for content publish/create/update/delete events, configuring outbound webhooks, building HTTP service endpoints for inbound webhooks, or triggering async processing on content changes. Do not use for content querying, frontend component development, non-Enonic event systems, or GitHub webhook configuration.
+license: MIT
+metadata:
+  author: webmaxru
+  version: "1.1"
 ---
 
 # Enonic Webhook Integrator

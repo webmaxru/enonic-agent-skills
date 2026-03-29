@@ -1,6 +1,10 @@
 ---
 name: enonic-content-migration
 description: Generates Enonic XP scripts for bulk content operations — creating, updating, querying, migrating, and transforming content using lib-content and lib-node APIs. Covers the query DSL (NoQL), aggregations, batch processing, task controllers for long-running operations, and export/import workflows. Use when writing bulk content creation, update, or deletion scripts, querying with NoQL syntax, migrating content between environments, running long-running task operations, or working with aggregations and paginated retrieval. Do not use for Guillotine GraphQL frontend queries, content type schema definitions, single contentLib.get() calls, or non-Enonic data migration tools.
+license: MIT
+metadata:
+  author: webmaxru
+  version: "1.1"
 ---
 
 # Enonic Content Migration
