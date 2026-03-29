@@ -74,10 +74,11 @@ Version differences and migration notes between major Guillotine releases.
 
 ## Content Type Name Convention
 
-Content type descriptors map to GraphQL type names by replacing dots and colons with underscores:
+Content type descriptors map to GraphQL type names by replacing dots and colons with underscores, and removing hyphens while capitalizing the following letter:
 
 ```
 com.enonic.app.myapp:BlogPost → com_enonic_app_myapp_BlogPost
+portal:template-folder        → portal_TemplateFolder
 ```
 
 This applies across all Guillotine versions.

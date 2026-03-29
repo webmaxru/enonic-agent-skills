@@ -159,6 +159,8 @@ type = 'app.name:article'
 _path LIKE '/content/my-site/articles/*'
 ```
 
+> **Important:** `_path` in queries uses the internal node path (with `/content/` prefix). Query results (`hit._path`) and `contentLib.get()` return the content-domain path (without prefix). Prepend `/content/` when constructing queries from result paths.
+
 **Direct children only:**
 ```
 _parentPath = '/content/my-site/articles'

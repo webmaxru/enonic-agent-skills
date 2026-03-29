@@ -34,8 +34,8 @@ Or set the HTTP header `X-Guillotine-SiteKey: <IdOrPathToSite>`.
 | `getChildrenConnection(key: ID, after: String, first: Int, sort: String): ContentConnection` | Children as a Relay connection |
 | `getPermissions(key: ID): Permissions` | Permissions on a content |
 | `getSite: portal_Site` | Parent site of current context |
-| `queryDsl(query: QueryDSLInput, offset: Int, first: Int, sort: SortDslInput): [Content]` | Query content with DSL |
-| `queryDslConnection(query: QueryDSLInput!, after: String, first: Int, sort: SortDslInput, aggregations: [AggregationInput], highlight: HighlightInputType): QueryDSLContentConnection` | DSL query as a connection with aggregations and highlight |
+| `queryDsl(query: QueryDSLInput, offset: Int, first: Int, sort: [SortDslInput]): [Content]` | Query content with DSL |
+| `queryDslConnection(query: QueryDSLInput!, after: String, first: Int, sort: [SortDslInput], aggregations: [AggregationInput], highlight: HighlightInputType): QueryDSLContentConnection` | DSL query as a connection with aggregations and highlight |
 | `getType(name: String!): ContentType` | Content type metadata |
 | `getTypes: [ContentType]` | All available content types |
 
@@ -78,10 +78,12 @@ All content types share these fields. Custom content types add a `data` field.
 
 ## Inline Fragments for Custom Types
 
-Custom content types are accessed via inline fragments. The type name is the content type descriptor with dots and hyphens replaced by underscores:
+Custom content types are accessed via inline fragments. The type name is derived from the content type descriptor by replacing dots (`.`) and colons (`:`) with underscores (`_`), and removing hyphens (`-`) while capitalizing the following letter. The first letter of each segment after a colon is capitalized.
 
 ```
 com.enonic.app.myapp:BlogPost → com_enonic_app_myapp_BlogPost
+portal:template-folder        → portal_TemplateFolder
+base:unstructured              → base_Unstructured
 ```
 
 Example:
@@ -116,7 +118,7 @@ Example:
 | `totalCount` | `Int!` |
 | `edges` | `[ContentEdge]` |
 | `pageInfo` | `PageInfo` |
-| `aggregationAsJson` | `JSON` (QueryDSLContentConnection only) |
+| `aggregationsAsJson` | `JSON` (QueryDSLContentConnection only) |
 | `highlightAsJson` | `JSON` (QueryDSLContentConnection only) |
 
 ### ContentEdge
@@ -206,7 +208,7 @@ Pass via `aggregations` on `queryDslConnection`. Each `AggregationInput` takes a
 | `getDistance` | Geo-distance buckets |
 | `min` / `max` / `count` | Simple single-value aggregations |
 
-Results are returned in `aggregationAsJson`.
+Results are returned in `aggregationsAsJson`.
 
 ## Highlight Input Types
 

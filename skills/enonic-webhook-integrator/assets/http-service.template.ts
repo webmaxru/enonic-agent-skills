@@ -7,6 +7,10 @@
  * The service will be accessible at:
  *   /_/service/<appKey>/<serviceName>
  *
+ * Note: This template uses TypeScript/ESM syntax. For .js targets, convert
+ * `import X from 'Y'` to `var X = require('Y')` and `export function` to
+ * `exports.xxx = function`.
+ *
  * Customize:
  *   - Authentication logic (API key, HMAC, Bearer token)
  *   - Payload validation
@@ -17,6 +21,7 @@
 // import contentLib from '/lib/xp/content';
 // import contextLib from '/lib/xp/context';
 
+// NOTE: When no apiKey is set in app.config, all requests are allowed through. Configure webhook.apiKey in production.
 const EXPECTED_API_KEY = app.config['webhook.apiKey'] || '';
 
 /**

@@ -27,7 +27,7 @@ description: Composes, debugs, and optimizes Guillotine GraphQL queries for Enon
 3. If aggregations or highlighting are needed, require `queryDslConnection` — these features are not available on `queryDsl`.
 
 **Step 4: Construct the content type fragment**
-1. Derive the GraphQL type name from the content type descriptor by replacing dots (`.`), colons (`:`), and hyphens (`-`) with underscores (`_`). Example: `com.enonic.app.myapp:BlogPost` → `com_enonic_app_myapp_BlogPost`.
+1. Derive the GraphQL type name from the content type descriptor by replacing dots (`.`) and colons (`:`) with underscores (`_`), and removing hyphens (`-`) while capitalizing the following letter. The first letter of each segment after a colon is capitalized. Example: `com.enonic.app.myapp:BlogPost` → `com_enonic_app_myapp_BlogPost`. For built-in types: `portal:template-folder` → `portal_TemplateFolder`.
 2. Use an inline fragment to access the type-specific `data` field: `... on <GraphQLTypeName> { data { ... } }`.
 3. For content references (ContentSelector, ImageSelector, MediaSelector), follow the reference with a nested inline fragment on the target type.
 4. For RichText / HtmlArea fields, include `processedHtml` and optionally `links`, `images`, `macros` sub-fields. Use the `processHtml` input argument for absolute URLs or srcset widths.
@@ -43,7 +43,7 @@ description: Composes, debugs, and optimizes Guillotine GraphQL queries for Enon
 1. Pass `aggregations` as an array of `AggregationInput` objects on `queryDslConnection`.
 2. Each aggregation requires a unique `name` and exactly one aggregation type field (`terms`, `dateRange`, `stats`, etc.).
 3. For highlighting, pass `highlight` with a `properties` array specifying `propertyName` for each field to highlight.
-4. Read aggregation and highlight results from `aggregationAsJson` and `highlightAsJson` on the connection result.
+4. Read aggregation and highlight results from `aggregationsAsJson` and `highlightAsJson` on the connection result.
 
 **Step 7: Generate TypeScript types (if requested)**
 1. Read `assets/guillotine-query.template.ts` as the starting template.

@@ -4,14 +4,21 @@ Version requirements and compatibility notes for the Next.js + Enonic XP integra
 
 ## Package Requirements
 
-| Component | Minimum Version | Recommended |
-|-----------|----------------|-------------|
-| Node.js | 18.x | 20.x or later |
-| Next.js | 14.x (App Router) | Latest stable |
-| @enonic/nextjs-adapter | Latest stable | Latest stable |
-| Enonic XP | 7.x | Latest stable |
-| Guillotine app | Installed in XP | Latest from marketplace |
-| Next.XP app (preview) | Installed in XP | Latest from marketplace |
+| Component | Adapter v3.x | Adapter v4.x |
+|-----------|-------------|-------------|
+| Node.js | 18.x+ | 22.15.1+ |
+| Next.js | 14.x (App Router) | 16.x |
+| React | 18.3.1+ | 19.x |
+| @enonic/nextjs-adapter | 3.x | 4.x |
+| Enonic XP | 7.x | 7.x |
+| Guillotine app | Installed in XP | Installed in XP |
+| Next.XP app (preview) | Installed in XP | Installed in XP |
+
+> **Version resolution:** When installing, specify the version explicitly:
+> - For Next.js 16+: `npm install @enonic/nextjs-adapter@4`
+> - For Next.js 14.x–15.x: `npm install @enonic/nextjs-adapter@3`
+>
+> Running `npm install @enonic/nextjs-adapter` without a version may resolve to v3.x, which has incompatible peer dependencies with Next.js 16+.
 
 ## Key Compatibility Notes
 

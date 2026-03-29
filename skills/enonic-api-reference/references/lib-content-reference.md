@@ -305,8 +305,8 @@ Publishes content to the master branch.
 | schedule | object | no | | Schedule publishing (`{ from, to }`) |
 | excludeChildrenIds | string[] | no | | Descendants to exclude |
 | includeDependencies | boolean | no | true | Include related content |
-| sourceBranch | string | yes | | Source branch |
-| targetBranch | string | yes | | Target branch |
+| sourceBranch | string | yes | | Source branch. *Not in use since XP 7.12.0* |
+| targetBranch | string | yes | | Target branch. *Not in use since XP 7.12.0* |
 
 **Returns:** `object` — `{ pushedContents[], failedContents[] }`.
 
@@ -323,7 +323,7 @@ Retrieves content using a query.
 | query | string/object | yes | | Query string or DSL expression |
 | filters | object | no | | Filters to apply |
 | sort | string/object | no | | Sorting expression or DSL |
-| aggregations | string | no | | Aggregations expression |
+| aggregations | object | no | | Aggregations expression |
 | contentTypes | string[] | no | | Content types to filter on |
 
 **Returns:** `object` — `{ total, count, hits[], aggregations }`.

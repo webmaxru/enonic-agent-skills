@@ -16,12 +16,12 @@ description: Guides setup, development, and troubleshooting of the Next.js and E
 
 **Step 2: Configure the Enonic adapter**
 1. Read `references/nextxp-reference.md` before writing or modifying configuration.
-2. Verify or create the `.env` file in the Next.js project root with the required variables:
+2. Verify or create the `.env` (or `.env.local` for local development) file in the Next.js project root with the required variables:
    - `ENONIC_API_TOKEN` — shared secret for preview mode authentication.
    - `ENONIC_APP_NAME` — fully qualified Enonic application name (e.g., `com.example.myproject`).
    - `ENONIC_MAPPINGS` — locale-to-project/site mapping (e.g., `en:intro/hmdb`).
    - `ENONIC_API` — base URL for the Guillotine API endpoint (e.g., `http://127.0.0.1:8080/site`).
-3. Install the `@enonic/nextjs-adapter` package if not already present: `npm install @enonic/nextjs-adapter`.
+3. Install the `@enonic/nextjs-adapter` package if not already present. Use the version matching the Next.js version: `npm install @enonic/nextjs-adapter@4` for Next.js 16+ or `npm install @enonic/nextjs-adapter@3` for Next.js 14.x. See `references/compatibility.md` for version requirements.
 4. Verify the Next.js project was scaffolded from the `nextxp-template` or contains the expected file structure: `src/components/_mappings.ts`, `src/app/[locale]/[[...contentPath]]/page.tsx`, and API routes under `src/app/api/`.
 5. Read `references/compatibility.md` to confirm version requirements between `@enonic/nextjs-adapter`, Next.js, and Enonic XP.
 

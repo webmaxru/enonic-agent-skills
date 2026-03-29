@@ -121,7 +121,7 @@ Import: `import thymeleafLib from '/lib/thymeleaf';`
 Add to `build.gradle`:
 ```
 dependencies {
-  include "com.enonic.lib:lib-thymeleaf:2.0.0"
+  include "com.enonic.lib:lib-thymeleaf:2.1.1"
 }
 ```
 

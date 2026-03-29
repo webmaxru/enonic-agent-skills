@@ -8,7 +8,7 @@ Common query errors and resolution strategies.
 |---|---|---|
 | `get` returns `null` | Wrong key (path or ID) | Verify content exists at the exact path; check draft vs master branch. |
 | `queryDsl` returns `[]` | Type filter mismatch | Ensure the `type` value matches the full descriptor, e.g. `com.enonic.app.myapp:BlogPost`, not just `BlogPost`. |
-| Inline fragment returns `null` fields | Wrong GraphQL type name | Replace dots, colons, and hyphens with underscores: `com_enonic_app_myapp_BlogPost`. |
+| Inline fragment returns `null` fields | Wrong GraphQL type name | Replace dots and colons with underscores, remove hyphens and capitalize following letter: `com_enonic_app_myapp_BlogPost`, `portal_TemplateFolder`. |
 | `data` field is null | Missing inline fragment | Use `... on <TypeName> { data { ... } }` — the `data` field is type-specific. |
 | Connection returns 0 edges | Query expression error | Simplify the DSL query to `matchAll: {}` to confirm data exists, then add filters incrementally. |
 
@@ -16,9 +16,10 @@ Common query errors and resolution strategies.
 
 **Error**: `Fragment on unknown type "com.enonic.app.myapp:BlogPost"`
 
-GraphQL type names use underscores, not the original descriptor format:
+GraphQL type names use underscores, not the original descriptor format. Additionally, hyphens are removed and the following letter is capitalized:
 - Wrong: `com.enonic.app.myapp:BlogPost`
 - Correct: `com_enonic_app_myapp_BlogPost`
+- Built-in: `portal:template-folder` → `portal_TemplateFolder`
 
 ## Deprecated Query Fields
 
@@ -59,7 +60,7 @@ queryDsl(
 
 | Symptom | Fix |
 |---|---|
-| `aggregationAsJson` is null | Aggregations are only available on `queryDslConnection`, not `queryDsl`. |
+| `aggregationsAsJson` is null | Aggregations are only available on `queryDslConnection`, not `queryDsl`. |
 | Empty aggregation buckets | The `field` path must match the indexed property path (e.g. `data.category`, not `category`). |
 | Unexpected bucket counts | `terms` aggregation defaults to 10 buckets — increase `size` for more. |
 

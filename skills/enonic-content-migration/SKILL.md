@@ -34,7 +34,7 @@ description: Generates Enonic XP scripts for bulk content operations — creatin
 2. For content-type filtering, use the `contentTypes` parameter on `contentLib.query()` or a `type` property comparison in node queries.
 3. For date-range queries, use `instant()` or `dateTime()` functions and the `range()` query function.
 4. For full-text search, use `fulltext()` with the appropriate field paths and operator (`AND`/`OR`).
-5. For path-scoped operations, use `_path LIKE '/content/site-path/*'` to match descendants.
+5. For path-scoped operations, use `_path LIKE '/content/site-path/*'` to match descendants. Note: the `_path` property in NoQL queries includes the internal `/content/` prefix, but `hit._path` in results returns the content-domain path without it. Always prepend `/content/` when building queries from result paths.
 6. Add `filters` for efficient post-query narrowing using `exists`, `notExists`, `hasValue`, or `boolean` combinations.
 7. Add `aggregations` when the operation needs grouped statistics (term counts, date histograms, numeric ranges, stats).
 8. Read `references/examples.md` for complete query and aggregation patterns.
@@ -47,7 +47,7 @@ description: Generates Enonic XP scripts for bulk content operations — creatin
 5. For `contentLib.modify()`, use the editor callback pattern to safely transform each content item.
 6. For `contentLib.publish()`, batch keys into groups of 50–100 to avoid timeout on large publish sets.
 7. Track success and failure counts for reporting.
-8. Read `assets/bulk-update.template.ts` for the reusable batch update controller template.
+8. Read `assets/bulk-update.template.ts` for the reusable batch update controller template. Note: templates use TypeScript/ESM syntax (`import`, `const`, arrow functions); adapt to CommonJS JavaScript (`require()`, `var`, `function()`) for XP runtime deployment as `.js` files.
 
 **Step 5: Handle branch operations and publishing**
 1. Run content modifications in the `draft` branch context.
