@@ -17,5 +17,6 @@
     "guillotine",
     "nextjs",
     "agent-skills"
-  ]
+  ],
+  "skills": "skills/"
 }
