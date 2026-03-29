@@ -37,13 +37,14 @@ webhook.slack-notify.events = node.pushed
 ```properties
 webhook.cdn-purge.url = https://api.cdn-provider.com/purge
 webhook.cdn-purge.events = node.pushed, node.deleted
-webhook.cdn-purge.secret = cdn-purge-secret-key
+webhook.cdn-purge.secret = REPLACE_WITH_CDN_SECRET
 ```
 
 ### Security Considerations
 
 - Always use HTTPS URLs to prevent payload interception.
 - Use a shared secret and verify HMAC signatures on the receiving end.
+- **Never write actual secret values into configuration files or source code.** Use descriptive placeholder tokens (e.g., `REPLACE_WITH_CDN_SECRET`) and instruct the operator to substitute real credentials out-of-band via secure deployment pipelines or secret management tools.
 - Config file changes with `.cfg` extension are applied without restarting XP.
 
 ---
@@ -104,8 +105,12 @@ Before processing any inbound webhook payload:
 ### Securing Service Endpoints
 
 - Restrict access via vhost configuration to limit which hosts can reach the service.
-- Use API keys or HMAC signatures to authenticate incoming requests.
+- Use API keys or HMAC signatures to authenticate incoming requests. Reject requests when authentication is not configured rather than falling through open.
 - Rate-limit inbound endpoints through XP's DoS filter or reverse proxy configuration.
+- Reject payloads exceeding a reasonable size limit (e.g., 1 MB) before parsing.
+- Sanitize all string fields from external payloads: trim, enforce max length, strip HTML, reject path traversal (`..`, `/`, `\`).
+- Use an allowlist of expected field names — never pass raw external payload objects directly to content APIs.
+- Never log full external payloads; log only field names or sanitized summaries to avoid log injection.
 
 ---
 
@@ -146,11 +151,14 @@ import httpClient from '/lib/http-client';
 ```typescript
 import httpClient from '/lib/http-client';
 
+// Token loaded from app.config — never hardcode secrets in source
+const API_TOKEN = app.config['external.api.token'] || '';
+
 const response = httpClient.request({
   url: 'https://api.example.com/webhook',
   method: 'POST',
   headers: {
-    'Authorization': 'Bearer my-token',
+    'Authorization': 'Bearer ' + API_TOKEN,
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({ event: 'content.published', paths: ['/site/blog/post-1'] }),
