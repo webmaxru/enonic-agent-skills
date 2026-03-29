@@ -36,8 +36,8 @@ The easiest way to get all Enonic XP skills is through the [webmaxru/ai-native-d
 #### GitHub Copilot CLI
 
 ```
-copilot plugin marketplace add webmaxru/ai-native-dev
-copilot plugin install enonic-skills
+> /plugin marketplace add webmaxru/ai-native-dev
+> /plugin install enonic-skills@webmaxru/ai-native-dev
 ```
 
 #### VS Code (GitHub Copilot)
@@ -61,8 +61,8 @@ Then open the Extensions sidebar, search `@agentPlugins enonic-skills`, and clic
 #### Claude Code
 
 ```
-/plugin marketplace add webmaxru/ai-native-dev
-/plugin install enonic-skills
+> /plugin marketplace add webmaxru/ai-native-dev
+> /plugin install enonic-skills@webmaxru/ai-native-dev
 ```
 
 After installation, your coding agent has access to all Enonic XP skills — no per-skill setup required.
