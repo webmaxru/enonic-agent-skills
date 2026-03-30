@@ -76,8 +76,17 @@ queryDsl(
 
 | Symptom | Fix |
 |---|---|
-| Custom field not appearing | Verify the `creationCallbacks` key matches the exact generated type name. Use Query Playground introspection to confirm. |
-| Type not found in dictionary | Ensure `context.dictionary` is passed to `createSchema`. |
+| Custom field not appearing | In Guillotine 7, use `exports.extensions` in `guillotine/guillotine.js`. For 6.x, verify the `creationCallbacks` key matches the exact generated type name. Use Query Playground introspection to confirm. |
+| Type not found in dictionary | Ensure `context.dictionary` is passed to `createSchema` (6.x only). In Guillotine 7, types are registered through the Extensions API. |
+
+## Guillotine 7 Migration Issues
+
+| Symptom | Fix |
+|---|---|
+| `params` argument type error on `pageUrl` | In Guillotine 7, `params` is `Json` type, not `String`. Update the argument type. |
+| Subscriptions not working | GraphQL subscriptions are removed in Guillotine 7. Implement a custom solution. |
+| `siteConfig` not available | Site configuration is no longer obtainable from `dataAsJson`, `site`, or `portal_Site.dataAsJson` fields in Guillotine 7. |
+| URLs changed from relative to absolute | Guillotine 7 generates absolute (server) URLs by default for all URL fields and `processedHtml`. Adjust client URL handling. |
 
 ## Debugging Steps
 
