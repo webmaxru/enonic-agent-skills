@@ -34,13 +34,18 @@ metadata:
 2. Read `references/examples.md` for complete content type mapping examples including queries, views, and processors.
 3. For each Enonic content type that needs a custom rendering:
    a. Create a Guillotine GraphQL query function in `src/components/queries/` that fetches the fields specific to that content type using type introspection (`... on AppName_ContentTypeName`).
-   b. Create a React view component in `src/components/views/` that accepts `FetchContentResult` props and renders the fetched data.
-   c. Register both in `src/components/_mappings.ts` using `ComponentRegistry.addContentType()`.
+   b. For content types with HTML area (rich text) fields, use `richTextQuery(fieldName)` from `@enonic/nextjs-adapter` to generate the query fragment. See `references/nextxp-reference.md` for the rich text rendering section.
+   c. Create a React view component in `src/components/views/` that accepts `FetchContentResult` props and renders the fetched data. Use `RichTextView` from `@enonic/nextjs-adapter/views/RichTextView` for HTML area fields.
+   d. Register both in `src/components/_mappings.ts` using `ComponentRegistry.addContentType()`.
 4. For page components (pages, parts, layouts):
    a. Define the component XML in the Enonic app under `src/main/resources/site/pages/`, `parts/`, or `layouts/`.
-   b. Create a corresponding React component in `src/components/pages/`, `parts/`, or `layouts/`.
+   b. Create a corresponding React component in `src/components/pages/`, `parts/`, or `layouts/`. Use `LayoutProps` for layouts and the named `RegionView` export for individual region rendering.
    c. Register using `ComponentRegistry.addPage()`, `ComponentRegistry.addPart()`, or `ComponentRegistry.addLayout()`.
-5. Use `APP_NAME` and `APP_NAME_UNDERSCORED` imports from `@enonic/nextjs-adapter` to keep content type references dynamic.
+5. For macros (custom components within rich text):
+   a. Create a React component in `src/components/macros/` that accepts `MacroProps`.
+   b. Register with `ComponentRegistry.addMacro()` using `configQuery` for form values. Register macros **before** any component that uses `RichTextView`.
+   c. See `references/examples.md` for a complete macro example.
+6. Use `APP_NAME` and `APP_NAME_UNDERSCORED` imports from `@enonic/nextjs-adapter` to keep content type references dynamic.
 
 **Step 4: Configure Guillotine data fetching**
 1. Read `references/nextxp-reference.md` for the Guillotine query structure and variable passing.
@@ -79,7 +84,8 @@ metadata:
 2. Verify that standalone Next.js rendering works at `http://localhost:3000` with published content.
 3. Verify Content Studio preview renders correctly for both draft and published content.
 4. Test content type mappings by visiting content URLs and confirming custom views render.
-5. Run the workspace build (`npm run build`) to catch TypeScript or build errors.
+5. Use `validateData()` from `@enonic/nextjs-adapter` in the page handler to catch invalid content responses. See `references/nextxp-reference.md` for the SSG page handler pattern.
+6. Run the workspace build (`npm run build`) to catch TypeScript or build errors.
 
 ## Error Handling
 * If Content Studio preview shows a blank page, read `references/troubleshooting.md` for preview proxy diagnostics, token mismatch detection, and CORS issues.
