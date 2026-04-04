@@ -12,8 +12,10 @@ The repository follows the [agentskills.io](https://agentskills.io) style: lean 
 
 ## Contents
 
-- [Install Skills](#install-skills)
-- [Included Skills](#included-skills)
+- [Install](#install)
+  - [Install via Plugin Marketplace (recommended)](#install-via-plugin-marketplace-recommended)
+  - [Install Individual Skills](#install-individual-skills)
+- [Skills in This Repository](#skills-in-this-repository)
   - [Enonic API Reference Skill](#enonic-api-reference-skill)
   - [Enonic Content Migration Skill](#enonic-content-migration-skill)
   - [Enonic Content Type Generator Skill](#enonic-content-type-generator-skill)
@@ -25,41 +27,66 @@ The repository follows the [agentskills.io](https://agentskills.io) style: lean 
 - [Repository Conventions](#repository-conventions)
 - [Common Workflows](#common-workflows)
 
-## Install Skills
+## Install
 
-Primary installation path: use [Agent Package Manager (APM)](https://github.com/microsoft/apm), a package manager for agent instructions, prompts, skills, and related configuration.
+### Install via Plugin Marketplace (recommended)
 
-If the target repository does not already use APM, initialize it first:
+The easiest way to get all Enonic XP skills is through the [webmaxru/ai-native-dev](https://github.com/webmaxru/ai-native-dev) plugin marketplace. Add the marketplace, then install the **enonic-skills** plugin from it.
 
-```bash
-apm init
+#### GitHub Copilot CLI
+
+```
+> /plugin marketplace add webmaxru/ai-native-dev
+> /plugin install enonic-skills@webmaxru/ai-native-dev
 ```
 
-Then install any skill from this repository with the repository and skill placeholders replaced as needed:
+#### VS Code (GitHub Copilot)
 
-```bash
-apm install OWNER/REPO/skills/SKILL_NAME
+Run **Chat: Install Plugin From Source** from the Command Palette and enter:
+
+```
+https://github.com/webmaxru/ai-native-dev
 ```
 
-Secondary installation path: use the `skills` package from npm for direct per-skill installs.
+Or add to your `settings.json`:
 
-```bash
-npx skills add OWNER/REPO --skill SKILL_NAME
+```json
+"chat.plugins.marketplaces": [
+  "webmaxru/ai-native-dev"
+]
 ```
 
-For this repository, `OWNER/REPO` is `webmaxru/enonic-agent-skills`. The concrete install commands for each available skill are listed in the relevant skill sections below.
+Then open the Extensions sidebar, search `@agentPlugins enonic-skills`, and click **Install**.
 
-For example, the Enonic API Reference skill installs with:
+#### Claude Code
 
-```bash
-apm install webmaxru/enonic-agent-skills/skills/enonic-api-reference
+```
+> /plugin marketplace add webmaxru/ai-native-dev
+> /plugin install enonic-skills@webmaxru/ai-native-dev
 ```
 
+After installation, your coding agent has access to all Enonic XP skills — no per-skill setup required.
+
+### Install Individual Skills
+
+If you prefer to install specific skills rather than the full marketplace, use [Agent Package Manager (APM)](https://github.com/microsoft/apm) or the `skills` npm package.
+
+#### APM
+
 ```bash
-npx skills add webmaxru/enonic-agent-skills --skill enonic-api-reference
+apm init          # if the target repo does not already use APM
+apm install webmaxru/enonic-agent-skills/skills/SKILL_NAME
 ```
 
-## Included Skills
+#### npm
+
+```bash
+npx skills add webmaxru/enonic-agent-skills --skill SKILL_NAME
+```
+
+The concrete install commands for each available skill are listed in the relevant skill sections below.
+
+## Skills in This Repository
 
 ### Enonic API Reference Skill
 

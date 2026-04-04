@@ -323,7 +323,7 @@ Retrieves content using a query.
 | query | string/object | yes | | Query string or DSL expression |
 | filters | object | no | | Filters to apply |
 | sort | string/object | no | | Sorting expression or DSL |
-| aggregations | string | no | | Aggregations expression |
+| aggregations | object | no | | Aggregations expression |
 | contentTypes | string[] | no | | Content types to filter on |
 
 **Returns:** `object` — `{ total, count, hits[], aggregations }`.

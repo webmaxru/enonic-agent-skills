@@ -81,6 +81,9 @@ Always use `base:structured` unless the content type has a specific reason to in
 | `ComboBox` | String | Dropdown with predefined static options |
 | `RadioButton` | String | Radio buttons for single selection |
 | `CheckBox` | Boolean | Single true/false toggle |
+
+> **Note:** CheckBox is a single boolean toggle. Occurrences are typically left at the default (`0..1`) or omitted entirely.
+
 | `ContentSelector` | Reference (content ID) | Select existing content items |
 | `ContentTypeFilter` | String | Select a content type |
 | `CustomSelector` | String | Custom service-backed selector |
@@ -169,6 +172,20 @@ Always use `base:structured` unless the content type has a specific reason to in
   <config/>
 </input>
 ```
+
+### Tag Config Example
+
+```xml
+<input name="tags" type="Tag">
+  <label>Tags</label>
+  <occurrences minimum="0" maximum="0"/>
+  <config>
+    <allowPath>*</allowPath>
+  </config>
+</input>
+```
+
+`allowPath` restricts the tag scope. Use `*` to allow tags from any path.
 
 ## Item Sets
 

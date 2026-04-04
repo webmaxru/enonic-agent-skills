@@ -62,8 +62,10 @@ eventLib.listener({
 
 ```properties
 cdn.purge.url = https://api.cdn-provider.com/purge
-cdn.api.key = your-cdn-api-key
+cdn.api.key = REPLACE_WITH_CDN_API_KEY
 ```
+
+> **Security:** Replace placeholder tokens with real credentials out-of-band. Never commit actual secrets to source control.
 
 ---
 
@@ -172,12 +174,34 @@ An HTTP service that receives payloads from an external DAM and creates media co
 import contentLib from '/lib/xp/content';
 import contextLib from '/lib/xp/context';
 
+// IMPORTANT: dam.sync.apiKey MUST be set in app.config for production use.
 const EXPECTED_API_KEY = app.config['dam.sync.apiKey'] || '';
 
+function sanitizeString(value, maxLength) {
+  if (typeof value !== 'string') return '';
+  let s = value.trim().substring(0, maxLength);
+  if (s.includes('..') || s.includes('/') || s.includes('\\')) return '';
+  s = s.replace(/<[^>]*>/g, '');
+  return s;
+}
+
+function isValidUrl(value) {
+  if (typeof value !== 'string') return false;
+  return value.startsWith('https://');
+}
+
 export function post(req) {
+  if (!EXPECTED_API_KEY) {
+    log.error('dam.sync.apiKey is not configured — rejecting request');
+    return { status: 500, body: JSON.stringify({ error: 'Server misconfigured' }), contentType: 'application/json' };
+  }
   const apiKey = req.headers['X-Api-Key'] || req.headers['x-api-key'] || '';
   if (apiKey !== EXPECTED_API_KEY) {
     return { status: 401, body: JSON.stringify({ error: 'Unauthorized' }), contentType: 'application/json' };
+  }
+
+  if (req.body && req.body.length > 1048576) {
+    return { status: 413, body: JSON.stringify({ error: 'Payload too large' }), contentType: 'application/json' };
   }
 
   let payload;
@@ -187,18 +211,23 @@ export function post(req) {
     return { status: 400, body: JSON.stringify({ error: 'Invalid JSON' }), contentType: 'application/json' };
   }
 
-  if (!payload.assetId || !payload.assetUrl) {
-    return { status: 400, body: JSON.stringify({ error: 'Missing required fields' }), contentType: 'application/json' };
+  // Allowlist and sanitize fields from the external payload
+  const assetId = sanitizeString(payload.assetId, 128);
+  const assetUrl = payload.assetUrl;
+  const assetName = sanitizeString(payload.assetName, 256);
+
+  if (!assetId || !isValidUrl(assetUrl)) {
+    return { status: 400, body: JSON.stringify({ error: 'Missing or invalid required fields' }), contentType: 'application/json' };
   }
 
   try {
     contextLib.run({ branch: 'draft', user: { login: 'su', idProvider: 'system' } }, () => {
       contentLib.create({
-        name: payload.assetId,
+        name: assetId,
         parentPath: '/media/dam-imports',
-        displayName: payload.assetName || payload.assetId,
+        displayName: assetName || assetId,
         contentType: 'media:unknown',
-        data: { sourceUrl: payload.assetUrl, sourceId: payload.assetId }
+        data: { sourceUrl: assetUrl, sourceId: assetId }
       });
     });
   } catch (e) {

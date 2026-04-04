@@ -344,8 +344,8 @@ Sets root node permissions and inheritance.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| repoId | object | Repository ID |
-| branch | object | Branch ID |
+| repoId | string | Repository ID |
+| branch | string | Branch ID |
 | user | User | Optional user for connection |
 | principals | string[] | Additional principals |
 

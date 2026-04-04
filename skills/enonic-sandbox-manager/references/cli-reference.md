@@ -32,7 +32,7 @@ enonic sandbox create [name] [-v <version>] [-t <template>] [--skip-template] [-
 | `-t, --template` | Use specific template (e.g., "Headless Demo") |
 | `--skip-template` | Skip template selection (no apps pre-installed) |
 | `-v, --version` | Specific XP distro version (e.g., `7.14.0`) |
-| `-a, --all` | Include pre-release versions in version list |
+| `--all` | Include pre-release versions in version list |
 | `--prod` | Run XP in non-development (production) mode |
 | `--skip-start` | Do not start sandbox after creation |
 | `-f, --force` | Non-interactive mode, accept defaults |
@@ -110,7 +110,7 @@ enonic create [project-name] [-r <starter>] [-s <sandbox>] [--prod] [--skip-star
 |------|-------------|
 | `project-name` | Project name (also used as folder name) |
 | `-r, --repo` | Starter repository: `<enonic-repo>`, `<org>/<repo>`, or full URL |
-| `-s, --sandbox` | Existing sandbox name to link |
+| `-s, --sandbox, --sb` | Existing sandbox name to link |
 | `--prod` | Run XP in production mode |
 | `--skip-start` | Do not start sandbox after creation |
 | `-f, --force` | Non-interactive mode |
@@ -230,7 +230,9 @@ enonic dev
 eval $(enonic project env)
 ```
 
-Export `JAVA_HOME` and `XP_HOME` to the current shell. Not available on Windows.
+Export `JAVA_HOME` and `XP_HOME` to the current shell.
+
+> **Note:** This command is only available on Linux and macOS. It does not appear in `enonic project --help` on Windows.
 
 ## XP Instance Commands
 
