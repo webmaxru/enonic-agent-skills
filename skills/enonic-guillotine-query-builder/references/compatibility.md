@@ -2,12 +2,48 @@
 
 Version differences and migration notes between major Guillotine releases.
 
-## Guillotine 6.x (Current Stable)
+## Guillotine 7.x (Current Stable)
+
+Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript to Java.
+
+### Key Changes from 6.x
+
+- **Java-based engine**: Fully reimplemented from JavaScript to Java for improved performance and stability.
+- **Extensions API**: New `exports.extensions` pattern in `guillotine/guillotine.js` for extending the GraphQL schema with custom types, input types, enums, unions, interfaces, and custom resolvers. Replaces the older `creationCallbacks`-only approach.
+- **Absolute URLs by default**: All `media` and `content` URLs in `pageUrl`, `imageUrl`, `mediaUrl`, `attachmentUrl`, and `processedHtml` are now `absolute` (server) URLs generated in endpoint context.
+- **`params` type changed**: The `params` argument for `pageUrl`, `mediaUrl`, `imageUrl`, and `attachmentUrl` is now `Json` instead of `String`.
+- **Subscriptions removed**: GraphQL subscriptions are no longer supported.
+- **Site configuration removed**: `siteConfig` is no longer available from `dataAsJson`, `site`, or `portal_Site.dataAsJson` fields.
+
+### Breaking Changes in 7.0
+
+| Change | Impact | Migration |
+|---|---|---|
+| Subscriptions removed | No GraphQL subscription support | Implement a custom solution outside Guillotine |
+| `params` type changed to `Json` | URL field `params` arguments break if passed as `String` | Update `pageUrl`, `mediaUrl`, `imageUrl`, `attachmentUrl` calls to use `Json` type |
+| Site configuration removed | Cannot read `siteConfig` from content fields | Obtain site config through alternative means |
+| Absolute URLs by default | All generated URLs are absolute server-relative | Adjust client URL handling if previously relying on relative URLs |
+
+### Guillotine 7 Update 1
+
+- **`siteKey` argument**: New optional `siteKey` argument on the `guillotine` field, usable instead of the `X-Guillotine-SiteKey` header.
+- **NPM type definitions**: Guillotine types available on NPM as `@enonic-types/guillotine`. Install with `npm install @enonic/guillotine-types --save-dev`.
+- **`modifyUnknownFields` config**: New option to control handling of unknown fields (throw error, ignore, or log warning).
+
+### Guillotine 7 Update 2
+
+- **CORS support**: Built-in Cross-Origin Resource Sharing support with configurable allowed origins, methods, and headers. Enabled by default.
+
+### Guillotine 7 Update 3
+
+- **`maxQueryTokens` config**: Configurable maximum number of raw tokens the parser accepts per query. Defaults to `15000`.
+
+## Guillotine 6.x
 
 ### Key Changes from 5.x
 
 - **Project-level API**: Guillotine mounts at the project root (`/site/<project>/<branch>`). Site-level deployment is removed.
-- **Dynamic site context**: Set `X-Guillotine-SiteKey` header or use `siteKey` argument on the `guillotine` field for site-scoped queries.
+- **Dynamic site context**: Set `X-Guillotine-SiteKey` header for site-scoped queries.
 - **Global schema**: The GraphQL schema is generated from all installed apps across the instance, not per-site.
 - **Typed x-data**: eXtra Data schemas are fully typed and grouped by application key.
 - **Content Studio Playground**: Embedded GraphQL API browser available directly in Content Studio.
@@ -51,7 +87,7 @@ Version differences and migration notes between major Guillotine releases.
 }
 ```
 
-### After (6.x with queryDsl)
+### After (6.x+ with queryDsl)
 
 ```graphql
 {

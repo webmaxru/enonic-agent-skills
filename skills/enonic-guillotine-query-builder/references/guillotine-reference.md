@@ -3,6 +3,8 @@
 Condensed reference for composing Guillotine queries against Enonic XP.
 Source: https://developer.enonic.com/docs/guillotine/stable/api
 
+Guillotine 7.x is the current stable release (requires XP 7.14.0+).
+
 ## Entry Point
 
 Every query starts with the `guillotine` root field:
@@ -15,7 +17,7 @@ Every query starts with the `guillotine` root field:
 }
 ```
 
-Pass `siteKey` when working in a site context:
+Pass `siteKey` when working in a site context (Guillotine 7.1+):
 
 ```graphql
 {
@@ -23,7 +25,7 @@ Pass `siteKey` when working in a site context:
 }
 ```
 
-Or set the HTTP header `X-Guillotine-SiteKey: <IdOrPathToSite>`.
+Or set the HTTP header `X-Guillotine-SiteKey: <IdOrPathToSite>` (6.x+).
 
 ## HeadlessCms Fields (Query Operations)
 
@@ -61,20 +63,28 @@ All content types share these fields. Custom content types add a `data` field.
 | `_path(type: ContentPathType)` | `String!` | Full or site-relative path |
 | `displayName` | `String` | Display name |
 | `type` | `String` | Content type descriptor |
+| `creator` | `PrincipalKey` | Content creator |
+| `modifier` | `PrincipalKey` | Last content modifier |
+| `owner` | `PrincipalKey` | Content owner |
 | `createdTime` | `String` | ISO datetime |
 | `modifiedTime` | `String` | ISO datetime |
 | `language` | `String` | Language code |
 | `valid` | `Boolean` | Content validity |
 | `hasChildren` | `Boolean` | Has children |
 | `dataAsJson` | `JSON` | Raw data as JSON |
+| `xAsJson` | `JSON` | Extra data as JSON |
+| `pageAsJson` | `JSON` | Page specific information |
 | `parent` | `Content` | Parent content |
+| `site` | `portal_Site` | Link to nearest site |
 | `children(offset, first, sort)` | `[Content]` | Direct children |
 | `childrenConnection(after, first, sort)` | `ContentConnection` | Children as a connection |
 | `publish` | `PublishInfo` | from, to, first timestamps |
 | `attachments` | `[Attachment]` | File attachments |
 | `components` | `[Component]` | Page components (flattened) |
-| `pageUrl(type, params)` | `String` | Generated URL for this content |
+| `pageUrl(type, params: Json)` | `String` | Generated URL for this content. `params` is `Json` type in Guillotine 7+ |
+| `pageTemplate` | `Content` | Related page template content |
 | `x` | `[ExtraData]` | eXtra Data |
+| `permissions` | `Permissions` | Content permissions |
 
 ## Inline Fragments for Custom Types
 
@@ -167,8 +177,10 @@ Example:
 ### TermDSLExpressionInput
 
 ```graphql
-term: { field: "type", value: { string: "com.enonic.app.myapp:Post" } }
+term: { field: "type", value: { string: "com.enonic.app.myapp:Post" }, boost: 2.0 }
 ```
+
+Supports `boost` for relevance scoring.
 
 ### RangeDSLExpressionInput
 
@@ -180,10 +192,16 @@ range: {
 }
 ```
 
+Supports `boost` for relevance scoring.
+
 ### DSLExpressionValueInput
 
 Exactly one type field:
 `string`, `double`, `long`, `boolean`, `localDate`, `localDateTime`, `localTime`, `instant`
+
+### Other DSL Expression Inputs
+
+All DSL expression types (`like`, `in`, `exists`, `fulltext`, `ngram`, `stemmed`, `matchAll`, `pathMatch`) support the `boost` parameter for relevance scoring. `fulltext`, `ngram`, and `stemmed` accept `fields`, `query`, and `operator` (`OR` or `AND`). `stemmed` also requires `language`.
 
 ## SortDslInput
 
@@ -196,7 +214,7 @@ Exactly one type field:
 
 ## Aggregation Input Types
 
-Pass via `aggregations` on `queryDslConnection`. Each `AggregationInput` takes a `name` and exactly one aggregation type:
+Pass via `aggregations` on `queryDslConnection`. Each `AggregationInput` takes a `name`, exactly one aggregation type, and an optional `subAggregations` array for nested aggregations:
 
 | Type | Purpose |
 |---|---|
@@ -208,6 +226,8 @@ Pass via `aggregations` on `queryDslConnection`. Each `AggregationInput` takes a
 | `getDistance` | Geo-distance buckets |
 | `min` / `max` / `count` | Simple single-value aggregations |
 
+Each aggregation also accepts `subAggregations: [AggregationInput]` for nesting.
+
 Results are returned in `aggregationsAsJson`.
 
 ## Highlight Input Types
@@ -216,12 +236,18 @@ Pass via `highlight` on `queryDslConnection`:
 
 | Field | Default |
 |---|---|
-| `encoder` | `default` (no encoding) |
+| `encoder` | `default` (no encoding). Use `html` for HTML encoding |
+| `tagsSchema` | Unset. Set to `styled` for built-in tag schema |
+| `fragmenter` | `span`. Alternative: `simple` |
 | `fragmentSize` | `100` |
+| `noMatchSize` | `0` (nothing returned if no match) |
 | `numberOfFragments` | `5` |
+| `order` | `none`. Set to `score` to sort by relevance |
 | `preTag` / `postTag` | `<em>` / `</em>` |
 | `requireFieldMatch` | `true` |
 | `properties` | Array of `HighlightPropertiesInputType` with `propertyName` |
+
+Each `HighlightPropertiesInputType` accepts per-property overrides: `propertyName` (required), `fragmenter`, `fragmentSize`, `noMatchSize`, `numberOfFragments`, `order`, `preTag`, `postTag`, `requireFieldMatch`.
 
 Results are returned in `highlightAsJson`.
 
@@ -233,18 +259,25 @@ Returned for HtmlArea fields:
 |---|---|
 | `raw` | Unprocessed HTML |
 | `processedHtml` | Processed HTML with resolved links, images, macros |
+| `macrosAsJson` | Detected macros as JSON array (alternative to `macros` field) |
 | `macros` | Detected macros with ref, name, descriptor, config |
-| `images` | Detected images with ref, content, style |
-| `links` | Detected links with ref, uri, media, content |
+| `images` | Detected images with ref, content, style (name, aspectRatio, filter) |
+| `links` | Detected links with ref, uri, media (intent, content), content |
 
-Use `processHtml` input argument for image width srcset generation:
+The `links` field distinguishes between media and content links:
+- `media` — non-null for media links; includes `intent` (`download` or `inline`) and `content`
+- `content` — non-null for content links; null for media links
+
+Use `processHtml` input argument for image processing:
 
 ```graphql
-body(processHtml: { imageWidths: [600, 992], type: absolute }) {
+body(processHtml: { imageWidths: [600, 992], imageSizes: "(max-width: 600px) 100vw, 50vw", type: absolute }) {
   processedHtml
   images { ref }
 }
 ```
+
+`imageSizes` specifies image widths for specific browser resolutions in the format `(media-condition) width`, comma-separated.
 
 ## Key Enum Types
 
@@ -252,6 +285,10 @@ body(processHtml: { imageWidths: [600, 992], type: absolute }) {
 |---|---|
 | `UrlType` | `server`, `absolute` |
 | `ContentPathType` | `siteRelative` |
+| `MediaIntentType` | `download`, `inline` |
 | `DslOperatorType` | `OR`, `AND` |
 | `DslSortDirectionType` | `ASC`, `DESC` |
 | `ComponentType` | `page`, `layout`, `image`, `part`, `text`, `fragment` |
+| `HighlightEncoderType` | `default`, `html` |
+| `HighlightFragmenterType` | `simple`, `span` |
+| `HighlightOrderType` | `score`, `none` |

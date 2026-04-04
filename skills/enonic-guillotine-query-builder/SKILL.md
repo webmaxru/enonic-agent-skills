@@ -14,7 +14,7 @@ metadata:
 **Step 1: Scan the workspace for existing Guillotine usage**
 1. Execute `node scripts/find-guillotine-targets.mjs .` to inventory files containing Guillotine markers (query strings, library imports, endpoint references).
 2. If a Node runtime is unavailable, search the workspace manually for `guillotine`, `queryDsl`, `queryDslConnection`, or `/lib/guillotine` in `.ts`, `.js`, `.graphql`, and `.gql` files.
-3. Note the Guillotine version in use: if `query(query: "...")` string-based fields are found, the project uses the deprecated 5.x-style API; if `queryDsl` / `queryDslConnection` are found, the project uses 6.x+ DSL.
+3. Note the Guillotine version in use: if `query(query: "...")` string-based fields are found, the project uses the deprecated 5.x-style API; if `queryDsl` / `queryDslConnection` are found, the project uses 6.x+ DSL. Check for `exports.extensions` in `guillotine/guillotine.js` to detect Guillotine 7 Extensions API usage.
 4. If both styles coexist, flag the deprecated usage for migration.
 
 **Step 2: Load the Guillotine API reference**
@@ -34,7 +34,7 @@ metadata:
 1. Derive the GraphQL type name from the content type descriptor by replacing dots (`.`) and colons (`:`) with underscores (`_`), and removing hyphens (`-`) while capitalizing the following letter. The first letter of each segment after a colon is capitalized. Example: `com.enonic.app.myapp:BlogPost` → `com_enonic_app_myapp_BlogPost`. For built-in types: `portal:template-folder` → `portal_TemplateFolder`.
 2. Use an inline fragment to access the type-specific `data` field: `... on <GraphQLTypeName> { data { ... } }`.
 3. For content references (ContentSelector, ImageSelector, MediaSelector), follow the reference with a nested inline fragment on the target type.
-4. For RichText / HtmlArea fields, include `processedHtml` and optionally `links`, `images`, `macros` sub-fields. Use the `processHtml` input argument for absolute URLs or srcset widths.
+4. For RichText / HtmlArea fields, include `processedHtml` and optionally `links`, `images`, `macros` sub-fields. Use the `processHtml` input argument for absolute URLs, srcset widths (`imageWidths`), or responsive sizes (`imageSizes`).
 
 **Step 5: Build query filters and sorting**
 1. Use Query DSL input types. Each `QueryDSLInput` must contain exactly one expression field.
@@ -66,7 +66,8 @@ metadata:
 3. Ensure `QueryDSLInput` objects contain exactly one expression field.
 4. Verify `DSLExpressionValueInput` objects contain exactly one value type field.
 5. Check that aggregation and highlight are only used on connection variants.
-6. Read `references/troubleshooting.md` if the query returns unexpected nulls, empty results, or type errors.
+6. For Guillotine 7+ projects, verify `pageUrl` / `mediaUrl` / `imageUrl` / `attachmentUrl` use `Json` type for `params` argument, not `String`.
+7. Read `references/troubleshooting.md` if the query returns unexpected nulls, empty results, or type errors.
 
 ## Error Handling
 * If `get` returns null, verify the key is a valid content path or ID and that the correct branch (draft vs master) is targeted.
