@@ -149,7 +149,11 @@ Generates URL to a content page.
 
 Resolves internal links to images and content items in HTML text, replacing them with correct URLs. Also processes embedded macros.
 
-**Parameters:** `{ value: string, imageWidths?: number[] }` — Input parameters.
+**Parameters:** `{ value: string, imageWidths?: number[], imageSizes?: string }` — Input parameters.
+
+- `imageWidths` *(XP 7.7.0+)*: Comma-separated list of image widths. Adds `srcset` attribute to `<img>` tags.
+- `imageSizes` *(XP 7.8.0+)*: Specifies image width depending on browser dimensions. Format: `(media-condition) width`, comma-separated for multiple sizes.
+
 **Returns:** `string` — Processed HTML.
 
 ### sanitizeHtml
