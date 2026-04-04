@@ -217,33 +217,172 @@ ComponentRegistry.addPage(`${APP_NAME}:main`, {
 });
 ```
 
-## Example 4: Layout with Header and Footer
+## Example 4: Layout with Two Columns
 
-### Root Layout Setup (src/app/[locale]/layout.tsx)
+### Enonic Layout Definition (src/main/resources/site/layouts/2-column/2-column.xml)
 
-```typescript
-import {RENDER_MODE, XP_REQUEST_TYPE, I18n} from '@enonic/nextjs-adapter';
-import Header from '../../components/views/Header';
-import Footer from '../../components/views/Footer';
-import {getAsset} from '@enonic/nextjs-adapter';
-
-// Inside the layout return:
-return (
-    <LocaleContextProvider locale={params.locale}>
-        <StaticContent condition={isEdit}>
-            <Header
-                meta={meta}
-                title={I18n.localize('title')}
-                logoUrl={getAsset('/images/xp-shield.svg', meta)}
-            />
-            <main>{children}</main>
-            <Footer/>
-        </StaticContent>
-    </LocaleContextProvider>
-);
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<layout xmlns="urn:enonic:xp:model:1.0">
+    <display-name>2 columns</display-name>
+    <description>Provides left and right regions</description>
+    <form/>
+    <regions>
+        <region name="left"/>
+        <region name="right"/>
+    </regions>
+</layout>
 ```
 
-## Example 5: Simple Part without Query (Config-only)
+### Next.js Layout Component (src/components/layouts/TwoColumnLayout.tsx)
+
+```typescript
+import type {LayoutProps} from '@enonic/nextjs-adapter';
+import React from 'react';
+import {RegionView} from '@enonic/nextjs-adapter/views/Region';
+
+const TwoColumnLayout = (props: LayoutProps) => {
+    const regions = props.layout.regions;
+    const {common, meta} = props;
+
+    return (
+        <div style={{display: 'flex', gap: '10px', flexWrap: 'wrap'}}>
+            <RegionView name="left" components={regions['left']?.components} common={common} meta={meta}/>
+            <RegionView name="right" components={regions['right']?.components} common={common} meta={meta}/>
+        </div>
+    );
+};
+
+export default TwoColumnLayout;
+```
+
+### Registration
+
+```typescript
+import TwoColumnLayout from './layouts/TwoColumnLayout';
+
+ComponentRegistry.addLayout(`${APP_NAME}:2-column`, {
+    view: TwoColumnLayout
+});
+```
+
+## Example 5: Rich Text with RichTextView
+
+### Query with richTextQuery Helper (src/components/queries/getPersonWithBio.ts)
+
+```typescript
+import {APP_NAME_UNDERSCORED, richTextQuery} from '@enonic/nextjs-adapter';
+
+const getPersonWithBio = () => `
+query($path:ID!){
+  guillotine {
+    get(key:$path) {
+      displayName
+      ... on ${APP_NAME_UNDERSCORED}_Person {
+        data {
+          ${richTextQuery('bio')}
+          dateofbirth
+          photos {
+            ... on media_Image {
+              imageUrl: imageUrl(type: absolute, scale: "width(500)")
+              attachments {
+                name
+              }
+            }
+          }
+        }
+      }
+      parent {
+        _path(type: siteRelative)
+      }
+    }
+  }
+}`;
+
+export default getPersonWithBio;
+```
+
+### View with RichTextView (src/components/views/PersonWithBio.tsx)
+
+```typescript
+import React from 'react';
+import {FetchContentResult, getUrl, I18n} from '@enonic/nextjs-adapter';
+import Link from 'next/link';
+import RichTextView from '@enonic/nextjs-adapter/views/RichTextView';
+
+const PersonWithBio = (props: FetchContentResult) => {
+    const {displayName, data, parent} = props.data?.get as any;
+    const {bio, photos} = data;
+    const meta = props.meta;
+
+    return (
+        <>
+            <h2>{displayName}</h2>
+            <RichTextView data={bio} meta={meta}/>
+            <div>
+                {photos.map((photo: any, i: number) => (
+                    <img key={i}
+                         src={getUrl(photo.imageUrl, meta)}
+                         alt={displayName}
+                         width="500"
+                    />
+                ))}
+            </div>
+            <p><Link href={getUrl(`/${parent._path}`, meta)}>{I18n.localize('back')}</Link></p>
+        </>
+    );
+};
+
+export default PersonWithBio;
+```
+
+### Registration
+
+```typescript
+import getPersonWithBio from './queries/getPersonWithBio';
+import PersonWithBio from './views/PersonWithBio';
+
+ComponentRegistry.addContentType(`${APP_NAME}:person`, {
+    query: getPersonWithBio,
+    view: PersonWithBio
+});
+```
+
+## Example 6: Macro Component
+
+### Macro Component (src/components/macros/FactBox.tsx)
+
+```typescript
+import type {MacroProps} from '@enonic/nextjs-adapter';
+import React from 'react';
+
+const FactBox = ({name, children, config, meta}: MacroProps) => {
+    const header = config.header?.length ? config.header : 'Fact Box';
+    return (
+        <ins>
+            <strong>{header}</strong>
+            {children}
+        </ins>
+    );
+};
+
+export default FactBox;
+```
+
+### Registration
+
+Macros must be registered before any component that uses `RichTextView`:
+
+```typescript
+import FactBox from './macros/FactBox';
+
+ComponentRegistry.addMacro(`${APP_NAME}:factbox`, {
+    view: FactBox,
+    configQuery: '{ header }'
+});
+```
+
+## Example 7: Simple Part without Query (Config-only)
 
 ### Heading Part (src/components/parts/Heading.tsx)
 
@@ -275,7 +414,7 @@ ComponentRegistry.addPart(`${APP_NAME}:heading`, {
 });
 ```
 
-## Example 6: Nested Type Introspection Query
+## Example 8: Nested Type Introspection Query
 
 Fetching a movie with nested person references and image URLs:
 
@@ -317,4 +456,172 @@ query($path:ID!){
     }
   }
 }
+```
+
+## Example 7: Rich Text Content Type with RichTextView
+
+### Rich Text Query (src/components/queries/getPersonWithBio.ts)
+
+Uses `richTextQuery()` to generate the GraphQL fragment for an HTML area field:
+
+```typescript
+import {APP_NAME_UNDERSCORED, richTextQuery} from '@enonic/nextjs-adapter';
+
+const getPersonWithBio = () => `
+query($path:ID!){
+  guillotine {
+    get(key:$path) {
+      displayName
+      ... on ${APP_NAME_UNDERSCORED}_Person {
+        data {
+          ${richTextQuery('bio')}
+          dateofbirth
+          photos {
+            ... on media_Image {
+              imageUrl: imageUrl(type: absolute, scale: "width(500)")
+              attachments {
+                name
+              }
+            }
+          }
+        }
+      }
+      parent {
+        _path(type: siteRelative)
+      }
+    }
+  }
+}`;
+
+export default getPersonWithBio;
+```
+
+### React View with RichTextView (src/components/views/PersonWithBio.tsx)
+
+```typescript
+import React from 'react';
+import {FetchContentResult, getUrl, I18n} from '@enonic/nextjs-adapter';
+import Link from 'next/link';
+import RichTextView from '@enonic/nextjs-adapter/views/RichTextView';
+
+const PersonWithBio = (props: FetchContentResult) => {
+    const {displayName, data, parent} = props.data?.get as any;
+    const {bio, photos} = data;
+    const meta = props.meta;
+
+    return (
+        <>
+            <div>
+                <h2>{displayName}</h2>
+                <RichTextView data={bio} meta={meta}/>
+                {photos.map((photo: any, i: number) => (
+                    <img key={i}
+                         src={getUrl(photo.imageUrl, meta)}
+                         title={getTitle(photo, displayName)}
+                         alt={getTitle(photo, displayName)}
+                         width="500"
+                    />
+                ))}
+            </div>
+            <p>
+                <Link href={getUrl(`/${parent._path}`, meta)}>
+                    {I18n.localize('back')}
+                </Link>
+            </p>
+        </>
+    );
+};
+
+export default PersonWithBio;
+
+function getTitle(photo: any, displayName: string) {
+    return (photo.attachments || [])[0]?.name || displayName;
+}
+```
+
+### Registration
+
+```typescript
+import getPersonWithBio from './queries/getPersonWithBio';
+import PersonWithBio from './views/PersonWithBio';
+
+ComponentRegistry.addContentType(`${APP_NAME}:person`, {
+    query: getPersonWithBio,
+    view: PersonWithBio
+});
+```
+
+## Example 8: Macro Component (FactBox)
+
+### Macro Component (src/components/macros/FactBox.tsx)
+
+```typescript
+import type {MacroProps} from '@enonic/nextjs-adapter';
+import React from 'react';
+
+const FactBox = ({name, children, config, meta}: MacroProps) => {
+    const header = config.header?.length ? config.header : 'Fact Box';
+    return (
+        <ins style={{
+            backgroundColor: 'rgb(235, 249, 249)',
+            display: 'block',
+            textDecoration: 'none',
+            borderRadius: '2px',
+            padding: '10px 20px',
+            margin: '20px auto',
+            width: '75%'
+        }}>
+            <strong>{header}</strong>
+            {children}
+        </ins>
+    );
+};
+
+export default FactBox;
+```
+
+### Registration (must be before components using RichTextView)
+
+```typescript
+import FactBox from './macros/FactBox';
+
+// Register macros first in _mappings.ts
+ComponentRegistry.addMacro(`${APP_NAME}:factbox`, {
+    view: FactBox,
+    configQuery: '{ header }'
+});
+```
+
+## Example 9: Layout with RegionView for Individual Regions
+
+### Layout Component (src/components/layouts/TwoColumnLayout.tsx)
+
+```typescript
+import type {LayoutProps} from '@enonic/nextjs-adapter';
+import React from 'react';
+import {RegionView} from '@enonic/nextjs-adapter/views/Region';
+
+const TwoColumnLayout = (props: LayoutProps) => {
+    const regions = props.layout.regions;
+    const {common, meta} = props;
+
+    return (
+        <div style={{display: 'flex', gap: '10px', flexWrap: 'wrap'}}>
+            <RegionView name="left" components={regions['left']?.components} common={common} meta={meta}/>
+            <RegionView name="right" components={regions['right']?.components} common={common} meta={meta}/>
+        </div>
+    );
+};
+
+export default TwoColumnLayout;
+```
+
+### Registration
+
+```typescript
+import TwoColumnLayout from './layouts/TwoColumnLayout';
+
+ComponentRegistry.addLayout(`${APP_NAME}:2-column`, {
+    view: TwoColumnLayout
+});
 ```

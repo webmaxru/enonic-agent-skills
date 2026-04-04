@@ -5,6 +5,10 @@
  * The main controller runs once when the application starts,
  * ensuring the listener is registered for the application's lifetime.
  *
+ * Note: This template uses TypeScript/ESM syntax. For .js targets, convert
+ * `import X from 'Y'` to `var X = require('Y')` and `export function` to
+ * `exports.xxx = function`.
+ *
  * Customize:
  *   - EVENT_TYPE: the event pattern to listen for
  *   - PATH_PREFIX: content path prefix to filter on

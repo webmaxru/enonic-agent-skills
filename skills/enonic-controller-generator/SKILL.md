@@ -1,6 +1,10 @@
 ---
 name: enonic-controller-generator
 description: Generates Enonic XP controller files (TypeScript/JavaScript) and paired XML descriptors for pages, parts, and layouts. Covers lib-portal imports, HTTP handler exports, region definitions, Thymeleaf/Mustache rendering, and response processors. Use when scaffolding page controllers with regions, part controllers with config access, layout controllers with multi-region support, or response processors for Enonic XP sites. Do not use for content type schemas, headless Next.js/React frontends, GraphQL Guillotine queries, or non-Enonic web frameworks.
+license: MIT
+metadata:
+  author: webmaxru
+  version: "1.1"
 ---
 
 # Enonic XP Controller Generator
@@ -69,6 +73,7 @@ description: Generates Enonic XP controller files (TypeScript/JavaScript) and pa
    - `com.enonic.xp:lib-content:${xpVersion}` — if the controller uses content queries.
    - `com.enonic.lib:lib-thymeleaf:2.0.0` — if using Thymeleaf rendering.
    - `com.enonic.lib:lib-mustache:2.1.0` — if using Mustache rendering.
+   - `com.enonic.lib:lib-asset:${libVersion}` — if the controller generates asset URLs (replaces the deprecated `portalLib.assetUrl` in XP 7.15+).
 
 **Step 9: Validate Output**
 1. Verify the descriptor file name matches the parent directory name exactly.

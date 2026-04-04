@@ -227,7 +227,7 @@ Get a count of blog posts per category:
       ]
     ) {
       totalCount
-      aggregationAsJson
+      aggregationsAsJson
     }
   }
 }

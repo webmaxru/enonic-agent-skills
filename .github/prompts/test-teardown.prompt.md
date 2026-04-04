@@ -1,7 +1,7 @@
 ---
 name: "Test Teardown"
-description: "Clean up the Enonic XP test environment. Stops sandbox, optionally deletes projects and logs. Use when you want to free resources or start fresh."
-argument-hint: "Optional: 'full' to remove all .test-infra contents, 'sandbox-only' to just stop/delete the sandbox"
+description: "Clean up the Docker-based Enonic XP test environment. Stops and removes containers, optionally deletes projects and logs."
+argument-hint: "Optional: 'full' to remove all .test-infra contents, 'docker-only' to just stop/remove the container"
 agent: "agent"
 ---
 
@@ -11,41 +11,50 @@ Since `.test-infra/` is gitignored, cleanup is optional — leaving it in place 
 
 ## Steps
 
-### 1. Stop Running Sandbox
+### 1. Stop and Remove Docker Container
 
 ```bash
-enonic sandbox stop
+docker stop enonic-xp-test
+docker rm enonic-xp-test
 ```
 
-### 2. Delete Sandbox
+### 2. (Optional) Remove Docker Image
+
+To free ~1.5 GB of disk space:
 
 ```bash
-enonic sandbox delete skill-test-sandbox -f
+docker rmi enonic/xp:7.16.2-ubuntu
 ```
 
-### 3. (Optional) Remove Test Projects
-
-If you want to clean up disk space:
+### 3. (Optional) Remove Gradle Image
 
 ```bash
-# Remove all scaffolded projects
-rm -rf .test-infra/projects/*
+docker rmi gradle:8.5-jdk17
 ```
 
-### 4. (Optional) Remove Test Output
+### 4. (Optional) Remove Test Projects
 
 ```bash
-# Remove test logs
-rm -rf .test-infra/output/*
+# Remove all scaffolded projects (PowerShell)
+Remove-Item -Recurse -Force .test-infra/projects/*
+
+# Or on bash:
+# rm -rf .test-infra/projects/*
 ```
 
-### 5. (Optional) Full Cleanup
+### 5. (Optional) Remove Test Output
+
+```bash
+Remove-Item -Recurse -Force .test-infra/output/*
+```
+
+### 6. (Optional) Full Cleanup
 
 To remove all test infrastructure (you'll need to run `test-setup` again):
 
 ```bash
-rm -rf .test-infra/projects/*
-rm -rf .test-infra/output/*
+Remove-Item -Recurse -Force .test-infra/projects/*
+Remove-Item -Recurse -Force .test-infra/output/*
 # Keep .test-infra/changes/ and .test-infra/findings.md for reference
 ```
 
@@ -59,4 +68,7 @@ Before full cleanup, consider:
 
 - The `.test-infra/` directory itself is gitignored and won't appear in Git
 - `TESTING.md` and the saved prompts in `.github/prompts/` remain in the repo
-- If any secondary sandboxes were created during testing (e.g., `test-secondary`), delete those too: `enonic sandbox delete <name> -f`
+- If any additional Docker containers were created during testing, remove those too:
+  ```bash
+  docker ps -a --filter "ancestor=enonic/xp:7.16.2-ubuntu" --format "{{.ID}}" | ForEach-Object { docker rm -f $_ }
+  ```

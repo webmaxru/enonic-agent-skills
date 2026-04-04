@@ -4,15 +4,8 @@ description: APM project for enonic-agent-skills
 author: Maxim Salnikov
 dependencies:
   apm:
-  - webmaxru/enonic-agent-skills/skills/enonic-api-reference
-  - webmaxru/enonic-agent-skills/skills/enonic-content-migration
-  - webmaxru/enonic-agent-skills/skills/enonic-content-type-generator
-  - webmaxru/enonic-agent-skills/skills/enonic-guillotine-query-builder
-  - webmaxru/enonic-agent-skills/skills/enonic-nextxp-integration
-  - webmaxru/enonic-agent-skills/skills/enonic-sandbox-manager
-  - webmaxru/enonic-agent-skills/skills/enonic-webhook-integrator
-  - webmaxru/enonic-agent-skills/skills/enonic-controller-generator
-  - webmaxru/agent-skills/skills/agent-package-manager
-  - webmaxru/agent-skills/skills/github-agentic-workflows
+  - webmaxru/ai-native-dev/skills/agent-package-manager
+  - webmaxru/ai-native-dev/skills/github-agentic-workflows
+  - webmaxru/ai-native-dev/skills/agent-skill-deploy
   mcp: []
 scripts: {}

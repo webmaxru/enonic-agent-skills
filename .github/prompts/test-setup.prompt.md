@@ -1,7 +1,7 @@
 ---
 name: "Test Setup"
-description: "Set up the Enonic XP test environment for skill testing. Creates sandbox, scaffolds test project, installs Guillotine, and creates sample content. Run this before test-run."
-argument-hint: "Optional: XP version (e.g., 7.16.2) or 'docker' for Docker-based setup"
+description: "Set up the Docker-based Enonic XP test environment for skill testing. Creates container, scaffolds test project, installs Guillotine, and creates sample content."
+argument-hint: "Optional: XP version (default 7.16.2)"
 agent: "agent"
 ---
 
@@ -9,9 +9,11 @@ Set up the Enonic XP test environment for testing the agent skills in this repos
 
 ## Prerequisites Check
 
-1. Verify Node.js and npm are available: `node --version && npm --version`
-2. Verify Java 17+ is available: `java --version`
+1. Verify Node.js 22+ and npm are available: `node --version && npm --version`
+2. Verify Docker is available: `docker --version`
 3. Verify port 8080 is available
+
+> **No local Java required.** All builds use Docker-based Gradle containers.
 
 ## Steps
 
@@ -19,77 +21,98 @@ Set up the Enonic XP test environment for testing the agent skills in this repos
 
 ```bash
 npm install -g @enonic/cli
-enonic --version
+enonic --version   # expect 3.4.0+
 ```
-
-Record the CLI version in `.test-infra/findings.md` under Environment.
 
 ### 2. Create Directory Structure
 
-Ensure `.test-infra/projects/`, `.test-infra/output/`, and `.test-infra/changes/` directories exist.
-
-### 3. Create and Start Sandbox
-
 ```bash
-enonic sandbox create skill-test-sandbox --skip-template -f
-enonic sandbox start skill-test-sandbox -d
+mkdir -p .test-infra/projects .test-infra/output .test-infra/changes
 ```
 
-Wait for XP to be accessible at http://localhost:8080. Record the XP version in `.test-infra/findings.md`.
+### 3. Start Enonic XP via Docker
 
-### 4. Scaffold Test Project
+```bash
+docker run -d --name enonic-xp-test -p 8080:8080 enonic/xp:7.16.2-ubuntu
+```
+
+Wait ~30 seconds for XP to start. Verify at http://localhost:8080.
+
+### 4. Create Admin User
+
+POST to `http://localhost:8080/admin/tool/_/idprovider/system`:
+
+```json
+{"action":"createAdminUser","user":"admin","email":"admin@test.local","password":"Admin12345!"}
+```
+
+### 5. Authenticate
+
+POST to the same URL:
+
+```json
+{"action":"login","user":"admin","password":"Admin12345!"}
+```
+
+Save the `JSESSIONID` cookie from the response for authenticated requests.
+
+### 6. Scaffold Test Project
 
 ```bash
 cd .test-infra/projects
-enonic create skill-test-app -r starter-vanilla -s skill-test-sandbox -f
+enonic create myproject -r starter-vanilla --skip-start -f
 ```
 
-### 5. Build and Deploy
+### 7. Build Without Local Java
 
 ```bash
-cd .test-infra/projects/skill-test-app
-enonic project deploy -f
+docker run --rm -v "<absolute-path-to-myproject>:/project" -w /project gradle:8.5-jdk17 gradle build --no-daemon
 ```
 
-Verify the app appears in XP admin at http://localhost:8080/admin.
-
-### 6. Install Guillotine
-
-Install Guillotine from Enonic Market. Use the version compatible with the installed XP version:
+**Windows note:** If Docker volume mount prevents `.gradle` creation, copy project into the container, build, and copy JAR back:
 
 ```bash
-enonic app install --url https://repo.enonic.com/public/com/enonic/app/guillotine/<VERSION>/guillotine-<VERSION>.jar
+docker cp .test-infra/projects/myproject enonic-xp-test:/build-project
+docker exec enonic-xp-test bash -c "cd /build-project && ./gradlew build --no-daemon"
+docker cp enonic-xp-test:/build-project/build/libs/myproject.jar .test-infra/projects/myproject/build/libs/
 ```
 
-Verify GraphQL endpoint at http://localhost:8080/site/default/draft.
-
-### 7. Create Sample Content
-
-In Content Studio (http://localhost:8080/admin/tool/com.enonic.app.contentstudio/main):
-
-1. Create a site named "test-site" with the test app assigned
-2. Create content items:
-   - 2-3 folders
-   - 3-5 structured content items with different field values
-   - At least 1 item with a date field for range query testing
-3. Publish 3-4 items to `master` branch
-4. Leave 2-3 items in `draft` only
-
-### 8. Verify Environment Health
-
-- [ ] XP admin accessible at http://localhost:8080/admin
-- [ ] Content Studio loads and shows the test site
-- [ ] Guillotine endpoint responds at http://localhost:8080/site/default/draft
-- [ ] Test app is deployed and running
-
-Record all version numbers in `.test-infra/findings.md`.
-
-## Docker Fallback
-
-If the sandbox approach fails, use Docker instead:
+### 8. Deploy to XP
 
 ```bash
-docker run -it --rm -p 8080:8080 enonic/xp:7.16.2-ubuntu
+docker cp .test-infra/projects/myproject/build/libs/myproject.jar enonic-xp-test:/enonic-xp/home/deploy/
 ```
 
-Then adapt the subsequent steps to work with the Docker instance.
+Verify in XP logs: `docker logs enonic-xp-test --tail 20`
+
+### 9. Install Guillotine
+
+```bash
+curl -o .test-infra/guillotine.jar "https://repo.enonic.com/public/com/enonic/app/guillotine/7.0.2/guillotine-7.0.2.jar"
+docker cp .test-infra/guillotine.jar enonic-xp-test:/enonic-xp/home/deploy/
+```
+
+### 10. Create Sample Content
+
+Using authenticated API calls to XP:
+1. Create a site named "test-site" with the test app and Guillotine assigned
+2. Create an "articles" folder under the site
+3. Create 5 articles under `test-site/articles/`
+4. Publish all items to `master` branch
+
+### 11. Verify Guillotine Endpoint
+
+The Guillotine GraphQL endpoint:
+
+```
+POST http://localhost:8080/admin/site/preview/default/draft
+Cookie: JSESSIONID=<session-cookie>
+Content-Type: application/json
+
+{"query": "{ guillotine { queryDsl(query: {matchAll: {}}, first: 5) { displayName _path } } }"}
+```
+
+### 12. Record Environment
+
+Update `.test-infra/findings.md` Environment section with:
+- Enonic XP version, Guillotine version, CLI version, Node.js version, date

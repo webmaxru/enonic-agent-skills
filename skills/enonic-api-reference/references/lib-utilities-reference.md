@@ -133,6 +133,8 @@ Sends an email message.
 | mimeType | string | no | Content type (inferred from filename if omitted) |
 | headers | object | no | Attachment-specific headers |
 
+The `from` parameter supports default email substitution. If the email address is not specified in angle brackets (e.g., `Some Name <>` or `<>`), the default *from* email address is used. An error is thrown if the default *from* email is not set.
+
 **Returns:** `boolean` — `true` if sent successfully.
 
 ### getDefaultFromEmail
@@ -266,6 +268,10 @@ Fetches a specific schema by name and type.
 
 Lists schemas of a given type for a specified application.
 
+### updateSchema
+
+Updates a dynamic schema in a virtual application.
+
 ### deleteSchema
 
 Deletes a dynamic schema.
@@ -282,6 +288,10 @@ Fetches a specific component by key and type.
 
 Lists components of a given type for a specified application.
 
+### updateComponent
+
+Updates a dynamic component in a virtual application.
+
 ### deleteComponent
 
 Deletes a dynamic component.
@@ -293,6 +303,10 @@ Creates dynamic styles for an application.
 ### getStyles
 
 Gets dynamic styles for an application.
+
+### updateStyles
+
+Updates dynamic styles in a virtual application.
 
 ### deleteStyles
 

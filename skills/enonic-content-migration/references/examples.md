@@ -415,7 +415,8 @@ contextLib.run({
   repo.push({
     keys: result.hits.map(h => h.id),
     target: 'master',
-    resolve: false
+    resolve: false,
+    includeChildren: false  // Set true to also push child nodes
   });
 
   repo.refresh();
