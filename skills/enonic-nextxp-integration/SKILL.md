@@ -4,7 +4,7 @@ description: Guides setup, development, and troubleshooting of the Next.js and E
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.1"
+  version: "1.2"
 ---
 
 # Next.js + Enonic XP Headless Integration (Next.XP)

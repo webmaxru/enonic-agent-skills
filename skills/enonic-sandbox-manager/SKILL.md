@@ -4,7 +4,7 @@ description: Guides developers through Enonic CLI commands for sandbox managemen
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.1"
+  version: "1.2"
 ---
 
 # Enonic CLI & Local Dev Environment Helper
