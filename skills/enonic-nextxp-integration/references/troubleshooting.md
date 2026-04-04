@@ -10,7 +10,7 @@ Common issues and diagnostic steps for the Next.js + Enonic XP integration (Next
 3. Check that `ENONIC_API_TOKEN` in `.env` matches the secret configured in the Next.XP app (default: `mySecretKey`).
 4. Open the browser developer tools in Content Studio and check for CORS errors or network request failures.
 5. Check the Next.js server console for errors during the preview request.
-6. Verify the `/api/preview/route.tsx` API route exists in the Next.js project.
+6. Verify the `/api/preview/route.ts` API route exists in the Next.js project.
 
 ### Preview works but links are broken
 1. Ensure all component links use `getUrl(path, meta)` from `@enonic/nextjs-adapter` instead of hardcoded paths.
@@ -61,10 +61,22 @@ Common issues and diagnostic steps for the Next.js + Enonic XP integration (Next
 
 ## Build and Runtime Issues
 
+### Rich text renders as plain text or missing components
+1. Verify the query uses `richTextQuery(fieldName)` from `@enonic/nextjs-adapter` instead of fetching the field directly.
+2. Confirm the query is a function (not a static string) so that macros are registered before query execution.
+3. Pass the rich text data to `RichTextView` component from `@enonic/nextjs-adapter/views/RichTextView`.
+4. Verify that macros are registered in `_mappings.ts` before any component that uses `RichTextView`.
+
+### Macros not rendering in rich text
+1. Confirm the macro is registered with `ComponentRegistry.addMacro()` using the fully qualified name: `${APP_NAME}:<macro-name>`.
+2. Macro registrations must appear before other component registrations that use `RichTextView` in `_mappings.ts`.
+3. Use `configQuery` to fetch macro form values if the macro component needs configuration.
+
 ### @enonic/nextjs-adapter import errors
 1. Run `npm install` to ensure the package is installed.
-2. Check `package.json` for `@enonic/nextjs-adapter` in dependencies.
-3. Verify the import path: some exports require subpath imports (e.g., `@enonic/nextjs-adapter/views/Region`).
+2. Check `package.json` for `@enonic/nextjs-adapter` in dependencies (v4.x requires React 19 and Next.js 16).
+3. Verify the import path: some exports require subpath imports (e.g., `@enonic/nextjs-adapter/views/Region`, `@enonic/nextjs-adapter/server`, `@enonic/nextjs-adapter/client`).
+4. Server-side functions like `fetchContent` must be imported from `@enonic/nextjs-adapter/server`, not the main entry point.
 
 ### TypeScript errors in component files
 1. Ensure `FetchContentResult`, `PageProps`, and `PartProps` types are imported from `@enonic/nextjs-adapter`.
