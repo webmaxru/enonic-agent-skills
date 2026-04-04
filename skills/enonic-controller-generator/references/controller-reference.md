@@ -31,15 +31,21 @@ Controllers export named functions matching HTTP methods:
 // TypeScript style
 export function get(req: Request): Response { ... }
 export function post(req: Request): Response { ... }
+export function delete(req: Request): Response { ... }
+export function patch(req: Request): Response { ... }  // XP 7.15+
 ```
 
 ```js
 // JavaScript (CommonJS) style
 exports.get = function (req) { ... };
 exports.post = function (req) { ... };
+exports.delete = function (req) { ... };
+exports.patch = function (req) { ... };  // XP 7.15+
 ```
 
 A special `all` export handles any HTTP method not explicitly declared.
+
+Supported methods: `get`, `post`, `put`, `delete`, `head`, `options`, and `patch` (XP 7.15+).
 
 The handler receives an HTTP Request object and must return an HTTP Response object:
 
@@ -52,6 +58,40 @@ export function get(req) {
   };
 }
 ```
+
+### Request Object Properties
+
+| Property | Type | Description |
+|---|---|---|
+| `method` | string | HTTP method (GET, POST, etc.) |
+| `scheme` | string | `http` or `https` |
+| `host` | string | Server host name |
+| `port` | string | Server port |
+| `path` | string | Request path |
+| `url` | string | Full request URL |
+| `remoteAddress` | string | Client IP (respects `X-Forwarded-For`) |
+| `mode` | string | Rendering mode: `inline`, `edit`, `preview`, `live` |
+| `branch` | string | Repository branch: `draft` or `master` |
+| `body` | string | Optional request body |
+| `params` | object | Query/form parameters |
+| `headers` | object | HTTP request headers |
+| `cookies` | object | HTTP request cookies |
+
+Since XP 7.12, the request object also exposes `getHeader(name)` — a case-insensitive header lookup function. Prefer it over accessing `headers` directly.
+
+### Response Object Properties
+
+| Property | Type | Default | Description |
+|---|---|---|---|
+| `status` | number | `200` | HTTP status code |
+| `body` | string/object | | Response body |
+| `contentType` | string | `text/plain; charset=utf-8` | MIME type |
+| `headers` | object | | Response headers (value can be `null` to remove a header, XP 7.15+) |
+| `cookies` | object | | Response cookies |
+| `redirect` | string | | URI to redirect to (sets status 303) |
+| `postProcess` | boolean | `true` | Site engine: process component placeholder tags in the body |
+| `pageContributions` | object | | Site engine: contribute HTML to specific positions in the response |
+| `applyFilters` | boolean | `true` | Site engine: if `false`, skip response processors and filters |
 
 ## Portal API (lib-portal)
 
@@ -72,12 +112,14 @@ dependencies {
 | `getComponent()` | part, layout | Returns the current component (config, regions) as JSON |
 | `getSite()` | page, part, layout | Returns the parent site as JSON |
 | `getSiteConfig()` | page, part, layout | Returns the site config for the current app |
-| `assetUrl({path})` | any | Generates URL to a static asset file |
+| `assetUrl({path})` | any | Generates URL to a static asset — **deprecated in XP 7.15**, use `lib-asset` or `lib-static` instead |
+| `attachmentUrl({id, name})` | any | Generates URL to a content attachment |
 | `imageUrl({id, scale})` | any | Generates URL to an image |
 | `pageUrl({path})` | any | Generates URL to a content page |
 | `componentUrl({component})` | any | Generates URL to a page component |
 | `serviceUrl({service})` | any | Generates URL to a service |
-| `processHtml({value})` | any | Resolves internal links in HTML content |
+| `processHtml({value})` | any | Resolves internal links in HTML content. Supports `imageWidths` (XP 7.7+) and `imageSizes` (XP 7.8+) for responsive images |
+| `sanitizeHtml(html)` | any | Strips unsafe tags/attributes to protect against XSS |
 
 ### Example — getComponent() Return Value (Layout)
 
@@ -152,6 +194,25 @@ const body = mustacheLib.render(view, model);
 return { body, contentType: 'text/html' };
 ```
 
+## Page Contributions
+
+Any component controller (page, part, layout) can add `pageContributions` to the response to inject content into the rendered page at four positions: `headBegin`, `headEnd`, `bodyBegin`, `bodyEnd`.
+
+```ts
+export function get(req) {
+  return {
+    body: '<div>My part</div>',
+    contentType: 'text/html',
+    pageContributions: {
+      headEnd: '<link rel="stylesheet" href="styles.css"/>',
+      bodyEnd: ['<script src="main.js"></script>']
+    }
+  };
+}
+```
+
+Duplicate contributions are automatically removed during the merge step. If the target tag (e.g., `<head>`) does not exist in the response, contributions to that position are ignored.
+
 ## Response Processors
 
 Place controller files at: `src/main/resources/site/processors/<name>.js`
@@ -167,6 +228,10 @@ exports.responseProcessor = function (req, res) {
   return res;
 };
 ```
+
+Response processors run between component rendering and the contributions filter. Setting `applyFilters: false` in the response skips further processors and filters.
+
+Execution order is determined by the `order` attribute (lower = higher priority) combined with app order on the site.
 
 Register in `site.xml`:
 ```xml

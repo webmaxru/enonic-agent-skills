@@ -5,7 +5,8 @@
 - **XP 7.x**: Current stable branch. All patterns in this skill target XP 7.x.
 - **XP 7.2+**: Custom icons for parts (SVG or PNG placed alongside the descriptor).
 - **XP 7.8+**: `archive` and `restore` functions in lib-content.
-- **XP 7.15+**: `assetUrl` from lib-portal is deprecated; use `lib-asset` or `lib-static` instead.
+- **XP 7.12+**: `request.getHeader(name)` for case-insensitive header lookup. `duplicate` function in lib-content.
+- **XP 7.15+**: `assetUrl` from lib-portal is deprecated; use `lib-asset` or `lib-static` instead. `patch` HTTP method supported in controllers. Response headers can be set to `null` to remove headers added by other controllers/filters.
 
 ## TypeScript vs JavaScript
 
@@ -38,6 +39,7 @@ Enonic XP supports both TypeScript and JavaScript controllers.
 | lib-content | `/lib/xp/content` | `com.enonic.xp:lib-content:${xpVersion}` |
 | lib-thymeleaf | `/lib/thymeleaf` | `com.enonic.lib:lib-thymeleaf:2.0.0` |
 | lib-mustache | `/lib/mustache` | `com.enonic.lib:lib-mustache:2.1.0` |
+| lib-asset | `/lib/enonic/asset` | `com.enonic.lib:lib-asset:${libVersion}` |
 
 ## Common Pitfalls
 
