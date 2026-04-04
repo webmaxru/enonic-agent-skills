@@ -1,7 +1,7 @@
 {
   "name": "enonic-skills",
   "description": "Agent skills for Enonic XP CMS development: server-side APIs, content modeling, content migration, Guillotine GraphQL queries, Next.js headless integration, controller generation, webhook/event integrations, and local sandbox management.",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "author": {
     "name": "Maxim Salnikov"
   },
