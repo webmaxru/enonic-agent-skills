@@ -7,7 +7,7 @@
 | `contentLib.query()` | 6.0 | Core function, always available |
 | `contentLib.create()` | 6.0 | `refresh` parameter available from 6.0 |
 | `contentLib.modify()` | 6.0 | Editor callback pattern |
-| `contentLib.publish()` | 6.0 | `sourceBranch`/`targetBranch` deprecated since 7.13 (still works) |
+| `contentLib.publish()` | 6.0 | `sourceBranch`/`targetBranch` not in use since 7.12 (ignored, publish always goes draft→master). `excludeChildrenIds` parameter added in 7.12 |
 | `contentLib.archive()` | 7.8 | Archive/restore workflow |
 | `contentLib.restore()` | 7.8 | Restore from archive |
 | `contentLib.duplicate()` | 7.12 | Includes `variant` option from 7.12 |
@@ -15,6 +15,11 @@
 | `taskLib.submitTask()` | 7.7 | Replaces deprecated `taskLib.submitNamed()` |
 | `taskLib.sleep()` | 7.0 | Only works inside a task context |
 | `repo.duplicate()` | 7.12 | Node-level duplication |
+| `repo.findChildren()` `recursive` | 7.7 | Recursive fetching of all nested children |
+| Named task `taskId` 2nd argument | 7.13 | `exports.run(params, taskId)` receives task ID |
+| `lib-export` (exportNodes/importNodes) | 7.8 | Node export/import API for environment migration |
+| Query DSL `exists` expression | 7.11 | DSL expression to check field existence |
+| Query DSL `boolean.filter` | 7.11 | Non-scoring filter compound in query DSL |
 | Query DSL (JSON format) | 7.9 | Alternative to string-based NoQL |
 | Sort DSL (JSON format) | 7.9 | Alternative to string-based sort |
 | Min/Max/Value Count aggregations | 7.7 | Standalone metric aggregations |

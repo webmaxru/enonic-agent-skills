@@ -38,8 +38,7 @@ const content = create({
 
 publish({
     keys: [content._id],
-    sourceBranch: 'draft',
-    targetBranch: 'master'
+    includeDependencies: true
 });
 ```
 

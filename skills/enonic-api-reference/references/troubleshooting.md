@@ -109,12 +109,18 @@ modify({
 
 | Feature | Minimum XP Version |
 |---------|-------------------|
-| archive / restore | 7.8.0 |
-| duplicate (content) | 7.12.0 |
-| duplicate (node) | 7.12.0 |
 | getOutboundDependencies | 7.2.0 |
 | resetInheritance | 7.6.0 |
 | getCommit (node) | 7.7.0 |
+| lib-scheduler | 7.7.0 |
+| processHtml imageWidths | 7.7.0 |
 | context attributes | 7.8.0 |
+| archive / restore | 7.8.0 |
+| login scope NONE | 7.8.0 |
+| processHtml imageSizes | 7.8.0 |
+| publish sourceBranch/targetBranch not in use | 7.12.0 |
+| duplicate (content) | 7.12.0 |
+| duplicate (node) | 7.12.0 |
 | getDefaultFromEmail | 7.14.1 |
 | assetUrl deprecated | 7.15.0 |
+| User.hasPassword | 7.15.0 |

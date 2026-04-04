@@ -1,84 +1,28 @@
 lockfile_version: '1'
-generated_at: '2026-03-28T09:15:01.426858+00:00'
+generated_at: '2026-03-29T12:49:10.233803+00:00'
 apm_version: 0.7.9
 dependencies:
-- repo_url: webmaxru/agent-skills
+- repo_url: webmaxru/ai-native-dev
   host: github.com
-  resolved_commit: 4e1265009f92b81e45965946ef65b46a11393437
+  resolved_commit: a8e3d543780d04b8527f2d2aece54db34fab690a
   virtual_path: skills/agent-package-manager
   is_virtual: true
   package_type: claude_skill
   deployed_files:
   - .github/skills/agent-package-manager
-- repo_url: webmaxru/agent-skills
+- repo_url: webmaxru/ai-native-dev
   host: github.com
-  resolved_commit: 4e1265009f92b81e45965946ef65b46a11393437
+  resolved_commit: a8e3d543780d04b8527f2d2aece54db34fab690a
+  virtual_path: skills/agent-skill-deploy
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .github/skills/agent-skill-deploy
+- repo_url: webmaxru/ai-native-dev
+  host: github.com
+  resolved_commit: a8e3d543780d04b8527f2d2aece54db34fab690a
   virtual_path: skills/github-agentic-workflows
   is_virtual: true
   package_type: claude_skill
   deployed_files:
   - .github/skills/github-agentic-workflows
-- repo_url: webmaxru/enonic-agent-skills
-  host: github.com
-  resolved_commit: cbdc50b7a7bc1a54b48bff301f21f52fb88ef04e
-  virtual_path: skills/enonic-api-reference
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .github/skills/enonic-api-reference
-- repo_url: webmaxru/enonic-agent-skills
-  host: github.com
-  resolved_commit: cbdc50b7a7bc1a54b48bff301f21f52fb88ef04e
-  virtual_path: skills/enonic-content-migration
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .github/skills/enonic-content-migration
-- repo_url: webmaxru/enonic-agent-skills
-  host: github.com
-  resolved_commit: cbdc50b7a7bc1a54b48bff301f21f52fb88ef04e
-  virtual_path: skills/enonic-content-type-generator
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .github/skills/enonic-content-type-generator
-- repo_url: webmaxru/enonic-agent-skills
-  host: github.com
-  resolved_commit: cbdc50b7a7bc1a54b48bff301f21f52fb88ef04e
-  virtual_path: skills/enonic-guillotine-query-builder
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .github/skills/enonic-guillotine-query-builder
-- repo_url: webmaxru/enonic-agent-skills
-  host: github.com
-  resolved_commit: cbdc50b7a7bc1a54b48bff301f21f52fb88ef04e
-  virtual_path: skills/enonic-nextxp-integration
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .github/skills/enonic-nextxp-integration
-- repo_url: webmaxru/enonic-agent-skills
-  host: github.com
-  resolved_commit: cbdc50b7a7bc1a54b48bff301f21f52fb88ef04e
-  virtual_path: skills/enonic-sandbox-manager
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .github/skills/enonic-sandbox-manager
-- repo_url: webmaxru/enonic-agent-skills
-  host: github.com
-  resolved_commit: cbdc50b7a7bc1a54b48bff301f21f52fb88ef04e
-  virtual_path: skills/enonic-webhook-integrator
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .github/skills/enonic-webhook-integrator
-- repo_url: webmaxru/enonic-agent-skills
-  host: github.com
-  resolved_commit: cbdc50b7a7bc1a54b48bff301f21f52fb88ef04e
-  virtual_path: skills/enonic-controller-generator
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .github/skills/enonic-controller-generator

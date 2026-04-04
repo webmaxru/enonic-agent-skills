@@ -162,6 +162,24 @@ const taskId = taskLib.executeFunction({
 });
 ```
 
+### submitTask(params)
+
+Submits a named task (defined by a task descriptor XML and controller) for asynchronous execution.
+
+**Parameters:** Object with `descriptor` (string — `<appKey>:<taskName>`), `config` (object — task configuration properties).
+
+**Returns:** `string` — Task ID.
+
+```typescript
+const taskId = taskLib.submitTask({
+  descriptor: 'com.example.myapp:sync-content',
+  config: {
+    sourceUrl: 'https://api.example.com/content',
+    batchSize: '100'
+  }
+});
+```
+
 ### progress(params)
 
 Reports progress from inside a running task.

@@ -55,12 +55,23 @@ async function detectXpVersion(dir) {
 
 async function detectAppName(dir) {
   const gradleFile = join(dir, 'build.gradle');
+  const gradleProps = join(dir, 'gradle.properties');
   try {
     const content = await readFile(gradleFile, 'utf-8');
-    const match = content.match(/app\s*\{\s*name\s*=\s*['"]([^'"]+)['"]/);
-    return match ? match[1] : null;
-  } catch {
-    return null;
+    const match = content.match(/app\s*\{\s*name\s*=\s*['"]([^'"]+)['"]/); 
+    let name = match ? match[1] : null;
+
+    // If the value is a Gradle variable placeholder, resolve from gradle.properties
+    if (name && /^\$\{.+\}$/.test(name)) {
+      const varName = name.slice(2, -1);
+      try {
+        const props = await readFile(gradleProps, 'utf-8');
+        const propMatch = props.match(new RegExp(`^${varName}\\s*=\\s*(.+)`, 'm'));
+        if (propMatch) name = propMatch[1].trim();
+      } catch { /* gradle.properties not found, keep placeholder */ }
+    }
+
+    return name;
   }
 }
 
