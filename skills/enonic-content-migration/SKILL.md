@@ -55,7 +55,7 @@ metadata:
 
 **Step 5: Handle branch operations and publishing**
 1. Run content modifications in the `draft` branch context.
-2. After modifications complete, publish changed items to `master` using `contentLib.publish()` with `sourceBranch: 'draft'` and `targetBranch: 'master'`.
+2. After modifications complete, publish changed items to `master` using `contentLib.publish()`. On XP < 7.12, pass `sourceBranch: 'draft'` and `targetBranch: 'master'`. On XP 7.12+, these parameters are ignored (publish always goes draft→master).
 3. Set `includeDependencies: false` when publishing bulk-updated items to avoid unintended dependency publishing.
 4. For operations comparing draft and master state, use `repo.diff()` from `lib-node` with `target: 'master'` and `includeChildren: true`.
 
@@ -65,6 +65,7 @@ metadata:
 3. Read `assets/task-migration.template.ts` for the reusable task controller template with progress reporting.
 4. Check for existing running instances with `taskLib.isRunning()` before starting a duplicate operation.
 5. Use `taskLib.sleep()` for throttling between batches if the operation generates excessive load.
+6. For named tasks on XP 7.13+, the `run` function receives `taskId` as its second argument: `exports.run = function(params, taskId) { ... }`.
 
 **Step 7: Validate and report results**
 1. After the operation completes, log a summary: items processed, items created/updated/deleted, items failed, total duration.

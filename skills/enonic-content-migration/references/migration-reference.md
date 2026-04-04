@@ -48,8 +48,13 @@ contentLib.create({
   displayName: 'Item Name',    // Display name
   contentType: 'app:typeName', // Required content type
   language: 'en',              // Optional language tag
+  childOrder: '_ts DESC',      // Optional default child ordering
   data: {},                    // Content data object
   x: {},                       // eXtra data (x-data)
+  workflow: {                  // Optional workflow state (default: READY)
+    state: 'READY',
+    checks: {}
+  },
   requireValid: true,          // Validate against content type (default: true)
   refresh: true                // Index refresh — set false for bulk operations
 });
@@ -71,13 +76,16 @@ contentLib.modify({
 
 ### Publish Pattern
 
+> **XP 7.12+ change:** `sourceBranch` and `targetBranch` are no longer in use. Publish always pushes from `draft` to `master`. These parameters are silently ignored on XP 7.12+. Keep them for backward compatibility with XP < 7.12.
+
 ```typescript
 contentLib.publish({
   keys: ['/site/page1', 'content-id-2'],
-  sourceBranch: 'draft',
-  targetBranch: 'master',
-  includeDependencies: false,  // Set false for bulk to avoid cascade
-  schedule: {                  // Optional scheduling
+  sourceBranch: 'draft',              // Ignored on XP 7.12+
+  targetBranch: 'master',             // Ignored on XP 7.12+
+  includeDependencies: false,          // Set false for bulk to avoid cascade
+  excludeChildrenIds: ['id-3'],        // Exclude descendants of specific items (XP 7.12+)
+  schedule: {                          // Optional scheduling
     from: new Date().toISOString(),
     to: '2025-12-31T23:59:59Z'
   }
@@ -110,7 +118,8 @@ const repo = connect({
 | `repo.diff()` | Compare node versions across branches |
 | `repo.exists()` | Check node existence |
 | `repo.get()` | Fetch nodes by id or path |
-| `repo.findChildren()` | Fetch children with pagination |
+| `repo.findChildren()` | Fetch children with pagination; supports `recursive` (XP 7.7+) and `countOnly` options |
+| `repo.findVersions()` | Fetch version history of a node |
 | `repo.refresh()` | Refresh indices after bulk updates |
 
 ## NoQL Query DSL Reference
@@ -371,9 +380,10 @@ Place in `src/main/resources/tasks/{taskName}/{taskName}.js`:
 ```typescript
 import { progress } from '/lib/xp/task';
 
-exports.run = function(params) {
+exports.run = function(params, taskId) {
   // params come from submitTask config
-  progress({ info: 'Starting', current: 0, total: params.total });
+  // taskId is provided as second argument (XP 7.13+)
+  progress({ info: 'Starting ' + taskId, current: 0, total: params.total });
   // ... processing ...
 };
 ```
@@ -387,4 +397,38 @@ submitTask({
   descriptor: 'myMigrationTask',
   config: { query: targetQuery, batchSize: 100 }
 });
+```
+
+## Export/Import API (lib-export, XP 7.8+)
+
+For environment-level migration (moving content between XP instances), use the dedicated export/import API.
+
+### Import
+
+```typescript
+import exportLib from '/lib/xp/export';
+```
+
+### Export Nodes
+
+```typescript
+exportLib.exportNodes({
+  sourceNodePath: '/content',
+  exportName: 'my-export',
+  includeNodeIds: true,
+  includeVersions: false
+});
+// Export is written to the server's exports directory
+```
+
+### Import Nodes
+
+```typescript
+exportLib.importNodes({
+  source: 'my-export',           // Export name in exports directory
+  targetNodePath: '/content',
+  includeNodeIds: true,           // Preserve original IDs (default: false)
+  includePermissions: true        // Preserve permissions (default: false)
+});
+// Returns: { addedNodes, updatedNodes, importedBinaries, importErrors }
 ```
