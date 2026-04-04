@@ -33,9 +33,14 @@ Version requirements and compatibility notes for the Next.js + Enonic XP integra
 - The Guillotine app is automatically installed when creating a sandbox with `enonic project create`.
 
 ### @enonic/nextjs-adapter
-- Provides `ComponentRegistry`, `FetchContentResult`, `PageProps`, `PartProps`, and utility functions.
-- Exports `APP_NAME` and `APP_NAME_UNDERSCORED` derived from `ENONIC_APP_NAME` env variable.
+- Provides `ComponentRegistry`, `FetchContentResult`, `PageProps`, `PartProps`, `LayoutProps`, `MacroProps`, and utility functions.
+- Exports `APP_NAME`, `APP_NAME_UNDERSCORED`, and `APP_NAME_DASHED` derived from `ENONIC_APP_NAME` env variable.
+- Exports `richTextQuery(fieldName)` to generate GraphQL fragments for HTML area fields.
+- Exports `validateData(props)` to validate content responses and throw `notFound()` for invalid data.
 - Handles draft/master branch switching automatically based on preview mode state.
+- Server-side functions (`fetchContent`, `fetchContentPathsForAllLocales`) are imported from `@enonic/nextjs-adapter/server`.
+- Client-side functions (`useLocaleContext`, `LocaleContextProvider`) are imported from `@enonic/nextjs-adapter/client`.
+- Views are imported from individual files under `@enonic/nextjs-adapter/views/` (e.g., `MainView`, `RichTextView`, `Region`, `StaticContent`).
 
 ### GraphQL Type Naming Convention
 - Content type names in GraphQL introspection follow: dots replaced with underscores, final segment capitalized.
