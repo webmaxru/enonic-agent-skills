@@ -1,6 +1,10 @@
 ---
 name: enonic-sandbox-manager
 description: Guides developers through Enonic CLI commands for sandbox management, project scaffolding, local development, app deployment, and CI/CD pipeline generation. Use when creating Enonic XP sandboxes, starting or stopping local instances, scaffolding projects from starters, running dev mode with hot-reload, deploying apps, or generating CI/CD workflows for Enonic apps. Don't use for writing XP application code (controllers, content types), querying via Guillotine or lib-content APIs, configuring non-Enonic environments, or Docker/Kubernetes deployment of XP.
+license: MIT
+metadata:
+  author: webmaxru
+  version: "1.1"
 ---
 
 # Enonic CLI & Local Dev Environment Helper

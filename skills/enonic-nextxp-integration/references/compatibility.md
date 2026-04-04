@@ -4,14 +4,21 @@ Version requirements and compatibility notes for the Next.js + Enonic XP integra
 
 ## Package Requirements
 
-| Component | Minimum Version | Recommended |
-|-----------|----------------|-------------|
-| Node.js | 18.x | 20.x or later |
-| Next.js | 14.x (App Router) | Latest stable |
-| @enonic/nextjs-adapter | Latest stable | Latest stable |
-| Enonic XP | 7.x | Latest stable |
-| Guillotine app | Installed in XP | Latest from marketplace |
-| Next.XP app (preview) | Installed in XP | Latest from marketplace |
+| Component | Adapter v3.x | Adapter v4.x |
+|-----------|-------------|-------------|
+| Node.js | 18.x+ | 22.15.1+ |
+| Next.js | 14.x (App Router) | 16.x |
+| React | 18.3.1+ | 19.x |
+| @enonic/nextjs-adapter | 3.x | 4.x |
+| Enonic XP | 7.x | 7.x |
+| Guillotine app | Installed in XP | Installed in XP |
+| Next.XP app (preview) | Installed in XP | Installed in XP |
+
+> **Version resolution:** When installing, specify the version explicitly:
+> - For Next.js 16+: `npm install @enonic/nextjs-adapter@4`
+> - For Next.js 14.x–15.x: `npm install @enonic/nextjs-adapter@3`
+>
+> Running `npm install @enonic/nextjs-adapter` without a version may resolve to v3.x, which has incompatible peer dependencies with Next.js 16+.
 
 ## Key Compatibility Notes
 
@@ -26,9 +33,14 @@ Version requirements and compatibility notes for the Next.js + Enonic XP integra
 - The Guillotine app is automatically installed when creating a sandbox with `enonic project create`.
 
 ### @enonic/nextjs-adapter
-- Provides `ComponentRegistry`, `FetchContentResult`, `PageProps`, `PartProps`, and utility functions.
-- Exports `APP_NAME` and `APP_NAME_UNDERSCORED` derived from `ENONIC_APP_NAME` env variable.
+- Provides `ComponentRegistry`, `FetchContentResult`, `PageProps`, `PartProps`, `LayoutProps`, `MacroProps`, and utility functions.
+- Exports `APP_NAME`, `APP_NAME_UNDERSCORED`, and `APP_NAME_DASHED` derived from `ENONIC_APP_NAME` env variable.
+- Exports `richTextQuery(fieldName)` to generate GraphQL fragments for HTML area fields.
+- Exports `validateData(props)` to validate content responses and throw `notFound()` for invalid data.
 - Handles draft/master branch switching automatically based on preview mode state.
+- Server-side functions (`fetchContent`, `fetchContentPathsForAllLocales`) are imported from `@enonic/nextjs-adapter/server`.
+- Client-side functions (`useLocaleContext`, `LocaleContextProvider`) are imported from `@enonic/nextjs-adapter/client`.
+- Views are imported from individual files under `@enonic/nextjs-adapter/views/` (e.g., `MainView`, `RichTextView`, `Region`, `StaticContent`).
 
 ### GraphQL Type Naming Convention
 - Content type names in GraphQL introspection follow: dots replaced with underscores, final segment capitalized.

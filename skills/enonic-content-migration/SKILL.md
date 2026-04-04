@@ -1,6 +1,10 @@
 ---
 name: enonic-content-migration
 description: Generates Enonic XP scripts for bulk content operations — creating, updating, querying, migrating, and transforming content using lib-content and lib-node APIs. Covers the query DSL (NoQL), aggregations, batch processing, task controllers for long-running operations, and export/import workflows. Use when writing bulk content creation, update, or deletion scripts, querying with NoQL syntax, migrating content between environments, running long-running task operations, or working with aggregations and paginated retrieval. Do not use for Guillotine GraphQL frontend queries, content type schema definitions, single contentLib.get() calls, or non-Enonic data migration tools.
+license: MIT
+metadata:
+  author: webmaxru
+  version: "1.1"
 ---
 
 # Enonic Content Migration
@@ -34,7 +38,7 @@ description: Generates Enonic XP scripts for bulk content operations — creatin
 2. For content-type filtering, use the `contentTypes` parameter on `contentLib.query()` or a `type` property comparison in node queries.
 3. For date-range queries, use `instant()` or `dateTime()` functions and the `range()` query function.
 4. For full-text search, use `fulltext()` with the appropriate field paths and operator (`AND`/`OR`).
-5. For path-scoped operations, use `_path LIKE '/content/site-path/*'` to match descendants.
+5. For path-scoped operations, use `_path LIKE '/content/site-path/*'` to match descendants. Note: the `_path` property in NoQL queries includes the internal `/content/` prefix, but `hit._path` in results returns the content-domain path without it. Always prepend `/content/` when building queries from result paths.
 6. Add `filters` for efficient post-query narrowing using `exists`, `notExists`, `hasValue`, or `boolean` combinations.
 7. Add `aggregations` when the operation needs grouped statistics (term counts, date histograms, numeric ranges, stats).
 8. Read `references/examples.md` for complete query and aggregation patterns.
@@ -47,11 +51,11 @@ description: Generates Enonic XP scripts for bulk content operations — creatin
 5. For `contentLib.modify()`, use the editor callback pattern to safely transform each content item.
 6. For `contentLib.publish()`, batch keys into groups of 50–100 to avoid timeout on large publish sets.
 7. Track success and failure counts for reporting.
-8. Read `assets/bulk-update.template.ts` for the reusable batch update controller template.
+8. Read `assets/bulk-update.template.ts` for the reusable batch update controller template. Note: templates use TypeScript/ESM syntax (`import`, `const`, arrow functions); adapt to CommonJS JavaScript (`require()`, `var`, `function()`) for XP runtime deployment as `.js` files.
 
 **Step 5: Handle branch operations and publishing**
 1. Run content modifications in the `draft` branch context.
-2. After modifications complete, publish changed items to `master` using `contentLib.publish()` with `sourceBranch: 'draft'` and `targetBranch: 'master'`.
+2. After modifications complete, publish changed items to `master` using `contentLib.publish()`. On XP < 7.12, pass `sourceBranch: 'draft'` and `targetBranch: 'master'`. On XP 7.12+, these parameters are ignored (publish always goes draft→master).
 3. Set `includeDependencies: false` when publishing bulk-updated items to avoid unintended dependency publishing.
 4. For operations comparing draft and master state, use `repo.diff()` from `lib-node` with `target: 'master'` and `includeChildren: true`.
 
@@ -61,6 +65,7 @@ description: Generates Enonic XP scripts for bulk content operations — creatin
 3. Read `assets/task-migration.template.ts` for the reusable task controller template with progress reporting.
 4. Check for existing running instances with `taskLib.isRunning()` before starting a duplicate operation.
 5. Use `taskLib.sleep()` for throttling between batches if the operation generates excessive load.
+6. For named tasks on XP 7.13+, the `run` function receives `taskId` as its second argument: `exports.run = function(params, taskId) { ... }`.
 
 **Step 7: Validate and report results**
 1. After the operation completes, log a summary: items processed, items created/updated/deleted, items failed, total duration.

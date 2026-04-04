@@ -177,6 +177,9 @@ Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight |
 | `ComboBox` | String | Dropdown with predefined static options |
 | `RadioButton` | String | Radio buttons for single selection |
 | `CheckBox` | Boolean | Single true/false toggle |
+
+> **Note:** CheckBox is a single boolean toggle. Occurrences are typically left at the default (`0..1`) or omitted entirely.
+
 | `ContentSelector` | Reference (content ID) | Select existing content items |
 | `ContentTypeFilter` | String | Select a content type |
 | `CustomSelector` | String | Custom service-backed selector |

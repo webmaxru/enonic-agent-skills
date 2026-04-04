@@ -42,7 +42,7 @@ export interface ContentConnection<T = __CONTENT_TYPE__Content> {
   totalCount: number;
   edges: ContentEdge<T>[];
   pageInfo: PageInfo;
-  aggregationAsJson?: Record<string, unknown>;
+  aggregationsAsJson?: Record<string, unknown>;
   highlightAsJson?: Record<string, unknown>;
 }
 

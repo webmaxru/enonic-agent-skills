@@ -1,6 +1,10 @@
 ---
 name: enonic-content-type-generator
 description: Generates Enonic XP content type XML schema definitions from natural-language descriptions. Covers structured content modeling including input types, form layout, option sets, item sets, mixins, x-data, and content-type inheritance. Use when creating, scaffolding, or generating Enonic XP content type definitions, adding fields or sets to existing content types, or querying Enonic XP input types and super-types. Do not use for non-Enonic CMS content modeling, GraphQL queries, JavaScript/TypeScript controllers, or generic XML editing unrelated to Enonic schemas.
+license: MIT
+metadata:
+  author: webmaxru
+  version: "1.1"
 ---
 
 # Enonic XP Content Type Generator
