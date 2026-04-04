@@ -59,10 +59,20 @@ Enonic XP applications can expose HTTP service endpoints to receive webhook payl
 src/main/resources/services/<serviceName>/<serviceName>.ts
 ```
 
-The service is accessible at:
+The service is accessible at any URL depth via the mount pattern:
 
 ```
-/_/service/<appKey>/<serviceName>
+**/_/service/<appKey>/<serviceName>
+```
+
+The `**` prefix means a service can be invoked from multiple locations, e.g., `domain.com/_/service/..` or `domain.com/some/path/_/service/..`. The URL context is available to the controller.
+
+To generate a service URL programmatically, use `serviceUrl()` from lib-portal:
+
+```typescript
+import { serviceUrl } from '/lib/xp/portal';
+
+const url = serviceUrl({ service: 'myWebhookService' });
 ```
 
 ### HTTP Request Object
@@ -103,6 +113,19 @@ Before processing any inbound webhook payload:
 5. Return `400` if the payload is malformed or missing required fields.
 
 ### Securing Service Endpoints
+
+- Use a service descriptor XML to restrict access by role without custom code. Place the descriptor alongside the controller:
+
+  `src/main/resources/services/<serviceName>/<serviceName>.xml`
+
+  ```xml
+  <service>
+    <allow>
+      <principal>role:system.admin</principal>
+      <principal>role:myapp.webhook-caller</principal>
+    </allow>
+  </service>
+  ```
 
 - Restrict access via vhost configuration to limit which hosts can reach the service.
 - Use API keys or HMAC signatures to authenticate incoming requests. Reject requests when authentication is not configured rather than falling through open.
