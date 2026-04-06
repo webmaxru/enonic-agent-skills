@@ -154,7 +154,7 @@ Example:
 |---|---|---|
 | `boolean` | `BooleanDSLExpressionInput` | Compound boolean (must, should, mustNot, filter) |
 | `term` | `TermDSLExpressionInput` | Exact-value match |
-| `like` | `LikeDSLExpressionInput` | Wildcard match (`*`) |
+| `like` | `LikeDSLExpressionInput` | Wildcard match (`*` zero-or-more, `?` single char) |
 | `in` | `InDSLExpressionInput` | Match any value in a list |
 | `range` | `RangeDSLExpressionInput` | lt, lte, gt, gte comparisons |
 | `exists` | `ExistsDSLExpressionInput` | Field exists check |
@@ -199,9 +199,49 @@ Supports `boost` for relevance scoring.
 Exactly one type field:
 `string`, `double`, `long`, `boolean`, `localDate`, `localDateTime`, `localTime`, `instant`
 
+### InDSLExpressionInput
+
+Matches content where a field contains any value in a list. Provide exactly one typed values field:
+
+| Field | Type | Description |
+|---|---|---|
+| `field` | `String!` | Property name to search |
+| `boost` | `Float` | Score multiplier |
+| `stringValues` | `[String]` | String values |
+| `doubleValues` | `[Float]` | Float values |
+| `longValues` | `[Int]` | Integer values |
+| `booleanValues` | `[Boolean]` | Boolean values |
+| `localDateValues` | `[Date]` | Date values (e.g. `2015-03-16`) |
+| `localDateTimeValues` | `[LocalDateTime]` | DateTime values without timezone (e.g. `2015-03-16T10:00:02`) |
+| `localTimeValues` | `[LocalTime]` | Time values without date (e.g. `10:00:03`) |
+| `instantValues` | `[DateTime]` | Point-in-time values (e.g. `2015-03-16T10:00:02Z`) |
+
+```graphql
+in: { field: "data.category", stringValues: ["news", "blog", "tutorial"] }
+```
+
 ### Other DSL Expression Inputs
 
-All DSL expression types (`like`, `in`, `exists`, `fulltext`, `ngram`, `stemmed`, `matchAll`, `pathMatch`) support the `boost` parameter for relevance scoring. `fulltext`, `ngram`, and `stemmed` accept `fields`, `query`, and `operator` (`OR` or `AND`). `stemmed` also requires `language`.
+Most DSL expression types (`like`, `in`, `exists`, `stemmed`, `matchAll`, `pathMatch`) support the `boost` parameter for relevance scoring. `fulltext` and `ngram` do not accept `boost` directly; use field-level boosting via `^N` notation instead (e.g. `"displayName^3"`). `fulltext`, `ngram`, and `stemmed` accept `fields`, `query`, and `operator` (`OR` or `AND`). `stemmed` also requires `language`.
+
+### String Expression Query Syntax
+
+The `query` parameter in `fulltext`, `ngram`, and `stemmed` supports these operators:
+
+| Operator | Meaning |
+|---|---|
+| `+` | AND — both terms required |
+| `\|` | OR — either term matches |
+| `-` | Negate a single token |
+| `*` (end of term) | Prefix query |
+| `( )` | Grouping / precedence |
+| `" "` | Phrase search |
+| `~N` (after word) | Edit distance (fuzziness) |
+| `~N` (after phrase) | Slop (how far apart phrase terms may be) |
+
+Field-level boosting uses `^N` notation in the `fields` array: `"displayName^3"` boosts matches in `displayName` by factor 3.
+
+The ngram tokenizer has a maximum limit of 25 characters. Search strings exceeding 25 characters will not produce ngram matches.
 
 ## SortDslInput
 

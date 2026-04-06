@@ -371,3 +371,34 @@ Get a count of blog posts per category:
   }
 }
 ```
+
+## 14. Filter by Multiple Values Using In Expression
+
+```graphql
+{
+  guillotine {
+    queryDsl(
+      query: {
+        boolean: {
+          must: [
+            { term: { field: "type", value: { string: "com.enonic.app.myapp:Article" } } }
+          ]
+          filter: [
+            { in: { field: "data.category", stringValues: ["news", "tutorial", "guide"] } }
+          ]
+        }
+      }
+      sort: { field: "createdTime", direction: DESC }
+      first: 20
+    ) {
+      displayName
+      ... on com_enonic_app_myapp_Article {
+        data {
+          title
+          category
+        }
+      }
+    }
+  }
+}
+```

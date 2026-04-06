@@ -11,6 +11,7 @@ Common query errors and resolution strategies.
 | Inline fragment returns `null` fields | Wrong GraphQL type name | Replace dots and colons with underscores, remove hyphens and capitalize following letter: `com_enonic_app_myapp_BlogPost`, `portal_TemplateFolder`. |
 | `data` field is null | Missing inline fragment | Use `... on <TypeName> { data { ... } }` — the `data` field is type-specific. |
 | Connection returns 0 edges | Query expression error | Simplify the DSL query to `matchAll: {}` to confirm data exists, then add filters incrementally. |
+| `ngram` returns no matches for long strings | Ngram 25-character limit | The ngram tokenizer caps at 25 characters. Strings exceeding this will not match. Combine `ngram` with `fulltext` for longer queries. |
 
 ## Type Name Errors
 
