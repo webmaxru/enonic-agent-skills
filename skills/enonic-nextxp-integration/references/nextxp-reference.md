@@ -456,6 +456,26 @@ export default FactBox;
 - **Master branch**: Used by the public Next.js frontend. Only published content is visible.
 - Publishing content in Content Studio moves it from draft to master.
 
+### Named Configurations for Multi-Frontend
+
+When multiple Next.js front-ends connect to the same Enonic instance (e.g., per-market or per-language sites), use named configurations in `com.enonic.app.nextxp.cfg`:
+
+```
+# default config (used when no named config is assigned)
+# nextjs.default.secret=yourSecret
+# nextjs.default.url=http://127.0.0.1:4242
+
+# named config 'marketA'
+nextjs.marketA.secret=yourSecret
+nextjs.marketA.url=https://your.next-site.com
+
+# named config 'marketB'
+nextjs.marketB.secret=yourOtherSecret
+nextjs.marketB.url=https://your.other-next-site.com
+```
+
+Assign a named configuration to a site in Content Studio: edit the site → click the pencil icon next to the `Next.XP` app → select the named configuration from the list.
+
 ## Static Site Generation (SSG) and Incremental Static Regeneration (ISR)
 
 The main catch-all page handler supports SSG with ISR:
@@ -706,7 +726,7 @@ export default async function Page({params}: {params: Promise<PageProps>}) {
     return <MainView {...data}/>;
 }
 
-export async function generateStaticParams(): Promise<any[]> {
+export async function generateStaticParams(props: { params: PageProps }): Promise<any[]> {
     return await fetchContentPathsForAllLocales('${site}/');
 }
 
