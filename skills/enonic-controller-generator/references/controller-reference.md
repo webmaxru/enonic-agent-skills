@@ -77,7 +77,7 @@ export function get(req) {
 | `headers` | object | HTTP request headers |
 | `cookies` | object | HTTP request cookies |
 
-Since XP 7.12, the request object also exposes `getHeader(name)` — a case-insensitive header lookup function. Prefer it over accessing `headers` directly.
+Since XP 7.12, the request object also exposes `getHeader(name)` — a case-insensitive header lookup function. Prefer it over accessing `headers` directly. Note: modifying the `headers` object does not affect the result of `getHeader(name)` calls.
 
 ### Response Object Properties
 
@@ -87,11 +87,30 @@ Since XP 7.12, the request object also exposes `getHeader(name)` — a case-inse
 | `body` | string/object | | Response body |
 | `contentType` | string | `text/plain; charset=utf-8` | MIME type |
 | `headers` | object | | Response headers (value can be `null` to remove a header, XP 7.15+) |
-| `cookies` | object | | Response cookies |
+| `cookies` | object | | Response cookies (see cookie options below) |
 | `redirect` | string | | URI to redirect to (sets status 303) |
 | `postProcess` | boolean | `true` | Site engine: process component placeholder tags in the body |
 | `pageContributions` | object | | Site engine: contribute HTML to specific positions in the response |
 | `applyFilters` | boolean | `true` | Site engine: if `false`, skip response processors and filters |
+
+### Response Cookie Options
+
+Cookie values can be a simple string or an object with detailed settings:
+
+```ts
+cookies: {
+  "simple": "value",
+  "detailed": {
+    value: "value",         // required
+    path: "/valid/path",    // optional, default empty
+    domain: "enonic.com",   // optional, default empty
+    maxAge: 2000,           // optional, seconds before deletion (-1 = session)
+    secure: false,          // optional, restrict to HTTPS
+    httpOnly: false,        // optional, hide from client-side scripts
+    sameSite: "Lax"         // optional (XP 7.3+): "Lax", "Strict", "None", or empty
+  }
+}
+```
 
 ## Portal API (lib-portal)
 
@@ -112,12 +131,14 @@ dependencies {
 | `getComponent()` | part, layout | Returns the current component (config, regions) as JSON |
 | `getSite()` | page, part, layout | Returns the parent site as JSON |
 | `getSiteConfig()` | page, part, layout | Returns the site config for the current app |
-| `assetUrl({path})` | any | Generates URL to a static asset — **deprecated in XP 7.15**, use `lib-asset` or `lib-static` instead |
+| `assetUrl({path})` | any | Generates URL to a static asset — **deprecated in XP 7.15**, use `lib-asset` or `lib-static` instead (see lib-asset section below) |
 | `attachmentUrl({id, name})` | any | Generates URL to a content attachment |
 | `imageUrl({id, scale})` | any | Generates URL to an image |
 | `pageUrl({path})` | any | Generates URL to a content page |
 | `componentUrl({component})` | any | Generates URL to a page component |
-| `serviceUrl({service})` | any | Generates URL to a service |
+| `serviceUrl({service})` | any | Generates URL to a service (type can be `server`, `absolute`, or `websocket`) |
+| `url({path})` | any | Generates URL to a generic resource (type can be `server`, `absolute`, or `websocket`) |
+| `imagePlaceholder({width, height})` | any | Generates a base64-encoded placeholder image URL |
 | `processHtml({value})` | any | Resolves internal links in HTML content. Supports `imageWidths` (XP 7.7+) and `imageSizes` (XP 7.8+) for responsive images |
 | `sanitizeHtml(html)` | any | Strips unsafe tags/attributes to protect against XSS |
 
@@ -163,7 +184,7 @@ Import: `import thymeleafLib from '/lib/thymeleaf';`
 Add to `build.gradle`:
 ```
 dependencies {
-  include "com.enonic.lib:lib-thymeleaf:2.1.1"
+  include "com.enonic.lib:lib-thymeleaf:2.0.0"
 }
 ```
 
@@ -173,6 +194,12 @@ const view = resolve('view.html');
 const body = thymeleafLib.render(view, model);
 return { body, contentType: 'text/html' };
 ```
+
+An optional third `options` parameter controls the template mode (default: `HTML`):
+```ts
+const body = thymeleafLib.render(view, model, { mode: 'HTML' });
+```
+Valid modes: `HTML`, `XML`, `TEXT`, `JAVASCRIPT`, `CSS`, `RAW`.
 
 Use `data-th-utext` for processed HTML output (unescaped).
 
@@ -193,6 +220,31 @@ const view = resolve('view.html');
 const body = mustacheLib.render(view, model);
 return { body, contentType: 'text/html' };
 ```
+
+## Asset Library (lib-asset) — replacement for deprecated assetUrl
+
+Import: `import { assetUrl } from '/lib/enonic/asset';`
+
+Add to `build.gradle`:
+```
+dependencies {
+  include "com.enonic.lib:lib-asset:${libVersion}"
+}
+```
+
+Usage:
+```ts
+import { assetUrl } from '/lib/enonic/asset';
+const cssUrl = assetUrl({ path: 'styles/main.css' });
+```
+
+For Thymeleaf templates, pass an `assetUrlBase` from the controller instead of using `portal.assetUrl` in the template:
+```ts
+const model = {
+  assetUrlBase: assetUrl({ path: '' })
+};
+```
+Then in the template: `<link th:href="${assetUrlBase} + '/styles.css'" rel="stylesheet"/>`
 
 ## Page Contributions
 
@@ -249,7 +301,7 @@ Register in `site.xml`:
 
 ```xml
 <page>
-  <display-name>My Page</display-name>
+  <display-name i18n="component.page.name">My Page</display-name>
   <description>Front page</description>
   <form/>
   <regions>
@@ -257,6 +309,8 @@ Register in `site.xml`:
   </regions>
 </page>
 ```
+
+The `i18n` attribute on `<display-name>` is optional and specifies a localization key for multi-language support.
 
 ### Part Descriptor
 
