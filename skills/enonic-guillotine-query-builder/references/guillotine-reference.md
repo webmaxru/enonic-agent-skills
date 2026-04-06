@@ -81,7 +81,7 @@ All content types share these fields. Custom content types add a `data` field.
 | `publish` | `PublishInfo` | from, to, first timestamps |
 | `attachments` | `[Attachment]` | File attachments |
 | `components` | `[Component]` | Page components (flattened) |
-| `pageUrl(type, params: Json)` | `String` | Generated URL for this content. `params` is `Json` type in Guillotine 7+ |
+| `pageUrl(type: UrlType, params: Json)` | `String` | Generated URL for this content. `params` is `Json` type in Guillotine 7+ |
 | `pageTemplate` | `Content` | Related page template content |
 | `x` | `[ExtraData]` | eXtra Data |
 | `permissions` | `Permissions` | Content permissions |
@@ -199,9 +199,26 @@ Supports `boost` for relevance scoring.
 Exactly one type field:
 `string`, `double`, `long`, `boolean`, `localDate`, `localDateTime`, `localTime`, `instant`
 
+### InDSLExpressionInput
+
+Matches content where the field contains any of the listed values. Uses separate typed value arrays — only one array field should be provided per expression:
+
+| Field | Type | Description |
+|---|---|---|
+| `field` | `String!` | Property name to search |
+| `boost` | `Float` | Score multiplier |
+| `stringValues` | `[String]` | String values |
+| `doubleValues` | `[Float]` | Float values |
+| `longValues` | `[Int]` | Integer values |
+| `booleanValues` | `[Boolean]` | Boolean values |
+| `localDateValues` | `[Date]` | Date values (e.g. `2015-03-16`) |
+| `localDateTimeValues` | `[LocalDateTime]` | DateTime values without timezone (e.g. `2015-03-16T10:00:02`) |
+| `localTimeValues` | `[LocalTime]` | Time values without date (e.g. `10:00:03`) |
+| `instantValues` | `[DateTime]` | Point-on-timeline values (e.g. `2015-03-16T10:00:02Z`) |
+
 ### Other DSL Expression Inputs
 
-All DSL expression types (`like`, `in`, `exists`, `fulltext`, `ngram`, `stemmed`, `matchAll`, `pathMatch`) support the `boost` parameter for relevance scoring. `fulltext`, `ngram`, and `stemmed` accept `fields`, `query`, and `operator` (`OR` or `AND`). `stemmed` also requires `language`.
+Most DSL expression types (`like`, `in`, `exists`, `stemmed`, `matchAll`, `pathMatch`) support the `boost` parameter for relevance scoring. `fulltext` and `ngram` do **not** support `boost`. `fulltext`, `ngram`, and `stemmed` accept `fields`, `query`, and `operator` (`OR` or `AND`). `stemmed` also requires `language`.
 
 ## SortDslInput
 
@@ -279,6 +296,25 @@ body(processHtml: { imageWidths: [600, 992], imageSizes: "(max-width: 600px) 100
 
 `imageSizes` specifies image widths for specific browser resolutions in the format `(media-condition) width`, comma-separated.
 
+## Attachment Type
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | `String` | Attachment name |
+| `label` | `String` | Attachment label |
+| `size` | `Int` | Attachment size |
+| `mimeType` | `String` | Attachment MIME type |
+| `attachmentUrl(download: Boolean, type: UrlType, params: Json)` | `String` | Attachment URL. `params` is `Json` type in Guillotine 7+ |
+
+## ContentType Utility Fields
+
+The `ContentType` type returned by `getType` and `getTypes` includes utility fields for fetching content instances directly:
+
+| Field | Type | Description |
+|---|---|---|
+| `getInstances(offset, first, query, sort)` | `[Content]` | Contents of this type |
+| `getInstanceConnection(after, first, query, sort)` | `ContentConnection` | Contents of this type as a connection |
+
 ## Key Enum Types
 
 | Enum | Values |
@@ -288,7 +324,9 @@ body(processHtml: { imageWidths: [600, 992], imageSizes: "(max-width: 600px) 100
 | `MediaIntentType` | `download`, `inline` |
 | `DslOperatorType` | `OR`, `AND` |
 | `DslSortDirectionType` | `ASC`, `DESC` |
+| `DslGeoPointDistanceType` | `m`, `meters`, `in`, `inch`, `yd`, `yards`, `ft`, `feet`, `km`, `kilometers`, `NM`, `nmi`, `nauticalmiles`, `mm`, `millimeters`, `cm`, `centimeters`, `mi`, `miles` |
 | `ComponentType` | `page`, `layout`, `image`, `part`, `text`, `fragment` |
 | `HighlightEncoderType` | `default`, `html` |
 | `HighlightFragmenterType` | `simple`, `span` |
 | `HighlightOrderType` | `score`, `none` |
+| `HighlightTagsSchemaType` | `styled` |

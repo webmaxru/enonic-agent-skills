@@ -83,10 +83,17 @@ queryDsl(
 
 | Symptom | Fix |
 |---|---|
-| `params` argument type error on `pageUrl` | In Guillotine 7, `params` is `Json` type, not `String`. Update the argument type. |
+| `params` argument type error on `pageUrl` | In Guillotine 7, `params` is `Json` type, not `String`. Update the argument type. Also applies to `mediaUrl`, `imageUrl`, and `attachmentUrl`. |
 | Subscriptions not working | GraphQL subscriptions are removed in Guillotine 7. Implement a custom solution. |
 | `siteConfig` not available | Site configuration is no longer obtainable from `dataAsJson`, `site`, or `portal_Site.dataAsJson` fields in Guillotine 7. |
 | URLs changed from relative to absolute | Guillotine 7 generates absolute (server) URLs by default for all URL fields and `processedHtml`. Adjust client URL handling. |
+
+## CORS and Request Issues
+
+| Symptom | Fix |
+|---|---|
+| Cross-origin request blocked | CORS is enabled by default in Guillotine 7.2.0+. Verify `cors.enabled=true` in `com.enonic.app.guillotine.cfg`. Set `cors.origin` to the allowed origins if needed. |
+| Query rejected with token limit error | The query exceeds `maxQueryTokens` (default `15000`, configurable in v7.3.0+). Simplify the query or increase the limit in `com.enonic.app.guillotine.cfg`. |
 
 ## Debugging Steps
 
