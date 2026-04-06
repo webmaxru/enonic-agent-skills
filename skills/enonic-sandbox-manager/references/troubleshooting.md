@@ -29,7 +29,7 @@
 **Resolution:**
 1. Check the XP version's Java requirement in the compatibility reference.
 2. Verify the system Java version: `java -version`
-3. XP 7.12+ requires Java 17+. XP 7.7–7.11 requires Java 11+.
+3. XP 7.16+ requires Java 21+. XP 7.13–7.15 requires Java 17+. XP 7.7–7.12 requires Java 11+.
 4. Install the correct Java version, or use `enonic project shell` to use the sandbox's bundled Java.
 
 ## Project Creation Fails

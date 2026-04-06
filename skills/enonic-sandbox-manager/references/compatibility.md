@@ -15,7 +15,7 @@ The Enonic CLI downloads and manages XP distributions automatically. Each sandbo
 
 | XP Version Range | Status | Java Requirement |
 |-----------------|--------|-----------------|
-| 7.16.x | Current stable | Java 21+ (GraalVM JDK 21) |
+| 7.16.x | Current stable | Java 21+ (GraalVM JDK 21). Final release with Mac x64 support. |
 | 7.15.x | Supported | Java 17+ |
 | 7.14.x | Supported | Java 17+ |
 | 7.13.x | Supported | Java 17+ (GraalVM JDK 17) |

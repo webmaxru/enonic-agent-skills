@@ -82,6 +82,8 @@ Stops the currently running sandbox (only works for sandboxes started via CLI).
 enonic sandbox upgrade [name] [-v <version>] [-a] [-f]
 ```
 
+Alias: `up`
+
 Upgrades the XP distribution for a sandbox. Downgrades are not permitted.
 
 ### enonic sandbox delete
@@ -90,6 +92,8 @@ Upgrades the XP distribution for a sandbox. Downgrades are not permitted.
 enonic sandbox delete [name] [-f]
 ```
 
+Aliases: `del`, `rm`
+
 Deletes a sandbox and all its data permanently.
 
 ### enonic sandbox copy
@@ -97,6 +101,8 @@ Deletes a sandbox and all its data permanently.
 ```
 enonic sandbox copy [source] [target] [-f]
 ```
+
+Alias: `cp`
 
 Copies a sandbox with all content to a new sandbox.
 

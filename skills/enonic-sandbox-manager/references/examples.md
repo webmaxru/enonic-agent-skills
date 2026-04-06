@@ -20,8 +20,8 @@ enonic dev
 ## Workflow 2: Create Sandbox with Specific Version
 
 ```bash
-# Create sandbox with XP 7.14.0 and no template
-enonic sandbox create staging-box -v 7.14.0 --skip-template -f
+# Create sandbox with XP 7.16.0 and no template
+enonic sandbox create staging-box -v 7.16.0 --skip-template -f
 
 # Verify it was created
 enonic sandbox ls
@@ -78,7 +78,7 @@ enonic app install --url https://repo.enonic.com/public/com/enonic/app/superhero
 enonic sandbox ls
 
 # Upgrade to a specific version
-enonic sandbox upgrade dev-sandbox -v 7.14.0
+enonic sandbox upgrade dev-sandbox -v 7.16.0
 ```
 
 ## Workflow 8: Copy Sandbox for Testing
