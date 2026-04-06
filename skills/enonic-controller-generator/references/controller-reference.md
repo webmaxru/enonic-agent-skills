@@ -115,11 +115,22 @@ dependencies {
 | `assetUrl({path})` | any | Generates URL to a static asset — **deprecated in XP 7.15**, use `lib-asset` or `lib-static` instead |
 | `attachmentUrl({id, name})` | any | Generates URL to a content attachment |
 | `imageUrl({id, scale})` | any | Generates URL to an image |
+| `imagePlaceholder({width, height})` | any | Generates a base64-encoded placeholder image URL |
 | `pageUrl({path})` | any | Generates URL to a content page |
 | `componentUrl({component})` | any | Generates URL to a page component |
 | `serviceUrl({service})` | any | Generates URL to a service |
+| `url({path})` | any | Generates URL to a generic resource; supports `server`, `absolute`, and `websocket` types |
 | `processHtml({value})` | any | Resolves internal links in HTML content. Supports `imageWidths` (XP 7.7+) and `imageSizes` (XP 7.8+) for responsive images |
 | `sanitizeHtml(html)` | any | Strips unsafe tags/attributes to protect against XSS |
+
+### Migrating from `assetUrl` to `lib-asset`
+
+Since XP 7.15, replace `portalLib.assetUrl` with `lib-asset`. Import path: `/lib/enonic/asset`. Gradle dependency: `com.enonic.lib:lib-asset:${libVersion}`. For Thymeleaf templates, pass the asset base URL from the controller instead of calling `portal.assetUrl` directly in the template:
+
+```ts
+import { assetUrl } from '/lib/enonic/asset';
+const model = { assetUrlBase: assetUrl({ path: '' }) };
+```
 
 ### Example — getComponent() Return Value (Layout)
 
@@ -183,7 +194,7 @@ Import: `import mustacheLib from '/lib/mustache';`
 Add to `build.gradle`:
 ```
 dependencies {
-  include "com.enonic.lib:lib-mustache:2.1.0"
+  include "com.enonic.lib:lib-mustache:2.1.1"
 }
 ```
 
@@ -249,7 +260,7 @@ Register in `site.xml`:
 
 ```xml
 <page>
-  <display-name>My Page</display-name>
+  <display-name i18n="component.page.name">My Page</display-name>
   <description>Front page</description>
   <form/>
   <regions>
@@ -257,6 +268,8 @@ Register in `site.xml`:
   </regions>
 </page>
 ```
+
+The optional `i18n` attribute on `<display-name>` enables localization of the component name.
 
 ### Part Descriptor
 
@@ -289,3 +302,11 @@ Register in `site.xml`:
 ### Form Schema Elements
 
 Common input types for component forms: `TextLine`, `TextArea`, `HtmlArea`, `ImageSelector`, `ContentSelector`, `CheckBox`, `ComboBox`, `Date`, `DateTime`, `Long`, `Double`.
+
+Each input supports these optional child elements in addition to `<label>` and `<occurrences>`:
+
+| Element | Purpose |
+|---|---|
+| `<default>` | Default value when the editor leaves the field empty |
+| `<help-text>` | Explanation shown below the input field; supports `i18n` attribute for localization |
+| `<config>` | Custom configuration specific to the input type |
