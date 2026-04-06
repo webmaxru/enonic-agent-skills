@@ -87,11 +87,30 @@ Since XP 7.12, the request object also exposes `getHeader(name)` — a case-inse
 | `body` | string/object | | Response body |
 | `contentType` | string | `text/plain; charset=utf-8` | MIME type |
 | `headers` | object | | Response headers (value can be `null` to remove a header, XP 7.15+) |
-| `cookies` | object | | Response cookies |
+| `cookies` | object | | Response cookies (see cookie format below) |
 | `redirect` | string | | URI to redirect to (sets status 303) |
 | `postProcess` | boolean | `true` | Site engine: process component placeholder tags in the body |
 | `pageContributions` | object | | Site engine: contribute HTML to specific positions in the response |
 | `applyFilters` | boolean | `true` | Site engine: if `false`, skip response processors and filters |
+
+### Response Cookie Format
+
+Cookie values can be a plain string or an object with options:
+
+```ts
+cookies: {
+  "simple": "value",
+  "detailed": {
+    value: "value",
+    path: "/valid/path",
+    domain: "enonic.com",
+    maxAge: 2000,
+    secure: false,
+    httpOnly: false,
+    sameSite: "Lax"   // XP 7.3+: "Lax", "Strict", or "None"
+  }
+}
+```
 
 ## Portal API (lib-portal)
 
@@ -118,6 +137,7 @@ dependencies {
 | `pageUrl({path})` | any | Generates URL to a content page |
 | `componentUrl({component})` | any | Generates URL to a page component |
 | `serviceUrl({service})` | any | Generates URL to a service |
+| `url({path})` | any | Generates URL to any resource. Supports `type` (`server` or `absolute` or `websocket`) and custom `params` |
 | `processHtml({value})` | any | Resolves internal links in HTML content. Supports `imageWidths` (XP 7.7+) and `imageSizes` (XP 7.8+) for responsive images |
 | `sanitizeHtml(html)` | any | Strips unsafe tags/attributes to protect against XSS |
 
@@ -142,6 +162,37 @@ dependencies {
   }
 }
 ```
+
+## Asset URLs (lib-asset)
+
+Starting from XP 7.15, `assetUrl` from lib-portal is deprecated. Use lib-asset instead.
+
+Import: `import { assetUrl } from '/lib/enonic/asset';`
+
+Add to `build.gradle`:
+```
+dependencies {
+  include "com.enonic.lib:lib-asset:${libVersion}"
+}
+```
+
+Usage in a controller:
+```ts
+import { assetUrl } from '/lib/enonic/asset';
+
+const cssUrl = assetUrl({ path: 'styles/main.css' });
+```
+
+For Thymeleaf templates that previously used `portal.assetUrl`, pass an `assetUrlBase` from the controller:
+```ts
+import { assetUrl } from '/lib/enonic/asset';
+
+const model = {
+  assetUrlBase: assetUrl({ path: '' })
+};
+```
+
+Then reference assets in the template with `${assetUrlBase} + '/styles.css'`.
 
 ## Content API (lib-content)
 
@@ -229,7 +280,7 @@ exports.responseProcessor = function (req, res) {
 };
 ```
 
-Response processors run between component rendering and the contributions filter. Setting `applyFilters: false` in the response skips further processors and filters.
+Response processors run between component rendering and the contributions filter. Setting `applyFilters: false` in the response skips further processors and filters. For use cases beyond page contributions (e.g., request interception or timing), consider using HTTP Filters (`exports.filter`) wired via site mappings instead.
 
 Execution order is determined by the `order` attribute (lower = higher priority) combined with app order on the site.
 
@@ -246,6 +297,8 @@ Register in `site.xml`:
 ## XML Descriptor Reference
 
 ### Page Descriptor
+
+The optional `i18n` attribute on `<display-name>` enables localization (e.g., `<display-name i18n="component.page.name">`).
 
 ```xml
 <page>

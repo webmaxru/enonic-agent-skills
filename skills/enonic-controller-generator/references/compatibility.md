@@ -4,6 +4,7 @@
 
 - **XP 7.x**: Current stable branch. All patterns in this skill target XP 7.x.
 - **XP 7.2+**: Custom icons for parts (SVG or PNG placed alongside the descriptor).
+- **XP 7.3+**: `sameSite` attribute on response cookies. Accepts `Lax`, `Strict`, or `None`. Default is browser's default when not set.
 - **XP 7.8+**: `archive` and `restore` functions in lib-content.
 - **XP 7.12+**: `request.getHeader(name)` for case-insensitive header lookup. `duplicate` function in lib-content.
 - **XP 7.15+**: `assetUrl` from lib-portal is deprecated; use `lib-asset` or `lib-static` instead. `patch` HTTP method supported in controllers. Response headers can be set to `null` to remove headers added by other controllers/filters.
