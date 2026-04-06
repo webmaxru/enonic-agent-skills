@@ -371,3 +371,34 @@ Get a count of blog posts per category:
   }
 }
 ```
+
+## 14. In DSL with Typed Value Arrays
+
+Fetch content matching any of several category values using `in` with `stringValues`:
+
+```graphql
+{
+  guillotine {
+    queryDsl(
+      query: {
+        boolean: {
+          must: [
+            { term: { field: "type", value: { string: "com.enonic.app.myapp:Article" } } }
+            { in: { field: "data.category", stringValues: ["news", "opinion", "review"] } }
+          ]
+        }
+      }
+      sort: { field: "createdTime", direction: DESC }
+      first: 20
+    ) {
+      displayName
+      ... on com_enonic_app_myapp_Article {
+        data {
+          title
+          category
+        }
+      }
+    }
+  }
+}
+```

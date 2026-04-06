@@ -32,11 +32,12 @@ Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript
 
 ### Guillotine 7 Update 2
 
-- **CORS support**: Built-in Cross-Origin Resource Sharing support with configurable allowed origins, methods, and headers. Enabled by default.
+- **CORS support** (v7.2.0): Built-in Cross-Origin Resource Sharing support with configurable allowed origins, methods, and headers. Enabled by default. Configure via `com.enonic.app.guillotine.cfg`:
+  - `cors.enabled` (default `true`), `cors.origin`, `cors.credentials` (default `false`), `cors.allowedHeaders` (default `Content-Type`), `cors.methods` (default `POST, OPTIONS`), `cors.maxAge`.
 
 ### Guillotine 7 Update 3
 
-- **`maxQueryTokens` config**: Configurable maximum number of raw tokens the parser accepts per query. Defaults to `15000`.
+- **`maxQueryTokens` config** (v7.3.0): Configurable maximum number of raw tokens the parser accepts per query. Defaults to `15000`. Set via `maxQueryTokens` in `com.enonic.app.guillotine.cfg`.
 
 ## Guillotine 6.x
 
