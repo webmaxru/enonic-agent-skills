@@ -8,20 +8,26 @@ on:
         description: Name of the skill directory under skills/ to review
 concurrency:
   group: skill-review-${{ inputs.skill-name }}
+  cancel-in-progress: false
 permissions:
+  actions: read
   contents: read
   pull-requests: read
-  issues: read
 engine: copilot
 tools:
-  github:
-    toolsets: [default]
   web-fetch:
   edit:
-  bash: true
+  bash:
+    - node
+    - git
 safe-outputs:
   create-pull-request:
+    title-prefix: "docs: "
+    draft: true
+    if-no-changes: warn
+    fallback-as-issue: false
   noop:
+    report-as-issue: false
 network:
   allowed:
     - defaults
