@@ -6,7 +6,8 @@
 - **XP 7.2+**: Custom icons for parts (SVG or PNG placed alongside the descriptor).
 - **XP 7.8+**: `archive` and `restore` functions in lib-content.
 - **XP 7.12+**: `request.getHeader(name)` for case-insensitive header lookup. `duplicate` function in lib-content.
-- **XP 7.15+**: `assetUrl` from lib-portal is deprecated; use `lib-asset` or `lib-static` instead. `patch` HTTP method supported in controllers. Response headers can be set to `null` to remove headers added by other controllers/filters.
+- **XP 7.15+**: `assetUrl` from lib-portal is deprecated; use `lib-asset` or `lib-static` instead. `patch` HTTP method supported in controllers. Response headers can be set to `null` to remove headers added by other controllers/filters. `@enonic-types/core` now includes TypeScript types for `Request` and `Response` objects.
+- **XP 7.16+**: GraalVM for JDK 21. No new controller-specific changes.
 
 ## TypeScript vs JavaScript
 
@@ -40,6 +41,15 @@ Enonic XP supports both TypeScript and JavaScript controllers.
 | lib-thymeleaf | `/lib/thymeleaf` | `com.enonic.lib:lib-thymeleaf:2.0.0` |
 | lib-mustache | `/lib/mustache` | `com.enonic.lib:lib-mustache:2.1.0` |
 | lib-asset | `/lib/enonic/asset` | `com.enonic.lib:lib-asset:${libVersion}` |
+
+### TypeScript Type Packages
+
+| Package | Purpose |
+|---|---|
+| `@enonic-types/core` | Shared types (Content, Principal, Request, Response — XP 7.15+) |
+| `@enonic-types/lib-portal` | Portal library type definitions |
+| `@enonic-types/lib-asset` | Asset library type definitions |
+| `@enonic-types/global` | Global objects (`app`, `__`, `log`) and functions (`resolve`, `require`) — highly recommended |
 
 ## Common Pitfalls
 
