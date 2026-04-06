@@ -110,6 +110,54 @@ Always use `base:structured` unless the content type has a specific reason to in
 
 Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight | BulletedList NumberedList Outdent Indent | FindAndReplace SpecialChar Anchor Image Macro Link Unlink | Table | PasteModeSwitcher`
 
+Complete list of available editor tools:
+
+| Tool | Description |
+|---|---|
+| `Format` | Text format menu |
+| `Bold` | Bold text |
+| `Italic` | Italic text |
+| `Underline` | Underline text |
+| `JustifyBlock` | Justify content |
+| `JustifyLeft` | Left align content |
+| `JustifyCenter` | Center content |
+| `JustifyRight` | Right align content |
+| `BulletedList` | Insert a bullet list |
+| `NumberedList` | Insert a numbered list |
+| `Outdent` | Decrease indent |
+| `Indent` | Increase indent |
+| `FindAndReplace` | Find and Replace dialog |
+| `SpecialChar` | Insert a special character |
+| `Anchor` | Insert an anchor |
+| `Image` | Insert/Edit an image |
+| `Macro` | Insert a macro |
+| `Link` | Insert/Edit a link |
+| `Unlink` | Remove link |
+| `Table` | Table format menu |
+| `PasteModeSwitcher` | Paste mode (formatted/plain text) |
+| `BGColor` | Background color |
+| `Blockquote` | Quotation |
+| `Copy` | Copy selected text into buffer |
+| `CopyFormatting` | Copy formatting |
+| `CreateDiv` | Wrap with div |
+| `Cut` | Cut selected text into buffer |
+| `Font` | Font menu |
+| `FontSize` | Font size menu |
+| `HorizontalRule` | Insert a horizontal line |
+| `Language` | Set language for parts of the text |
+| `ListStyle` | Change style of BulletedList |
+| `NewPage` | Clean editor's content |
+| `Preview` | Preview HTML Area contents |
+| `Redo` | Repeat the last action |
+| `RemoveFormat` | Remove formatting |
+| `SelectAll` | Select editor's content |
+| `Strike` | Strikethrough over text |
+| `Styles` | Text styles menu |
+| `Subscript` | Subscript text |
+| `Superscript` | Superscript text |
+| `TextColor` | Text color |
+| `Undo` | Undo the last action |
+
 ### Numeric Inputs
 
 | Type | Value Type | Description |
@@ -155,6 +203,17 @@ Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight |
 | `DateTime` | LocalDateTime / Instant | Date and time (local by default; timezone via config) |
 | `Time` | LocalTime | Time only |
 
+### Date Config
+
+```xml
+<input name="mydate" type="Date">
+  <label>My Date</label>
+  <default>2011-09-12</default>
+</input>
+```
+
+- `default` supports ISO 8601 date format (`yyyy-MM-dd`) or relative expressions (e.g., `+1year -12days`, `now`)
+
 #### DateTime Config
 
 ```xml
@@ -169,6 +228,17 @@ Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight |
 
 - `timezone` — set to `true` to store value with timezone (produces `Instant`); default is `false` (produces `LocalDateTime`)
 - `default` supports ISO 8601 format (`yyyy-MM-ddThh:mm`, with optional timezone offset) or relative expressions (e.g., `+1year -12hours`, `now`)
+
+#### Time Config
+
+```xml
+<input name="mytime" type="Time">
+  <label>My Time</label>
+  <default>13:22</default>
+</input>
+```
+
+- `default` supports 24h format (`hh:mm`) or relative expressions (e.g., `+1hour -12minutes`, `now`)
 
 ### Selection Inputs
 
@@ -244,6 +314,18 @@ Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight |
 | `GeoPoint` | GeoPoint | Latitude/longitude coordinates |
 | `Tag` | String | Free-form tags |
 
+#### GeoPoint Config
+
+```xml
+<input name="mygeopoint" type="GeoPoint">
+  <label>My GeoPoint</label>
+  <occurrences minimum="0" maximum="1"/>
+  <default>51.5,-0.1</default>
+</input>
+```
+
+- `default` specifies a default coordinate as two comma-separated decimal numbers (latitude, longitude)
+
 ### Common Input Attributes
 
 ```xml
@@ -275,21 +357,30 @@ Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight |
     <option value="clothing">Clothing</option>
     <option value="home">Home</option>
   </config>
+  <default>electronics</default>
 </input>
 ```
+
+- `default` is optional and may be equal to one of the option `@value` attributes
 
 ### RadioButton Config Example
 
 ```xml
 <input name="priority" type="RadioButton">
   <label>Priority</label>
+  <occurrences minimum="1" maximum="1"/>
   <config>
-    <option value="low">Low</option>
-    <option value="medium">Medium</option>
-    <option value="high">High</option>
+    <option value="low" i18n="priority.low">Low</option>
+    <option value="medium" i18n="priority.medium">Medium</option>
+    <option value="high" i18n="priority.high">High</option>
   </config>
+  <default>medium</default>
 </input>
 ```
+
+- `default` is optional and may be equal to one of the option `@value` attributes
+- `i18n` on `<option>` is optional and holds the key to a localization phrase
+- Occurrences only supports `minimum` of 0 or 1; `maximum` is always 1
 
 ### ContentSelector Config Example
 
@@ -485,12 +576,29 @@ Location: `src/main/resources/site/x-data/[name]/[name].xml`
 </x-data>
 ```
 
+### X-Data Registration in site.xml
+
+X-data schemas are registered for use in `src/main/resources/site/site.xml`. Use `allowContentTypes` to restrict by content type pattern and `optional` to let editors enable it manually:
+
+```xml
+<site>
+  <x-data name="my-x-data-1" />
+  <x-data name="my-x-data-2" allowContentTypes="^(?!base:folder$).*" />
+  <x-data name="my-x-data-3" allowContentTypes="portal:site" optional="true" />
+  <form/>
+</site>
+```
+
+- Without `allowContentTypes` and `optional`, x-data is enabled for all content types with no option to remove it
+- `allowContentTypes` accepts a regular expression to match content type names
+- `optional="true"` requires editors to manually enable the x-data in Content Wizard
+
 ## Field Sets (Decorative Grouping)
 
 Group fields visually without affecting data structure:
 
 ```xml
-<field-set name="personalInfo">
+<field-set>
   <label>Personal Information</label>
   <items>
     <input name="firstName" type="TextLine">
@@ -503,7 +611,7 @@ Group fields visually without affecting data structure:
 </field-set>
 ```
 
-Field sets do **not** create a nested property — fields inside remain at the same level.
+Field sets do **not** need a `name` attribute since they are only visual and do **not** affect the data model — fields inside remain at the same property level.
 
 ## Documentation Links
 
