@@ -27,7 +27,7 @@ ENONIC_APP_NAME=com.example.myproject
 ENONIC_MAPPINGS=en:intro/hmdb
 
 # Base URL for the Guillotine API (without project and branch segments)
-ENONIC_API=http://127.0.0.1:8080/site
+ENONIC_API=http://127.0.0.1:8080/site/
 ```
 
 Multiple locale mappings example:
@@ -752,7 +752,7 @@ In client-side components, use the `useLocaleContext` hook from `@enonic/nextjs-
 import {useLocaleContext} from '@enonic/nextjs-adapter/client';
 
 export default function ClientSideComponent() {
-    const {locale, localize, setLocale} = useLocaleContext();
+    const {locale, localize} = useLocaleContext();
     const localizedText = localize('text.key');
     // ...
 }

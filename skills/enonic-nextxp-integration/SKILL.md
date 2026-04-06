@@ -24,7 +24,7 @@ metadata:
    - `ENONIC_API_TOKEN` — shared secret for preview mode authentication.
    - `ENONIC_APP_NAME` — fully qualified Enonic application name (e.g., `com.example.myproject`).
    - `ENONIC_MAPPINGS` — locale-to-project/site mapping (e.g., `en:intro/hmdb`).
-   - `ENONIC_API` — base URL for the Guillotine API endpoint (e.g., `http://127.0.0.1:8080/site`).
+   - `ENONIC_API` — base URL for the Guillotine API endpoint (e.g., `http://127.0.0.1:8080/site/`).
 3. Install the `@enonic/nextjs-adapter` package if not already present: `npm install @enonic/nextjs-adapter`.
 4. Import `@enonic/nextjs-adapter/baseMappings` at the top of `src/components/_mappings.ts` to register built-in component renderers.
 5. Verify the Next.js project was scaffolded from the `nextxp-template` or contains the expected file structure: `src/components/_mappings.ts`, `src/app/[locale]/[[...contentPath]]/page.tsx`, and API routes under `src/app/api/`.
