@@ -96,6 +96,7 @@ Always use `base:structured` unless the content type has a specific reason to in
 ```xml
 <input name="myhtmlarea" type="HtmlArea">
   <label>My HtmlArea</label>
+  <default><h3>Enter description here</h3></default>
   <config>
     <exclude>*</exclude>
     <include>JustifyLeft JustifyRight | Bold Italic</include>
@@ -104,11 +105,60 @@ Always use `base:structured` unless the content type has a specific reason to in
 </input>
 ```
 
+- `default` — can contain any valid HTML elements (tags must be correctly closed since the schema is XML)
 - `exclude` — remove tools from toolbar (use `*` to remove all)
 - `include` — add tools to toolbar (separate with space, group with `|`)
 - `allowHeadings` — space-separated list of allowed heading tags (`h1` through `h6`; all allowed by default)
 
 Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight | BulletedList NumberedList Outdent Indent | FindAndReplace SpecialChar Anchor Image Macro Link Unlink | Table | PasteModeSwitcher`
+
+All available editor tools:
+
+| Tool | Description |
+|---|---|
+| `Format` | Text format menu |
+| `Bold` | Bold text |
+| `Italic` | Italic text |
+| `Underline` | Underline text |
+| `JustifyBlock` | Justify content |
+| `JustifyLeft` | Left align content |
+| `JustifyCenter` | Center content |
+| `JustifyRight` | Right align content |
+| `BulletedList` | Insert a bullet list |
+| `NumberedList` | Insert a numbered list |
+| `Outdent` | Decrease indent |
+| `Indent` | Increase indent |
+| `FindAndReplace` | Find and Replace dialog |
+| `SpecialChar` | Insert a special character |
+| `Anchor` | Insert an anchor |
+| `Image` | Insert/Edit an image |
+| `Macro` | Insert a macro |
+| `Link` | Insert/Edit a link |
+| `Unlink` | Remove link |
+| `Table` | Table format menu |
+| `PasteModeSwitcher` | Paste mode (formatted/plain text) |
+| `BGColor` | Background color |
+| `Blockquote` | Quotation |
+| `Copy` | Copy selected text into buffer |
+| `CopyFormatting` | Copy formatting |
+| `CreateDiv` | Wrap with div |
+| `Cut` | Cut selected text into buffer |
+| `Font` | Font menu |
+| `FontSize` | Font size menu |
+| `HorizontalRule` | Insert a horizontal line |
+| `Language` | Set language for parts of the text |
+| `ListStyle` | Change style of BulletedList |
+| `NewPage` | Clean editor's content |
+| `Preview` | Preview HTML Area contents |
+| `Redo` | Repeat the last action |
+| `RemoveFormat` | Remove formatting |
+| `SelectAll` | Select editor's content |
+| `Strike` | Strikethrough over text |
+| `Styles` | Text styles menu |
+| `Subscript` | Subscript text |
+| `Superscript` | Superscript text |
+| `TextColor` | Text color |
+| `Undo` | Undo the last action |
 
 ### Numeric Inputs
 
@@ -168,7 +218,45 @@ Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight |
 ```
 
 - `timezone` — set to `true` to store value with timezone (produces `Instant`); default is `false` (produces `LocalDateTime`)
-- `default` supports ISO 8601 format (`yyyy-MM-ddThh:mm`, with optional timezone offset) or relative expressions (e.g., `+1year -12hours`, `now`)
+- `default` supports:
+  - ISO 8601 format with timezone: `yyyy-MM-ddThh:mm±hh:mm` (e.g., `2016-12-31T23:59+01:00`)
+  - ISO 8601 format without timezone: `yyyy-MM-ddThh:mm` (e.g., `2016-12-31T23:59`)
+  - Relative expressions (e.g., `+1year -12hours`, `now`)
+
+#### Date Config
+
+```xml
+<input name="mydate" type="Date">
+  <label>My Date</label>
+  <default>2011-09-12</default>
+</input>
+```
+
+- `default` supports ISO 8601 format (`yyyy-MM-dd`) or relative date expressions (e.g., `+1year -12days`, `now`)
+
+#### Time Config
+
+```xml
+<input name="mytime" type="Time">
+  <label>My Time</label>
+  <default>13:22</default>
+</input>
+```
+
+- `default` supports 24h format (`hh:mm`) or relative time expressions (e.g., `+1hour -12minutes`, `now`)
+
+#### Relative Expression Unit Strings
+
+| Singular | Plural | Initial Letter |
+|---|---|---|
+| `year` | `years` | `y` |
+| `month` | `months` | `M` |
+| `week` | `weeks` | `w` |
+| `day` | `days` | `d` |
+| `hour` | `hours` | `h` |
+| `minute` | `minutes` | `m` |
+
+Date type supports `year`, `month`, `week`, `day`. Time type supports `hour`, `minute`. DateTime supports all units.
 
 ### Selection Inputs
 
@@ -244,6 +332,18 @@ Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight |
 | `GeoPoint` | GeoPoint | Latitude/longitude coordinates |
 | `Tag` | String | Free-form tags |
 
+#### GeoPoint Config
+
+```xml
+<input name="mygeopoint" type="GeoPoint">
+  <label>My GeoPoint</label>
+  <occurrences minimum="0" maximum="1"/>
+  <default>51.5,-0.1</default>
+</input>
+```
+
+- `default` — comma-separated latitude and longitude (e.g., `51.5,-0.1`). Latitude: -90 to 90. Longitude: -180 to 180.
+
 ### Common Input Attributes
 
 ```xml
@@ -275,21 +375,31 @@ Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight |
     <option value="clothing">Clothing</option>
     <option value="home">Home</option>
   </config>
+  <default>electronics</default>
 </input>
 ```
+
+- `option` elements and the `@value` attribute define the value stored when the option is selected. Multiple `option` elements are allowed and ordered.
+- `default` — optional, must equal one of the option values
 
 ### RadioButton Config Example
 
 ```xml
 <input name="priority" type="RadioButton">
   <label>Priority</label>
+  <occurrences minimum="1" maximum="1"/>
   <config>
-    <option value="low">Low</option>
-    <option value="medium">Medium</option>
-    <option value="high">High</option>
+    <option value="low" i18n="priority.low.label">Low</option>
+    <option value="medium" i18n="priority.medium.label">Medium</option>
+    <option value="high" i18n="priority.high.label">High</option>
   </config>
+  <default>medium</default>
 </input>
 ```
+
+- `option` elements and the `@value` attribute define the value stored when the option is selected. Optional `i18n` attribute localizes the option label.
+- `occurrences` — only `minimum="0"` or `minimum="1"` is meaningful; `maximum` is always `1`
+- `default` — optional, must equal one of the option values
 
 ### ContentSelector Config Example
 
@@ -485,12 +595,29 @@ Location: `src/main/resources/site/x-data/[name]/[name].xml`
 </x-data>
 ```
 
-## Field Sets (Decorative Grouping)
+### X-Data in site.xml
 
-Group fields visually without affecting data structure:
+Attach x-data to content types via `site.xml`. Use `allowContentTypes` with regular expressions to restrict which content types receive the x-data. Set `optional="true"` to let editors enable it manually in the Content Wizard.
 
 ```xml
-<field-set name="personalInfo">
+<site>
+  <x-data name="my-x-data-1" />
+  <x-data name="my-x-data-2" allowContentTypes="^(?!base:folder$).*" />
+  <x-data name="my-x-data-3" allowContentTypes="portal:site" optional="true" />
+  <form/>
+</site>
+```
+
+- No attributes — x-data is enabled for all content types with no option to remove it
+- `allowContentTypes` — regex pattern to match content type names; unmatched types will not see the x-data
+- `optional="true"` — editors must manually enable the x-data in Content Wizard
+
+## Field Sets (Decorative Grouping)
+
+Group fields visually without affecting data structure. Field sets do **not** need a `name` attribute since they are only visual and do **not** affect the data model:
+
+```xml
+<field-set>
   <label>Personal Information</label>
   <items>
     <input name="firstName" type="TextLine">
@@ -503,7 +630,7 @@ Group fields visually without affecting data structure:
 </field-set>
 ```
 
-Field sets do **not** create a nested property — fields inside remain at the same level.
+Fields inside a field set remain at the same level in the persisted data — no nested property is created.
 
 ## Documentation Links
 
