@@ -22,6 +22,7 @@ import contentLib from '/lib/xp/content';
 | `contentLib.exists()` | Check if content exists at path or id |
 | `contentLib.get()` | Fetch a single content item |
 | `contentLib.getChildren()` | Fetch children with pagination |
+| `contentLib.getOutboundDependencies()` | List outbound content references by key (XP 7.2+) |
 | `contentLib.archive()` | Archive content (XP 7.8+) |
 | `contentLib.restore()` | Restore archived content (XP 7.8+) |
 
@@ -416,19 +417,35 @@ exportLib.exportNodes({
   sourceNodePath: '/content',
   exportName: 'my-export',
   includeNodeIds: true,
-  includeVersions: false
+  includeVersions: false,
+  nodeResolved: (count) => {
+    log.info('Nodes to export: %s', count);
+  },
+  nodeExported: (count) => {
+    log.info('Exported so far: %s', count);
+  }
 });
 // Export is written to the server's exports directory
+// Returns: { exportedNodes, exportedBinaries, exportErrors }
 ```
 
 ### Import Nodes
 
 ```typescript
 exportLib.importNodes({
-  source: 'my-export',           // Export name in exports directory
+  source: 'my-export',           // Export name in exports directory, or application resource key
   targetNodePath: '/content',
+  xslt: 'transform.xslt',       // Optional XSLT for pre-import transformation
+  xsltParams: { key: 'value' },  // Optional parameters for XSLT
   includeNodeIds: true,           // Preserve original IDs (default: false)
-  includePermissions: true        // Preserve permissions (default: false)
+  includePermissions: true,       // Preserve permissions (default: false)
+  nodeResolved: (count) => {
+    log.info('Nodes to import: %s', count);
+  },
+  nodeImported: (count) => {
+    log.info('Imported so far: %s', count);
+  }
 });
 // Returns: { addedNodes, updatedNodes, importedBinaries, importErrors }
+// importErrors entries contain: { exception, message, stacktrace }
 ```
