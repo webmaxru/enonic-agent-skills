@@ -10,14 +10,15 @@
 | `contentLib.publish()` | 6.0 | `sourceBranch`/`targetBranch` not in use since 7.12 (ignored, publish always goes draft→master). `excludeChildrenIds` parameter added in 7.12 |
 | `contentLib.archive()` | 7.8 | Archive/restore workflow |
 | `contentLib.restore()` | 7.8 | Restore from archive |
-| `contentLib.duplicate()` | 7.12 | Includes `variant` option from 7.12 |
+| `contentLib.getOutboundDependencies()` | 7.2 | List outbound content references for dependency resolution |
+| `contentLib.duplicate()` | 7.12 | Includes `variant`, `parent`, `name` options from 7.12 |
 | `taskLib.executeFunction()` | 7.7 | Replaces deprecated `taskLib.submit()` |
 | `taskLib.submitTask()` | 7.7 | Replaces deprecated `taskLib.submitNamed()` |
 | `taskLib.sleep()` | 7.0 | Only works inside a task context |
-| `repo.duplicate()` | 7.12 | Node-level duplication |
+| `repo.duplicate()` | 7.12 | Node-level duplication with `dataProcessor` callback and `refresh` option |
 | `repo.findChildren()` `recursive` | 7.7 | Recursive fetching of all nested children |
 | Named task `taskId` 2nd argument | 7.13 | `exports.run(params, taskId)` receives task ID |
-| `lib-export` (exportNodes/importNodes) | 7.8 | Node export/import API for environment migration |
+| `lib-export` (exportNodes/importNodes) | 7.8 | Node export/import API for environment migration; `importNodes` supports XSLT pre-transformation and progress callbacks (`nodeResolved`, `nodeImported`) |
 | Query DSL `exists` expression | 7.11 | DSL expression to check field existence |
 | Query DSL `boolean.filter` | 7.11 | Non-scoring filter compound in query DSL |
 | Query DSL (JSON format) | 7.9 | Alternative to string-based NoQL |

@@ -422,3 +422,102 @@ contextLib.run({
   repo.refresh();
 });
 ```
+
+## Export and Import with Progress Tracking
+
+Use the export/import API (XP 7.8+) to move content between environments with progress reporting and optional XSLT transformation.
+
+```typescript
+import exportLib from '/lib/xp/export';
+import contextLib from '/lib/xp/context';
+import { executeFunction, progress } from '/lib/xp/task';
+
+exports.run = function () {
+  executeFunction({
+    description: 'Export and reimport content with transformation',
+    func: () => {
+      contextLib.run({
+        branch: 'draft',
+        principals: ['role:system.admin']
+      }, () => {
+        let totalNodes = 0;
+
+        // Export content subtree
+        const exportResult = exportLib.exportNodes({
+          sourceNodePath: '/content/my-site/articles',
+          exportName: 'articles-export',
+          includeNodeIds: true,
+          includeVersions: false,
+          nodeResolved: (count) => {
+            totalNodes = count;
+            progress({ info: `Exporting ${count} nodes`, current: 0, total: count });
+          },
+          nodeExported: (count) => {
+            progress({ info: `Exported ${count}/${totalNodes}`, current: count, total: totalNodes });
+          }
+        });
+
+        if (exportResult.exportErrors.length > 0) {
+          log.error('Export errors: %s', JSON.stringify(exportResult.exportErrors));
+          return;
+        }
+
+        // Import into a different path with XSLT transformation
+        const importResult = exportLib.importNodes({
+          source: 'articles-export',
+          targetNodePath: '/content/new-site/articles',
+          xslt: 'migration-transform.xslt',
+          xsltParams: { newSiteName: 'new-site' },
+          includeNodeIds: false,
+          includePermissions: true,
+          nodeResolved: (count) => {
+            totalNodes = count;
+            progress({ info: `Importing ${count} nodes`, current: 0, total: count });
+          },
+          nodeImported: (count) => {
+            progress({ info: `Imported ${count}/${totalNodes}`, current: count, total: totalNodes });
+          }
+        });
+
+        log.info('Added: %s, Updated: %s', importResult.addedNodes.length, importResult.updatedNodes.length);
+
+        if (importResult.importErrors.length > 0) {
+          importResult.importErrors.forEach((err) => {
+            log.error('Import error: %s - %s', err.exception, err.message);
+          });
+        }
+
+        progress({ info: 'Export/import complete', current: totalNodes, total: totalNodes });
+      });
+    }
+  });
+};
+```
+
+## Resolve Outbound Dependencies Before Deletion
+
+Use `getOutboundDependencies()` (XP 7.2+) to identify referenced content before bulk deletion.
+
+```typescript
+import contentLib from '/lib/xp/content';
+import contextLib from '/lib/xp/context';
+
+contextLib.run({
+  branch: 'draft',
+  principals: ['role:system.admin']
+}, () => {
+  const targets = contentLib.query({
+    count: 100,
+    query: "type = 'app:deprecated-type'"
+  });
+
+  targets.hits.forEach((hit) => {
+    const deps = contentLib.getOutboundDependencies({ key: hit._id });
+    if (deps.length > 0) {
+      log.warning('Content %s references %s other items — skipping delete', hit._path, deps.length);
+    } else {
+      contentLib.delete({ key: hit._id });
+    }
+  });
+});
+```
