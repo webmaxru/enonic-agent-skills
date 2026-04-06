@@ -180,6 +180,36 @@ const taskId = taskLib.submitTask({
 });
 ```
 
+### Named Task Structure
+
+Named tasks are defined by a descriptor and a controller placed in `src/main/resources/tasks/<taskName>/`:
+
+- **Descriptor:** `<taskName>.xml` — defines the task description and an optional parameter form schema.
+
+```xml
+<task>
+  <description>Background job</description>
+  <form>
+    <input type="Long" name="count">
+      <label>Number of items to process</label>
+      <occurrences minimum="1" maximum="1"/>
+    </input>
+  </form>
+</task>
+```
+
+- **Controller:** `<taskName>.js` (or `.ts`) — exports a `run` function. Since XP 7.13.0, `taskId` is provided as a second argument.
+
+```typescript
+exports.run = function (params, taskId) {
+  taskLib.progress({ info: 'Initializing task ' + taskId });
+  // processing logic
+  taskLib.progress({ info: 'Task completed ' + taskId });
+};
+```
+
+**Distributable tasks (XP 7.6.0+):** Named tasks can be distributed across cluster nodes. Only one node executes the task. Configure `com.enonic.xp.task.cfg` to control which nodes accept distributable tasks. Distributable tasks execute with the same context (user, repository/branch) they were originally submitted in.
+
 ### progress(params)
 
 Reports progress from inside a running task.
