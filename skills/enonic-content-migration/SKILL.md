@@ -39,7 +39,7 @@ metadata:
 3. For date-range queries, use `instant()` or `dateTime()` functions and the `range()` query function.
 4. For full-text search, use `fulltext()` with the appropriate field paths and operator (`AND`/`OR`).
 5. For path-scoped operations, use `_path LIKE '/content/site-path/*'` to match descendants. Note: the `_path` property in NoQL queries includes the internal `/content/` prefix, but `hit._path` in results returns the content-domain path without it. Always prepend `/content/` when building queries from result paths.
-6. Add `filters` for efficient post-query narrowing using `exists`, `notExists`, `hasValue`, or `boolean` combinations.
+6. Add `filters` for efficient post-query narrowing using `exists`, `notExists`, `hasValue`, `ids`, or `boolean` combinations.
 7. Add `aggregations` when the operation needs grouped statistics (term counts, date histograms, numeric ranges, stats).
 8. Read `references/examples.md` for complete query and aggregation patterns.
 

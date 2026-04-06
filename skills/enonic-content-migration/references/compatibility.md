@@ -8,9 +8,10 @@
 | `contentLib.create()` | 6.0 | `refresh` parameter available from 6.0 |
 | `contentLib.modify()` | 6.0 | Editor callback pattern |
 | `contentLib.publish()` | 6.0 | `sourceBranch`/`targetBranch` not in use since 7.12 (ignored, publish always goes draft→master). `excludeChildrenIds` parameter added in 7.12 |
+| `contentLib.getOutboundDependencies()` | 7.2 | Returns ids of outbound content dependencies |
 | `contentLib.archive()` | 7.8 | Archive/restore workflow |
 | `contentLib.restore()` | 7.8 | Restore from archive |
-| `contentLib.duplicate()` | 7.12 | Includes `variant` option from 7.12 |
+| `contentLib.duplicate()` | 7.12 | Includes `variant`, `parent`, and `name` options from 7.12 |
 | `taskLib.executeFunction()` | 7.7 | Replaces deprecated `taskLib.submit()` |
 | `taskLib.submitTask()` | 7.7 | Replaces deprecated `taskLib.submitNamed()` |
 | `taskLib.sleep()` | 7.0 | Only works inside a task context |

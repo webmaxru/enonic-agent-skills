@@ -24,6 +24,8 @@ import contentLib from '/lib/xp/content';
 | `contentLib.getChildren()` | Fetch children with pagination |
 | `contentLib.archive()` | Archive content (XP 7.8+) |
 | `contentLib.restore()` | Restore archived content (XP 7.8+) |
+| `contentLib.duplicate()` | Duplicate content with optional variant/parent (XP 7.12+) |
+| `contentLib.getOutboundDependencies()` | List outbound content references for dependency analysis (XP 7.2+) |
 
 ### Query Parameters
 
@@ -259,6 +261,43 @@ aggregations: {
 }
 ```
 
+### Date Range Aggregation
+
+```typescript
+aggregations: {
+  publishPeriods: {
+    dateRange: {
+      field: 'publish.from',
+      format: 'MM-yyyy',
+      ranges: [
+        { to: 'now-12M/M' },
+        { from: 'now-12M/M', to: 'now-6M/M' },
+        { from: 'now-6M/M' }
+      ]
+    }
+  }
+}
+```
+
+Date range `from`/`to` values support date-math expressions: `now-1d`, `2024-01-01T00:00:00Z||-3h+1m`, `now+1d+30m/m` (rounded to minutes).
+
+### Histogram Aggregation
+
+```typescript
+aggregations: {
+  priceDistribution: {
+    histogram: {
+      field: 'data.price',
+      interval: 100,
+      minDocCount: 1,
+      extendedBoundMin: 0,
+      extendedBoundMax: 10000,
+      order: '_key desc'
+    }
+  }
+}
+```
+
 ### Nested Aggregation (terms + sub-aggregation)
 
 ```typescript
@@ -416,19 +455,39 @@ exportLib.exportNodes({
   sourceNodePath: '/content',
   exportName: 'my-export',
   includeNodeIds: true,
-  includeVersions: false
+  includeVersions: false,
+  nodeResolved: (count) => {        // Callback: total nodes to export
+    log.info('Nodes to export: %s', count);
+  },
+  nodeExported: (count) => {        // Callback: nodes exported since last call
+    log.info('Exported: %s', count);
+  }
 });
-// Export is written to the server's exports directory
+// Returns: { exportedNodes, exportedBinaries, exportErrors }
 ```
 
 ### Import Nodes
 
 ```typescript
 exportLib.importNodes({
-  source: 'my-export',           // Export name in exports directory
+  source: 'my-export',           // Export name in exports directory, or application resource key
   targetNodePath: '/content',
+  xslt: 'transform.xslt',       // Optional XSLT for pre-import transformation
+  xsltParams: { key: 'value' },  // Optional params passed to XSLT
   includeNodeIds: true,           // Preserve original IDs (default: false)
-  includePermissions: true        // Preserve permissions (default: false)
+  includePermissions: true,       // Preserve permissions (default: false)
+  nodeResolved: (count) => {      // Callback: total nodes to import
+    log.info('Nodes to import: %s', count);
+  },
+  nodeImported: (count) => {      // Callback: nodes imported since last call
+    log.info('Imported: %s', count);
+  }
 });
-// Returns: { addedNodes, updatedNodes, importedBinaries, importErrors }
+// Returns:
+// {
+//   addedNodes: string[],
+//   updatedNodes: string[],
+//   importedBinaries: string[],
+//   importErrors: Array<{ exception: string, message: string, stacktrace: string[] }>
+// }
 ```
