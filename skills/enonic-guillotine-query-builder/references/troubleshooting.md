@@ -64,6 +64,13 @@ queryDsl(
 | Empty aggregation buckets | The `field` path must match the indexed property path (e.g. `data.category`, not `category`). |
 | Unexpected bucket counts | `terms` aggregation defaults to 10 buckets — increase `size` for more. |
 
+## In Expression Issues
+
+| Symptom | Fix |
+|---|---|
+| `in` expression returns type error | `InDSLExpressionInput` uses typed array fields (`stringValues`, `doubleValues`, `longValues`, etc.) instead of a single `value` field. Use the array matching your value type. |
+| `in` expression returns no results | Verify the typed values array field matches the indexed type. For instance, use `stringValues` for text fields, `longValues` for integer fields. |
+
 ## Rich Text / HtmlArea Issues
 
 | Symptom | Fix |

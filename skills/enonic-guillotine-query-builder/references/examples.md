@@ -371,3 +371,33 @@ Get a count of blog posts per category:
   }
 }
 ```
+
+## 14. In Expression with Typed Value Arrays
+
+Match content whose category is any of several values using the `in` expression. Use the typed array field matching your value type (e.g. `stringValues` for strings):
+
+```graphql
+{
+  guillotine {
+    queryDsl(
+      query: {
+        in: {
+          field: "data.category"
+          stringValues: ["news", "blog", "tutorial"]
+        }
+      }
+      sort: { field: "createdTime", direction: DESC }
+      first: 20
+    ) {
+      _id
+      displayName
+      ... on com_enonic_app_myapp_Article {
+        data {
+          title
+          category
+        }
+      }
+    }
+  }
+}
+```

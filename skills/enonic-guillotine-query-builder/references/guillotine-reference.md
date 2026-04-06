@@ -199,9 +199,51 @@ Supports `boost` for relevance scoring.
 Exactly one type field:
 `string`, `double`, `long`, `boolean`, `localDate`, `localDateTime`, `localTime`, `instant`
 
+### InDSLExpressionInput
+
+Matches content where a field contains any value from a list. Unlike other DSL expressions, `in` uses separate typed array fields instead of a single `value`:
+
+| Field | Type | Description |
+|---|---|---|
+| `field` | `String!` | Property name to search |
+| `boost` | `Float` | Relevance score multiplier |
+| `stringValues` | `[String]` | String values |
+| `doubleValues` | `[Float]` | Float values |
+| `longValues` | `[Int]` | Integer values |
+| `booleanValues` | `[Boolean]` | Boolean values |
+| `localDateValues` | `[Date]` | Date values (e.g. `2015-03-16`) |
+| `localDateTimeValues` | `[LocalDateTime]` | DateTime without timezone (e.g. `2015-03-16T10:00:02`) |
+| `localTimeValues` | `[LocalTime]` | Time without date (e.g. `10:00:03`) |
+| `instantValues` | `[DateTime]` | Point on the time-line (e.g. `2015-03-16T10:00:02Z`) |
+
+Only one typed values field should be provided per expression. Example:
+
+```graphql
+in: { field: "data.category", stringValues: ["news", "blog", "tutorial"] }
+```
+
 ### Other DSL Expression Inputs
 
-All DSL expression types (`like`, `in`, `exists`, `fulltext`, `ngram`, `stemmed`, `matchAll`, `pathMatch`) support the `boost` parameter for relevance scoring. `fulltext`, `ngram`, and `stemmed` accept `fields`, `query`, and `operator` (`OR` or `AND`). `stemmed` also requires `language`.
+The `like`, `exists`, `stemmed`, `matchAll`, and `pathMatch` expression types support the `boost` parameter for relevance scoring. `fulltext`, `ngram`, and `stemmed` accept `fields`, `query`, and `operator` (`OR` or `AND`). `stemmed` also requires `language` and supports `boost`. Note: `fulltext` and `ngram` do not support `boost`.
+
+## Attachment Type
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | `String` | Attachment name |
+| `label` | `String` | Attachment label |
+| `size` | `Int` | Attachment size |
+| `mimeType` | `String` | Attachment MIME type |
+| `attachmentUrl(download: Boolean, type: UrlType, params: Json)` | `String` | Attachment URL. `params` is `Json` type in Guillotine 7+ |
+
+## ContentType Utility Fields
+
+The `ContentType` type (returned by `getType` / `getTypes`) includes utility fields for fetching content instances directly:
+
+| Field | Type | Description |
+|---|---|---|
+| `getInstances(offset, first, query, sort)` | `[Content]` | Fetch contents of this type |
+| `getInstanceConnection(after, first, query, sort)` | `ContentConnection` | Fetch contents of this type as a connection |
 
 ## SortDslInput
 
