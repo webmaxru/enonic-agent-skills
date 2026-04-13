@@ -48,6 +48,7 @@ metadata:
 3. Write the generated XML to the file.
 4. If a mixin was generated, write it to: `[projectRoot]/src/main/resources/site/mixins/[name]/[name].xml`
 5. If x-data was generated, write it to: `[projectRoot]/src/main/resources/site/x-data/[name]/[name].xml`
+6. If x-data references are needed in `site.xml`, add `<x-data>` entries with `allowContentTypes` and `optional` attributes as specified.
 
 **Step 5: Validate Output**
 1. Verify the generated XML is well-formed.
