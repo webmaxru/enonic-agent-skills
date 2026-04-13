@@ -26,6 +26,23 @@ The directory name **must** match the file name (minus the `.xml` extension).
 </content-type>
 ```
 
+> **Note:** `allow-child-content-type` has no effect if `allow-child-content` is set to `false`.
+
+`allow-child-content-type` supports pattern matching (the same syntax as ContentSelector's MATCH mode). Examples:
+
+- `${app}:article` — match `article` type from the current application
+- `${app}:article-*` — match all types starting with `article-` from the current application
+- `base:folder` — match the built-in folder type
+- `*:quote` — match `quote` from any application
+
+### Content Type Icon
+
+A content type may optionally have its own icon. Add a PNG or SVG file with the same name in the content type directory:
+
+```
+src/main/resources/site/content-types/my-type/my-type.svg
+```
+
 ### XSD Validation Attributes
 
 Add these attributes to `<content-type>` for editor validation:
@@ -110,6 +127,54 @@ Always use `base:structured` unless the content type has a specific reason to in
 
 Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight | BulletedList NumberedList Outdent Indent | FindAndReplace SpecialChar Anchor Image Macro Link Unlink | Table | PasteModeSwitcher`
 
+Complete list of available toolbar tools:
+
+| Tool | Description |
+|---|---|
+| `Format` | Text format menu |
+| `Bold` | Bold text |
+| `Italic` | Italic text |
+| `Underline` | Underline text |
+| `JustifyBlock` | Justify content |
+| `JustifyLeft` | Left align content |
+| `JustifyCenter` | Center content |
+| `JustifyRight` | Right align content |
+| `BulletedList` | Insert a bullet list |
+| `NumberedList` | Insert a numbered list |
+| `Outdent` | Decrease indent |
+| `Indent` | Increase indent |
+| `FindAndReplace` | Find and Replace dialog |
+| `SpecialChar` | Insert a special character |
+| `Anchor` | Insert an anchor |
+| `Image` | Insert/Edit an image |
+| `Macro` | Insert a macro |
+| `Link` | Insert/Edit a link |
+| `Unlink` | Remove link |
+| `Table` | Table format menu |
+| `PasteModeSwitcher` | Paste mode (formatted/plain text) |
+| `BGColor` | Background color |
+| `Blockquote` | Quotation |
+| `Copy` | Copy selected text into buffer |
+| `CopyFormatting` | Copy formatting |
+| `CreateDiv` | Wrap with div |
+| `Cut` | Cut selected text into buffer |
+| `Font` | Font menu |
+| `FontSize` | Font size menu |
+| `HorizontalRule` | Insert a horizontal line |
+| `Language` | Set language for parts of the text |
+| `ListStyle` | Change style of BulletedList |
+| `NewPage` | Clean editor's content |
+| `Preview` | Preview HTML Area contents |
+| `Redo` | Repeat the last action |
+| `RemoveFormat` | Remove formatting |
+| `SelectAll` | Select editor's content |
+| `Strike` | Strikethrough over text |
+| `Styles` | Text styles menu |
+| `Subscript` | Subscript text |
+| `Superscript` | Superscript text |
+| `TextColor` | Text color |
+| `Undo` | Undo the last action |
+
 ### Numeric Inputs
 
 | Type | Value Type | Description |
@@ -170,6 +235,19 @@ Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight |
 - `timezone` — set to `true` to store value with timezone (produces `Instant`); default is `false` (produces `LocalDateTime`)
 - `default` supports ISO 8601 format (`yyyy-MM-ddThh:mm`, with optional timezone offset) or relative expressions (e.g., `+1year -12hours`, `now`)
 
+A relative datetime expression is a sequence of one or more offsets: a plus or minus sign, an integer, and a unit string.
+
+| Singular | Plural | Initial letter |
+|---|---|---|
+| `year` | `years` | `y` |
+| `month` | `months` | `M` |
+| `week` | `weeks` | `w` |
+| `day` | `days` | `d` |
+| `hour` | `hours` | `h` |
+| `minute` | `minutes` | `m` |
+
+The special value `now` means the current date and time.
+
 ### Selection Inputs
 
 | Type | Value Type | Description |
@@ -228,6 +306,44 @@ Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight |
 - `service` — name of a JavaScript service at `/resources/services/[name]/[name].js`; can reference another app with `com.myapp:servicename`
 - `param` — optional name-value parameters passed to the service as query params (repeatable)
 - `galleryMode` — `true` displays options as a three-column image gallery
+
+#### CustomSelector Service Request
+
+In addition to `param` values, the service receives these query parameters:
+
+- `ids` — array of item IDs already selected (service should return those items)
+- `start` — index of the first item expected (pagination)
+- `count` — maximum number of items expected (pagination)
+- `query` — search text typed by the user
+
+#### CustomSelector Service Response
+
+The service controller must return JSON with `total`, `count`, and `hits` properties:
+
+```json
+{
+  "total": 10,
+  "count": 2,
+  "hits": [
+    {
+      "id": "1",
+      "displayName": "Option number 1",
+      "description": "Optional description",
+      "iconUrl": "/some/path/images/icon.svg"
+    },
+    {
+      "id": "2",
+      "displayName": "Option number 2",
+      "icon": {
+        "data": "<svg xmlns=\"http://www.w3.org/2000/svg\"/>",
+        "type": "image/svg+xml"
+      }
+    }
+  ]
+}
+```
+
+Each hit must have `id` and `displayName`. Optional fields: `description`, `iconUrl`, `icon`.
 
 ### Media Inputs
 
@@ -312,6 +428,59 @@ Default toolbar: `Format | JustifyBlock JustifyLeft JustifyCenter JustifyRight |
 - `hideToggleIcon` — `true` hides the flat/tree toggle icon (default: `false`)
 
 By default, ContentSelector only displays content from the same site.
+
+#### Allow Content Type Pattern Matching
+
+XP uses one of two modes for content type patterns:
+
+- **`LEGACY`** — substring matching within the content type name (default before XP 7.7.0)
+- **`MATCH`** — regex-based pattern matching (current default since XP 7.7.0); the whole content type name must match
+
+Special cases in XP pattern matching:
+
+- `${app}` — template expression replaced with the current application name
+- `*` — treated as "0 or more of any character(s) except line breaks" (glob-style, not regex `*`)
+
+#### allowContentType Samples
+
+```xml
+<!-- Content type "citation" within your current application -->
+<allowContentType>citation</allowContentType>
+
+<!-- Content type "quote" from the application "my.other.app" -->
+<allowContentType>my.other.app:quote</allowContentType>
+
+<!-- Content types "quote" from any application -->
+<allowContentType>*:quote</allowContentType>
+
+<!-- Any content types from current application -->
+<allowContentType>${app}:*</allowContentType>
+
+<!-- All content types starting with "banana" -->
+<allowContentType>*:banana*</allowContentType>
+
+<!-- All content types except "base:folder" -->
+<allowContentType>^(?!base:folder$)*</allowContentType>
+```
+
+#### allowPath Samples
+
+```xml
+<!-- All content starting from the root -->
+<allowPath>*</allowPath>
+
+<!-- Only content from the current site -->
+<allowPath>${site}/*</allowPath>
+
+<!-- All children of <site>/people -->
+<allowPath>${site}/people/*</allowPath>
+
+<!-- All children of the current content -->
+<allowPath>./*</allowPath>
+
+<!-- All children of the current content's parent -->
+<allowPath>../*</allowPath>
+```
 
 ### ImageSelector Config Example
 
@@ -484,6 +653,23 @@ Location: `src/main/resources/site/x-data/[name]/[name].xml`
   </form>
 </x-data>
 ```
+
+### X-Data Configuration in site.xml
+
+Activate X-data by referencing it in the application's `site.xml`:
+
+```xml
+<site>
+  <x-data name="my-x-data-1" />
+  <x-data name="my-x-data-2" allowContentTypes="^(?!base:folder$).*" />
+  <x-data name="my-x-data-3" allowContentTypes="portal:site" optional="true" />
+  <form/>
+</site>
+```
+
+- **No attributes** — X-data is added to all content types with no option to remove it
+- `allowContentTypes` — restrict X-data to content types matching the regex pattern
+- `optional="true"` — X-data must be manually enabled in Content Wizard by the editor
 
 ## Field Sets (Decorative Grouping)
 
