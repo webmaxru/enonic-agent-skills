@@ -132,14 +132,14 @@ dependencies {
 | `getSite()` | page, part, layout | Returns the parent site as JSON |
 | `getSiteConfig()` | page, part, layout | Returns the site config for the current app |
 | `assetUrl({path})` | any | Generates URL to a static asset — **deprecated in XP 7.15**, use `lib-asset` or `lib-static` instead (see lib-asset section below) |
-| `attachmentUrl({id, name})` | any | Generates URL to a content attachment |
-| `imageUrl({id, scale})` | any | Generates URL to an image |
-| `pageUrl({path})` | any | Generates URL to a content page |
-| `componentUrl({component})` | any | Generates URL to a page component |
-| `serviceUrl({service})` | any | Generates URL to a service (type can be `server`, `absolute`, or `websocket`) |
-| `url({path})` | any | Generates URL to a generic resource (type can be `server`, `absolute`, or `websocket`) |
+| `attachmentUrl({id, path, name, label, download, type})` | any | Generates URL to a content attachment. `label` defaults to `source`; `download` (boolean) sets disposition header; `type` can be `server` or `absolute` |
+| `imageUrl({id, path, scale, quality, background, format, filter, type})` | any | Generates URL to an image. `scale` is required (e.g., `width(px)`, `block(w,h)`). `quality` (0–100, default 85) controls JPEG compression. `filter` applies transformations (e.g., `blur(3)`, `rounded(5)`) |
+| `pageUrl({id, path, type})` | any | Generates URL to a content page. Either `id` or `path` can identify the content |
+| `componentUrl({id, path, component, type})` | any | Generates URL to a page component. `component` is the path to the component within the page |
+| `serviceUrl({service, application, type})` | any | Generates URL to a service (`type` can be `server`, `absolute`, or `websocket`) |
+| `url({path, type})` | any | Generates URL to a generic resource (`type` can be `server`, `absolute`, or `websocket`) |
 | `imagePlaceholder({width, height})` | any | Generates a base64-encoded placeholder image URL |
-| `processHtml({value})` | any | Resolves internal links in HTML content. Supports `imageWidths` (XP 7.7+) and `imageSizes` (XP 7.8+) for responsive images |
+| `processHtml({value, type, imageWidths, imageSizes})` | any | Resolves internal links in HTML content. `type` can be `server` or `absolute`. Supports `imageWidths` (XP 7.7+) for `srcset` generation and `imageSizes` (XP 7.8+) for responsive `sizes` attribute |
 | `sanitizeHtml(html)` | any | Strips unsafe tags/attributes to protect against XSS |
 
 ### Example — getComponent() Return Value (Layout)
