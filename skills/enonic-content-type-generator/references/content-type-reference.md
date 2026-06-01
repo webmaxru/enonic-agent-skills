@@ -99,6 +99,8 @@ Always use `base:structured` unless the content type has a specific reason to in
 - `show-counter` — show text length counter (default: hidden)
 - `regexp` — regular expression for validation
 
+> **Note (since XP 7.8.0):** TextLine values are checked for spelling errors by the browser's built-in spell checker based on the language set for the content.
+
 #### TextArea Config
 
 ```xml
@@ -119,6 +121,7 @@ Always use `base:structured` unless the content type has a specific reason to in
 ```xml
 <input name="myhtmlarea" type="HtmlArea">
   <label>My HtmlArea</label>
+  <default><h3>Enter description here</h3></default>
   <config>
     <exclude>*</exclude>
     <include>JustifyLeft JustifyRight | Bold Italic</include>
@@ -127,6 +130,7 @@ Always use `base:structured` unless the content type has a specific reason to in
 </input>
 ```
 
+- `default` — optional; may contain valid HTML elements (tags must be correctly closed since the input type is defined inside XML)
 - `exclude` — remove tools from toolbar (use `*` to remove all)
 - `include` — add tools to toolbar (separate with space, group with `|`)
 - `allowHeadings` — space-separated list of allowed heading tags (`h1` through `h6`; all allowed by default)
@@ -523,6 +527,9 @@ Special cases in XP pattern matching:
 
 <!-- All children of <site>/people -->
 <allowPath>${site}/people/*</allowPath>
+
+<!-- All content starting with "people" under a specific site, including children -->
+<allowPath>/mySite/people*</allowPath>
 
 <!-- All children of the current content -->
 <allowPath>./*</allowPath>
