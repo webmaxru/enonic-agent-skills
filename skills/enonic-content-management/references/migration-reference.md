@@ -25,6 +25,7 @@ import contentLib from '/lib/xp/content';
 | `contentLib.getOutboundDependencies()` | List outbound content references by key (XP 7.2+) |
 | `contentLib.archive()` | Archive content (XP 7.8+) |
 | `contentLib.restore()` | Restore archived content (XP 7.8+) |
+| `contentLib.duplicate()` | Duplicate content with optional reparenting and renaming (XP 7.12+) |
 
 ### Query Parameters
 
@@ -37,7 +38,6 @@ contentLib.query({
   sort: '',          // Sort expression or DSL
   aggregations: {},  // Aggregation definitions
   contentTypes: [],  // Content type filter array
-  highlight: {}      // Highlighting config (field-level hit highlighting)
 });
 ```
 
