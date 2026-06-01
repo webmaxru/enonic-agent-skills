@@ -117,7 +117,7 @@ cd my-headless-app
 enonic dev
 ```
 
-## Workflow 11: Docker-Backed Sandbox (CLI 4.0+)
+## Workflow 11: Docker-Backed Sandbox (CLI 4.0+, Experimental)
 
 ```bash
 # Create a sandbox backed by a Docker image (requires docker on PATH)

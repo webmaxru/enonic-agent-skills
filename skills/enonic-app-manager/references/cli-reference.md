@@ -32,7 +32,7 @@ enonic sandbox create [name] [-v <version>] [-t <template>] [--skip-template] [-
 | `-t, --template` | Use specific template (e.g., "Headless Demo") |
 | `--skip-template` | Skip template selection (no apps pre-installed) |
 | `-v, --version` | Specific XP distro version (e.g., `7.14.0`) |
-| `-i, --image` | Docker image to back the sandbox (e.g., `enonic/xp:latest-sdk`). Requires `docker` on `$PATH`. (CLI 4.0+) |
+| `-i, --image` | Docker image to back the sandbox (e.g., `enonic/xp:latest-sdk`). Requires `docker` on `$PATH`. (CLI 4.0+, **experimental**) |
 | `--all` | Include pre-release versions in version list |
 | `--prod` | Run XP in non-development (production) mode |
 | `--skip-start` | Do not start sandbox after creation |
@@ -84,7 +84,7 @@ Stops the currently running sandbox (only works for sandboxes started via CLI).
 enonic sandbox upgrade [name] [-v <version>] [-i <image>] [-a] [-f]
 ```
 
-Upgrades the XP distribution for a sandbox. Downgrades are not permitted. Use `-i <image>` to switch to a Docker-backed sandbox (CLI 4.0+).
+Upgrades the XP distribution for a sandbox. Downgrades are not permitted. Use `-i <image>` to switch to a Docker-backed sandbox (CLI 4.0+, **experimental**).
 
 ### enonic sandbox delete
 
