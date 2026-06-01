@@ -31,8 +31,9 @@ Version requirements and compatibility notes for the Next.js + Enonic XP integra
 
 ### @enonic/nextjs-adapter
 - Version 4.x requires React 19 and Next.js 16 as peer dependencies.
+- The adapter **must** be listed in `transpilePackages` in `next.config.js`: `transpilePackages: ['@enonic/nextjs-adapter']`.
 - Provides `ComponentRegistry`, `FetchContentResult`, `PageProps`, `PartProps`, `LayoutProps`, `MacroProps`, and utility functions.
-- Exports `APP_NAME` and `APP_NAME_UNDERSCORED` derived from `ENONIC_APP_NAME` env variable.
+- Exports `APP_NAME`, `APP_NAME_UNDERSCORED`, and `APP_NAME_DASHED` derived from `ENONIC_APP_NAME` env variable.
 - Handles draft/master branch switching automatically based on preview mode state.
 - Server-side functions (`fetchContent`, `fetchContentPathsForAllLocales`) are imported from `@enonic/nextjs-adapter/server`.
 - Client-side hooks (`useLocaleContext`) are imported from `@enonic/nextjs-adapter/client`.
