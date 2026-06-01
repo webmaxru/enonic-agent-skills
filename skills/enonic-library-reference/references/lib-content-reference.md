@@ -303,10 +303,10 @@ Publishes content to the master branch.
 |------|------|----------|---------|-------------|
 | keys | string[] | yes | | Content keys to publish |
 | schedule | object | no | | Schedule publishing (`{ from, to }`) |
-| excludeChildrenIds | string[] | no | | Descendants to exclude |
+| excludeDescendantsOf | string[] | no | | Content keys whose children should be excluded |
+| excludeChildrenIds | string[] | no | | *(Deprecated — use `excludeDescendantsOf`)* Descendants to exclude |
 | includeDependencies | boolean | no | true | Include related content |
-| sourceBranch | string | no | | *(Not in use from XP 7.12.0)* Source branch |
-| targetBranch | string | no | | *(Not in use since XP 7.12.0)* Target branch |
+| message | string | no | | Publish message for audit logging |
 
 **Returns:** `object` — `{ pushedContents[], failedContents[] }`.
 
@@ -366,9 +366,27 @@ Restores a content from the archive. *(XP 7.8.0+)*
 
 **Returns:** `string[]` — List with ids of restored contents.
 
-### setPermissions
+### applyPermissions
 
-Sets permissions on a content.
+Applies permissions to a content. Replaces the deprecated `setPermissions`. Supports scoped application (single node, tree, or subtree).
+
+**Parameters (object):**
+
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| key | string | yes | | Path or id of the content |
+| scope | string | no | SINGLE | Scope: `SINGLE`, `TREE`, or `SUBTREE` |
+| permissions | AccessControlEntry[] | no | | Full set of permissions (cannot combine with addPermissions/removePermissions) |
+| addPermissions | AccessControlEntry[] | no | | Permissions to add (cannot combine with permissions) |
+| removePermissions | AccessControlEntry[] | no | | Permissions to remove (cannot combine with permissions) |
+
+**AccessControlEntry:** `{ principal: string, allow?: string[], deny?: string[] }`
+
+**Returns:** `object` — Result of the apply permissions operation, keyed by branch with arrays of per-node results.
+
+### setPermissions *(Deprecated)*
+
+Sets permissions on a content. **Use `applyPermissions` instead.**
 
 **Parameters (object):**
 
@@ -382,6 +400,112 @@ Sets permissions on a content.
 **PermissionsParams:** `{ principal: string, allow: string[], deny: string[] }`
 
 **Returns:** `boolean` — `true` if successful.
+
+### update
+
+Updates a content. Alias for `modify`. *(Newer API alternative)*
+
+**Parameters (object):**
+
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| key | string | yes | | Path or id to the content |
+| editor | function | yes | | Editor callback function |
+| requireValid | boolean | no | true | Content must be valid to be updated |
+
+**Returns:** `object` — Updated content as JSON, or null.
+
+### updateMedia
+
+Updates a media content. Alias for `modifyMedia` with a simplified interface.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or id of the media content |
+| name | string | yes | Name of the media content |
+| data | stream | yes | Media data stream |
+| artist | string/string[] | no | Artist |
+| caption | string | no | Caption |
+| copyright | string | no | Copyright |
+| focalX | number | no | Focal point for X axis |
+| focalY | number | no | Focal point for Y axis |
+| tags | string/string[] | no | Tags |
+
+**Returns:** `object` — Updated media content.
+
+### updateMetadata
+
+Updates metadata (owner and variantOf) for a content. Applied to both master and draft branches.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or id to the content |
+| editor | function | yes | Editor callback; receives `{ source, owner, variantOf }` |
+
+**Returns:** `object` — Updated content metadata result.
+
+### updateWorkflow
+
+Updates workflow information (state and checks) for a content. Applied to the draft branch only.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or id to the content |
+| editor | function | yes | Editor callback; receives `{ source, state }` |
+
+**Returns:** `object` — Updated workflow result.
+
+### patch
+
+Patches a content with fine-grained control over attachments and branch targeting.
+
+**Parameters (object):**
+
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| key | string | yes | | Path or id to the content |
+| patcher | function | yes | | Patcher callback function |
+| attachments | object | no | | Attachments to create, modify, or remove |
+| attachments.createAttachments | object[] | no | | Attachments to add |
+| attachments.modifyAttachments | object[] | no | | Existing attachments to modify |
+| attachments.removeAttachments | string[] | no | | Attachment names to remove |
+| skipSync | boolean | no | false | If true, content will not be synced to child projects |
+| branches | string[] | no | [] | Branches to patch in; defaults to context branch |
+
+**Returns:** `object` — Patched content as JSON.
+
+### getVersions
+
+Returns version history for a content.
+
+**Parameters (object):**
+
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| key | string | yes | | Path or id to the content |
+| count | number | no | | Number of versions to fetch |
+| cursor | string | no | | Cursor for pagination |
+
+**Returns:** `object` — Version list.
+
+### getActiveVersions
+
+Returns the active versions of a content across specified branches.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or id to the content |
+| branches | string[] | yes | Branches to check |
+
+**Returns:** `object` — Active version info per branch.
 
 ### unpublish
 

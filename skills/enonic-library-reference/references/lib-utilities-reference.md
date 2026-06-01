@@ -239,6 +239,32 @@ Refreshes indices in the current repository.
 
 > **Note:** `com.enonic.cms.default` is the legacy default repository — now deprecated and hidden unless enabled via configuration. Pass an explicit `repo` of `com.enonic.cms.<project-name>` (e.g. `com.enonic.cms.myproject`) rather than relying on the default.
 
+### modify
+
+Updates an existing repository.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| id | string | yes | Repository ID |
+| editor | function | yes | Editor callback function |
+
+**Returns:** `object` — Updated repository as JSON.
+
+### getBinary
+
+Returns a data stream for the specified repository attachment.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| repoId | string | yes | Repository ID |
+| binaryReference | string | yes | Reference to the binary |
+
+**Returns:** `stream` — Stream of the attachment data.
+
 ### Events
 
 | Event | Description |

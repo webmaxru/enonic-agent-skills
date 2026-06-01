@@ -124,3 +124,11 @@ modify({
 | getDefaultFromEmail | 7.14.1 |
 | assetUrl deprecated | 7.15.0 |
 | User.hasPassword | 7.15.0 |
+| publish message param | — |
+| publish excludeDescendantsOf | — |
+| applyPermissions (replaces setPermissions) | — |
+| patch (content) | — |
+| update / updateMedia / updateMetadata / updateWorkflow | — |
+| getVersions / getActiveVersions (content) | — |
+| lib-repo modify | — |
+| lib-repo getBinary | — |
