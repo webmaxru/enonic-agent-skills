@@ -6,19 +6,29 @@
 |---------|-------------------|-------|
 | `contentLib.query()` | 6.0 | Core function, always available |
 | `contentLib.create()` | 6.0 | `refresh` parameter available from 6.0 |
-| `contentLib.modify()` | 6.0 | Editor callback pattern |
-| `contentLib.publish()` | 6.0 | `sourceBranch`/`targetBranch` not in use since 7.12 (ignored, publish always goes draft→master). `excludeChildrenIds` parameter added in 7.12 |
+| `contentLib.modify()` | 6.0 | Editor callback pattern. Renamed to `contentLib.update()` in XP 8 |
+| `contentLib.delete()` | 6.0 | Renamed to `contentLib.deleteContent()` in XP 8 (old export kept for backward compatibility) |
+| `contentLib.publish()` | 6.0 | `sourceBranch`/`targetBranch` not in use since 7.12 (ignored, publish always goes draft→master), removed in XP 8. `excludeChildrenIds` added in 7.12, deprecated in XP 8 — use `excludeDescendantsOf`. `message` parameter added in XP 8 |
 | `contentLib.archive()` | 7.8 | Archive/restore workflow |
 | `contentLib.restore()` | 7.8 | Restore from archive |
 | `contentLib.getOutboundDependencies()` | 7.2 | List outbound content references for dependency resolution |
 | `contentLib.duplicate()` | 7.12 | Includes `variant`, `parent`, `name` options from 7.12 |
+| `contentLib.update()` | 8.0 | Replaces `contentLib.modify()`. Same editor-callback signature |
+| `contentLib.deleteContent()` | 8.0 | Replaces `contentLib.delete()`. Old `delete` export kept for backward compatibility |
+| `contentLib.patch()` | 8.0 | Low-level multi-branch content patching. Restricted to admin/cms.admin roles |
+| `contentLib.applyPermissions()` | 8.0 | Replaces `contentLib.setPermissions()`. Supports `addPermissions`/`removePermissions` and `scope` (`SINGLE`/`TREE`/`SUBTREE`) |
+| `contentLib.getActiveVersions()` | 8.0 | Get active content version per branch |
+| `contentLib.getVersions()` | 8.0 | Cursor-based content version history |
+| `publish()` `excludeDescendantsOf` | 8.0 | Replaces deprecated `excludeChildrenIds` |
+| `publish()` `message` | 8.0 | Optional publish message |
 | `taskLib.executeFunction()` | 7.7 | Replaces deprecated `taskLib.submit()` |
-| `taskLib.submitTask()` | 7.7 | Replaces deprecated `taskLib.submitNamed()` |
+| `taskLib.submitTask()` | 7.7 | Replaces deprecated `taskLib.submitNamed()`. Optional `name` parameter overrides the descriptor key |
 | `taskLib.sleep()` | 7.0 | Only works inside a task context |
 | `repo.duplicate()` | 7.12 | Node-level duplication with `dataProcessor` callback and `refresh` option |
 | `repo.findChildren()` `recursive` | 7.7 | Recursive fetching of all nested children |
 | Named task `taskId` 2nd argument | 7.13 | `exports.run(params, taskId)` receives task ID |
-| `lib-export` (exportNodes/importNodes) | 7.8 | Node export/import API for environment migration; `importNodes` supports XSLT pre-transformation and progress callbacks (`nodeResolved`, `nodeImported`) |
+| `lib-export` (exportNodes/importNodes) | 7.8 | Node export/import API for environment migration. XP 8: `includeNodeIds`/`includeVersions` removed from `exportNodes`; `batchSize` added; exports are ZIP archives. `importNodes` gains `nodeSkipped` callback and `versionAttributes` parameter |
+| `exportLib.list()` | 8.0 | Lists available node exports |
 | Query DSL `exists` expression | 7.11 | DSL expression to check field existence |
 | Query DSL `boolean.filter` | 7.11 | Non-scoring filter compound in query DSL |
 | Query DSL (JSON format) | 7.9 | Alternative to string-based NoQL |
@@ -44,7 +54,7 @@ When running migration scripts outside Content Studio (e.g. via task controllers
 
 A content project's repository ID follows the pattern `com.enonic.cms.<project-name>` — for a project named `myproject` it is `com.enonic.cms.myproject`. The repository IDs in these examples and templates use `com.enonic.cms.myproject` as a **placeholder**; replace `myproject` with your actual content project name.
 
-> **Avoid `com.enonic.cms.default`.** The legacy default repository is deprecated and hidden unless explicitly enabled via configuration. Target an explicit `com.enonic.cms.<project-name>` repository instead, or read the current repository from the execution context.
+> **Avoid `com.enonic.cms.default`.** The legacy default repository is deprecated and hidden unless explicitly enabled via configuration. In XP 8, the default CMS repository is no longer created automatically at all. Target an explicit `com.enonic.cms.<project-name>` repository instead, or read the current repository from the execution context.
 
 To verify the repository ID in your current execution context:
 

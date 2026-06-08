@@ -27,6 +27,7 @@ metadata:
 **Step 2: Select the API layer and context**
 1. Read `references/migration-reference.md` for query DSL patterns, batch processing strategies, and branch handling rules.
 2. Choose `lib-content` when the operation works with CMS content and needs publish/unpublish, content-type validation, and the content domain abstraction.
+   - On XP 8+, use `contentLib.update()` instead of `contentLib.modify()`, and `contentLib.deleteContent()` instead of `contentLib.delete()`. The signatures are unchanged.
 3. Choose `lib-node` when the operation needs low-level node manipulation, custom repositories, or bypasses content-type validation for raw data migration.
 4. Determine the required context:
    - Use `lib-context` to run operations in `draft` branch for modifications and `master` branch for reading published content.
@@ -48,19 +49,20 @@ metadata:
 2. Set `count` to a batch size between 50 and 200 depending on the complexity of per-item processing.
 3. Loop until `result.hits.length === 0` or `start >= result.total`, incrementing `start` by the batch size each iteration.
 4. For `contentLib.create()` in bulk, set `refresh: false` to avoid per-item index refresh; call a manual refresh after the batch completes.
-5. For `contentLib.modify()`, use the editor callback pattern to safely transform each content item.
+5. For `contentLib.modify()` (XP 7) or `contentLib.update()` (XP 8), use the editor callback pattern to safely transform each content item.
 6. For `contentLib.publish()`, batch keys into groups of 50–100 to avoid timeout on large publish sets.
 7. Track success and failure counts for reporting.
 8. Read `assets/bulk-update.template.ts` for the reusable batch update controller template. Note: templates use TypeScript/ESM syntax (`import`, `const`, arrow functions); adapt to CommonJS JavaScript (`require()`, `var`, `function()`) for XP runtime deployment as `.js` files.
 
 **Step 5: Handle branch operations and publishing**
 1. Run content modifications in the `draft` branch context.
-2. After modifications complete, publish changed items to `master` using `contentLib.publish()`. On XP < 7.12, pass `sourceBranch: 'draft'` and `targetBranch: 'master'`. On XP 7.12+, these parameters are ignored (publish always goes draft→master).
+2. After modifications complete, publish changed items to `master` using `contentLib.publish()`. On XP < 7.12, pass `sourceBranch: 'draft'` and `targetBranch: 'master'`. On XP 7.12+, these parameters are ignored (publish always goes draft→master). On XP 8, they are removed.
 3. Set `includeDependencies: false` when publishing bulk-updated items to avoid unintended dependency publishing.
-4. For operations comparing draft and master state, use `repo.diff()` from `lib-node` with `target: 'master'` and `includeChildren: true`.
+4. On XP 8, use `excludeDescendantsOf` instead of the deprecated `excludeChildrenIds` to skip descendants of specific items during publish.
+5. For operations comparing draft and master state, use `repo.diff()` from `lib-node` with `target: 'master'` and `includeChildren: true`.
 
 **Step 6: Wrap long-running operations in a task controller**
-1. Use `taskLib.executeFunction()` for inline task functions or `taskLib.submitTask()` for named task descriptors.
+1. Use `taskLib.executeFunction()` for inline task functions or `taskLib.submitTask()` for named task descriptors. The optional `name` parameter overrides the default task name derived from the descriptor.
 2. Report progress using `taskLib.progress({ info, current, total })` at regular intervals during batch processing.
 3. Read `assets/task-migration.template.ts` for the reusable task controller template with progress reporting.
 4. Check for existing running instances with `taskLib.isRunning()` before starting a duplicate operation.

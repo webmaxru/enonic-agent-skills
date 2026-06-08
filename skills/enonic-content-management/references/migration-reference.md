@@ -14,8 +14,8 @@ import contentLib from '/lib/xp/content';
 |----------|---------|
 | `contentLib.query()` | Query content with NoQL, filters, aggregations |
 | `contentLib.create()` | Create a content item |
-| `contentLib.modify()` | Modify content via editor callback |
-| `contentLib.delete()` | Delete content by key (path or id) |
+| `contentLib.modify()` | Modify content via editor callback (XP 7). Renamed to `contentLib.update()` in XP 8 |
+| `contentLib.delete()` | Delete content by key (path or id). Renamed to `contentLib.deleteContent()` in XP 8 |
 | `contentLib.move()` | Rename or relocate content |
 | `contentLib.publish()` | Push content from draft to master |
 | `contentLib.unpublish()` | Remove content from master branch |
@@ -25,6 +25,8 @@ import contentLib from '/lib/xp/content';
 | `contentLib.getOutboundDependencies()` | List outbound content references by key (XP 7.2+) |
 | `contentLib.archive()` | Archive content (XP 7.8+) |
 | `contentLib.restore()` | Restore archived content (XP 7.8+) |
+| `contentLib.patch()` | Low-level multi-branch content patching; admin-only (XP 8+) |
+| `contentLib.applyPermissions()` | Set permissions with scope control; replaces `setPermissions()` (XP 8+) |
 
 ### Query Parameters
 
@@ -64,9 +66,13 @@ contentLib.create({
 });
 ```
 
-### Modify Pattern
+### Modify/Update Pattern
+
+> **XP 8 rename:** `contentLib.modify()` is renamed to `contentLib.update()`. The signature is unchanged.
 
 ```typescript
+// XP 7: contentLib.modify()
+// XP 8: contentLib.update()
 contentLib.modify({
   key: '/path/to/content',     // Path or id
   editor: (content) => {
@@ -80,15 +86,19 @@ contentLib.modify({
 
 ### Publish Pattern
 
-> **XP 7.12+ change:** `sourceBranch` and `targetBranch` are no longer in use. Publish always pushes from `draft` to `master`. These parameters are silently ignored on XP 7.12+. Keep them for backward compatibility with XP < 7.12.
+> **XP 7.12+ change:** `sourceBranch` and `targetBranch` are no longer in use. Publish always pushes from `draft` to `master`. These parameters are silently ignored on XP 7.12+ and removed entirely in XP 8.
+
+> **XP 8 change:** `excludeChildrenIds` is deprecated — use `excludeDescendantsOf` instead. A new optional `message` parameter records a publish message.
 
 ```typescript
 contentLib.publish({
   keys: ['/site/page1', 'content-id-2'],
-  sourceBranch: 'draft',              // Ignored on XP 7.12+
-  targetBranch: 'master',             // Ignored on XP 7.12+
+  sourceBranch: 'draft',              // Ignored on XP 7.12+, removed in XP 8
+  targetBranch: 'master',             // Ignored on XP 7.12+, removed in XP 8
   includeDependencies: false,          // Set false for bulk to avoid cascade
-  excludeChildrenIds: ['id-3'],        // Exclude descendants of specific items (XP 7.12+)
+  excludeChildrenIds: ['id-3'],        // Exclude descendants of specific items (XP 7.12+, deprecated in XP 8)
+  excludeDescendantsOf: ['id-3'],      // XP 8+ replacement for excludeChildrenIds
+  message: 'Bulk migration publish',   // Optional publish message (XP 8+)
   schedule: {                          // Optional scheduling
     from: new Date().toISOString(),
     to: '2025-12-31T23:59:59Z'
@@ -426,12 +436,16 @@ import exportLib from '/lib/xp/export';
 
 ### Export Nodes
 
+> **XP 8 change:** `includeNodeIds` and `includeVersions` parameters are removed. `batchSize` parameter added. Exports are stored as ZIP archives instead of folders.
+
 ```typescript
+// XP 7 parameters shown; see notes for XP 8 differences
 exportLib.exportNodes({
   sourceNodePath: '/content',
   exportName: 'my-export',
-  includeNodeIds: true,
-  includeVersions: false,
+  includeNodeIds: true,          // Removed in XP 8
+  includeVersions: false,        // Removed in XP 8
+  batchSize: 1000,               // XP 8+: controls memory usage (default: 1000)
   nodeResolved: (count) => {
     log.info('Nodes to export: %s', count);
   },
@@ -440,10 +454,14 @@ exportLib.exportNodes({
   }
 });
 // Export is written to the server's exports directory
+// XP 7: as a folder structure
+// XP 8: as a ZIP archive ({exportName}.zip)
 // Returns: { exportedNodes, exportedBinaries, exportErrors }
 ```
 
 ### Import Nodes
+
+> **XP 8 change:** `nodeSkipped` callback added. `versionAttributes` parameter added. Return includes `skippedNodes`.
 
 ```typescript
 exportLib.importNodes({
@@ -453,13 +471,24 @@ exportLib.importNodes({
   xsltParams: { key: 'value' },  // Optional parameters for XSLT
   includeNodeIds: true,           // Preserve original IDs (default: false)
   includePermissions: true,       // Preserve permissions (default: false)
+  versionAttributes: {},          // XP 8+: optional attributes attached to every imported node version
   nodeResolved: (count) => {
     log.info('Nodes to import: %s', count);
   },
   nodeImported: (count) => {
     log.info('Imported so far: %s', count);
+  },
+  nodeSkipped: (count) => {       // XP 8+: called with skipped node count
+    log.info('Skipped so far: %s', count);
   }
 });
-// Returns: { addedNodes, updatedNodes, importedBinaries, importErrors }
+// Returns: { addedNodes, updatedNodes, skippedNodes, importedBinaries, importErrors }
 // importErrors entries contain: { exception, message, stacktrace }
+```
+
+### List Exports (XP 8+)
+
+```typescript
+const result = exportLib.list();
+// result.exports === [{ name: 'export-1' }, { name: 'export-2' }]
 ```

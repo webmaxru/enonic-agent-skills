@@ -12,6 +12,7 @@
 - For import scripts, generate unique names by appending a counter or timestamp.
 
 ```typescript
+// XP 7: contentLib.modify()  |  XP 8: contentLib.update()
 try {
   contentLib.create({ name, parentPath, contentType, data });
 } catch (e) {

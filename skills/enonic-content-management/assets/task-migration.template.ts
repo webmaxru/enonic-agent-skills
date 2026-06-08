@@ -5,6 +5,10 @@
 // 'com.enonic.cms.myproject' is a placeholder repository ID — replace 'myproject'
 // with your content project name (pattern: com.enonic.cms.<project-name>).
 // Do not use the deprecated 'com.enonic.cms.default' repository.
+//
+// XP 8 note: contentLib.modify() is renamed to contentLib.update() and
+// contentLib.delete() is renamed to contentLib.deleteContent(). The
+// signatures are unchanged. Adapt the import and calls when targeting XP 8.
 
 import contentLib from '/lib/xp/content';
 import contextLib from '/lib/xp/context';
