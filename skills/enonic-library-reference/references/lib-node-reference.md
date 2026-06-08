@@ -52,6 +52,7 @@ Queries nodes across multiple repositories.
 | filters | object | no | | Query filters |
 | sort | string | no | _score DESC | Sorting expression |
 | aggregations | object | no | | Aggregations config |
+| suggestions | object | no | | Term suggestions config |
 | highlight | object | no | | Highlighting config |
 | explain | boolean | no | | Include score explanation |
 
@@ -284,6 +285,7 @@ Queries nodes.
 | filters | object | no | | Query filters |
 | sort | string/object | no | _score DESC | Sorting |
 | aggregations | object | no | | Aggregations config |
+| suggestions | object | no | | Term suggestions config |
 | highlight | object | no | | Highlighting config |
 | explain | boolean | no | | Include score explanation |
 
@@ -308,7 +310,7 @@ Sets the active version of a node.
 | Name | Type | Description |
 |------|------|-------------|
 | key | string | Path or ID |
-| versionID | string | Version to set as active |
+| versionId | string | Version to set as active |
 
 **Returns:** `boolean`
 
