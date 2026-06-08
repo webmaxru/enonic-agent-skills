@@ -47,6 +47,8 @@ A special `all` export handles any HTTP method not explicitly declared.
 
 Supported methods: `get`, `post`, `put`, `delete`, `head`, `options`, and `patch` (XP 7.15+).
 
+Markup returned by a component controller (page, part, layout) must have a single root element.
+
 The handler receives an HTTP Request object and must return an HTTP Response object:
 
 ```ts
@@ -76,6 +78,7 @@ export function get(req) {
 | `params` | object | Query/form parameters |
 | `headers` | object | HTTP request headers |
 | `cookies` | object | HTTP request cookies |
+| `locales` | string[] | Locale strings in decreasing order of preference, derived from the `Accept-Language` header. When absent, contains the server's default locale. |
 
 Since XP 7.12, the request object also exposes `getHeader(name)` — a case-insensitive header lookup function. Prefer it over accessing `headers` directly. Note: modifying the `headers` object does not affect the result of `getHeader(name)` calls.
 
@@ -136,10 +139,10 @@ dependencies {
 | `imageUrl({id, scale})` | any | Generates URL to an image |
 | `pageUrl({path})` | any | Generates URL to a content page |
 | `componentUrl({component})` | any | Generates URL to a page component |
-| `serviceUrl({service})` | any | Generates URL to a service (type can be `server`, `absolute`, or `websocket`) |
+| `serviceUrl({service})` | any | Generates URL to a service (type can be `server`, `absolute`, or `websocket`) — **deprecated in XP 8**, use `apiUrl` instead |
 | `url({path})` | any | Generates URL to a generic resource (type can be `server`, `absolute`, or `websocket`) |
 | `imagePlaceholder({width, height})` | any | Generates a base64-encoded placeholder image URL |
-| `processHtml({value})` | any | Resolves internal links in HTML content. Supports `imageWidths` (XP 7.7+) and `imageSizes` (XP 7.8+) for responsive images |
+| `processHtml({value})` | any | Resolves internal links in HTML content. Supports `type` (`server` or `absolute`), `imageWidths` (XP 7.7+) and `imageSizes` (XP 7.8+) for responsive images |
 | `sanitizeHtml(html)` | any | Strips unsafe tags/attributes to protect against XSS |
 
 ### Example — getComponent() Return Value (Layout)
