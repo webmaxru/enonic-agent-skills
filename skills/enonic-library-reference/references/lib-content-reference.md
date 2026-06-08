@@ -325,6 +325,7 @@ Retrieves content using a query.
 | sort | string/object | no | | Sorting expression or DSL |
 | aggregations | object | no | | Aggregations expression |
 | contentTypes | string[] | no | | Content types to filter on |
+| highlight | object | no | | Highlighting config for field-level hit highlighting |
 
 **Returns:** `object` — `{ total, count, hits[], aggregations }`.
 
@@ -341,6 +342,8 @@ Removes an attachment from an existing content.
 | key | string | yes | Path or id to the content |
 | name | string/string[] | yes | Attachment name(s) |
 
+**Returns:** void
+
 ### resetInheritance
 
 Resets custom inheritance flags of a content item. *(XP 7.6.0+)*
@@ -352,6 +355,8 @@ Resets custom inheritance flags of a content item. *(XP 7.6.0+)*
 | key | string | yes | Path or id to the content |
 | projectName | string | yes | Content Layer unique id |
 | inherit | string[] | yes | Flags: CONTENT, PARENT, NAME, SORT |
+
+**Returns:** void
 
 ### restore
 
