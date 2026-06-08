@@ -27,16 +27,21 @@
 
 **Symptom:** Schema fails to compile.
 
-**Fix:** The `name` attribute on `<input>`, `<item-set>`, and `<option-set>` must be a valid XML name — alphanumeric with no spaces. Use camelCase or underscores:
+**Fix:** The `name` attribute on `<input>`, `<item-set>`, and `<option-set>` must be a valid XML name — alphanumeric with no spaces. Use `snake_case` (recommended) or camelCase:
 ```xml
-<!-- Good -->
-<input name="firstName" type="TextLine">
+<!-- Recommended (snake_case) -->
+<input name="first_name" type="TextLine">
 <input name="phone_number" type="TextLine">
+
+<!-- Acceptable (camelCase) but capitals are flattened during indexing -->
+<input name="firstName" type="TextLine">
 
 <!-- Bad -->
 <input name="first name" type="TextLine">
 <input name="first-name" type="TextLine">
 ```
+
+> **Note:** The official Enonic documentation recommends `snake_case` for all names. Capital letters are flattened during indexing, which can cause unexpected query behavior and generates less clean GraphQL API field names.
 
 ### Incorrect `type` Case
 
@@ -56,6 +61,7 @@
 - `MediaSelector` (not `mediaselector`)
 - `CustomSelector` (not `customselector`)
 - `ContentTypeFilter` (not `contenttypefilter`)
+- `Instant` (not `instant`)
 
 ### Duplicate `name` Attributes
 
@@ -116,12 +122,15 @@ The directory name and file name (without `.xml`) must match exactly.
 
 **Symptom:** DateTime values lose timezone information when saved, or API returns `LocalDateTime` instead of `Instant`.
 
-**Fix:** By default DateTime stores values without timezone. Add `<timezone>true</timezone>` in the config to store timezone-aware values:
+**Fix:** `DateTime` always stores values without timezone (`LocalDateTime`). For timezone-aware storage, use the `Instant` input type instead:
 ```xml
-<config>
-  <timezone>true</timezone>
-</config>
+<input name="published_at" type="Instant">
+  <label>Published At</label>
+  <default>now</default>
+</input>
 ```
+
+> **Note:** The `<config><timezone>true</timezone></config>` option on DateTime is deprecated. Use the dedicated `Instant` type for timezone-aware dates.
 
 ### ImageSelector `allowContentType` Ignored
 

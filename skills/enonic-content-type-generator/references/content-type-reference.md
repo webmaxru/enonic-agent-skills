@@ -1,11 +1,14 @@
 # Enonic XP Content Type Reference
 
+> **Note:** The official Enonic documentation now uses YAML as the primary schema definition format (see [enonic/doc-cms](https://github.com/enonic/doc-cms)). XML definitions remain supported for backward compatibility. This reference covers the XML format used by this skill.
+
 ## XML Structure
 
 Content types are XML files located at:
-`/src/main/resources/site/content-types/[name]/[name].xml`
+- **Legacy path:** `/src/main/resources/site/content-types/[name]/[name].xml`
+- **CMS path:** `/src/main/resources/cms/content-types/[name]/[name].yaml` (YAML format)
 
-The directory name **must** match the file name (minus the `.xml` extension).
+The directory name **must** match the file name (minus the extension).
 
 ### Root Element
 
@@ -223,8 +226,11 @@ Complete list of available editor tools:
 | Type | Value Type | Description |
 |---|---|---|
 | `Date` | LocalDate | Date only (no time) |
-| `DateTime` | LocalDateTime / Instant | Date and time (local by default; timezone via config) |
+| `DateTime` | LocalDateTime | Date and time without timezone |
 | `Time` | LocalTime | Time only |
+| `Instant` | Instant | Date and time with timezone |
+
+> **Note:** In the latest Enonic documentation, timezone-aware dates use the dedicated `Instant` input type instead of `DateTime` with `<config><timezone>true</timezone></config>`. The `DateTime` type now always stores `LocalDateTime` (no timezone). Source: https://github.com/enonic/doc-cms/blob/master/docs/schemas/form-items/instant.adoc
 
 ### Date Config
 
@@ -240,17 +246,28 @@ Complete list of available editor tools:
 #### DateTime Config
 
 ```xml
-<input name="mydatetime" type="DateTime">
+<input name="my_datetime" type="DateTime">
   <label>My DateTime</label>
-  <config>
-    <timezone>true</timezone>
-  </config>
   <default>2011-09-12</default>
 </input>
 ```
 
-- `timezone` — set to `true` to store value with timezone (produces `Instant`); default is `false` (produces `LocalDateTime`)
-- `default` supports ISO 8601 format (`yyyy-MM-ddThh:mm`, with optional timezone offset like `+01:00` or `Z`) or relative expressions (e.g., `+1year -12hours`, `now`)
+- `default` supports ISO 8601 format (`yyyy-MM-ddThh:mm`) or relative expressions (e.g., `+1year -12hours`, `now`)
+
+> **Deprecation note:** The `<config><timezone>true</timezone></config>` option for DateTime is deprecated. Use the `Instant` input type for timezone-aware dates instead.
+
+#### Instant Config
+
+```xml
+<input name="my_instant" type="Instant">
+  <label>My Instant</label>
+  <default>2025-06-15T12:00:00+01:00</default>
+</input>
+```
+
+- `default` supports ISO 8601 format with timezone offset (`yyyy-MM-ddThh:mm±hh:mm`, with `Z` for UTC) or relative expressions (e.g., `+1year -12hours`, `now`)
+- Value type is `Instant` — always stores with timezone
+- Use `Instant` instead of `DateTime` with `<timezone>true</timezone>` for timezone-aware storage
 
 **Relative expression unit strings:**
 
@@ -321,7 +338,7 @@ A relative expression is one or more offsets (e.g., `+3days -2hours`). The keywo
 #### CustomSelector Config
 
 ```xml
-<input name="mycustomselector" type="CustomSelector">
+<input name="my_custom_selector" type="CustomSelector">
   <label>My Custom Selector</label>
   <config>
     <service>my-custom-selector</service>
@@ -331,9 +348,12 @@ A relative expression is one or more offsets (e.g., `+3days -2hours`). The keywo
 </input>
 ```
 
-- `service` — name of a JavaScript service at `/resources/services/[name]/[name].js`; can reference another app with `com.myapp:servicename`
-- `param` — optional name-value parameters passed to the service as query params (repeatable)
+- `service` — **deprecated**; name of a JavaScript service at `/resources/services/[name]/[name].js`; can reference another app with `com.myapp:servicename`. Use `extension` instead for new implementations.
+- `extension` — references an extension that provides the options. Can reference extensions in other applications with `com.myapplication.app:my-extension`. This is the recommended replacement for `service`.
+- `param` — optional name-value parameters passed to the service/extension as query params (repeatable)
 - `galleryMode` — `true` displays options as a three-column image gallery
+
+> **Source:** https://github.com/enonic/doc-cms/blob/master/docs/schemas/form-items/customselector.adoc
 
 #### CustomSelector Service Request
 
@@ -403,7 +423,7 @@ Each hit must have `id` and `displayName`. Optional fields: `description`, `icon
 ### Common Input Attributes
 
 ```xml
-<input name="fieldName" type="InputType">
+<input name="field_name" type="InputType">
   <label i18n="key">Display Label</label>        <!-- required -->
   <help-text>Explanation for editors</help-text>   <!-- optional -->
   <occurrences minimum="0" maximum="1"/>           <!-- optional; defaults 0..1 -->
@@ -413,6 +433,18 @@ Each hit must have `id` and `displayName`. Optional fields: `description`, `icon
   </config>
 </input>
 ```
+
+> **Naming convention:** Use `snake_case` (lowercase with underscores) for all `name` attributes. Capital letters are flattened during indexing, which can cause unexpected query behavior. The `snake_case` convention also ensures clean field names in the GraphQL API.
+>
+> ```xml
+> <!-- Recommended -->
+> <input name="my_field_name" type="TextLine">
+>
+> <!-- Avoid — capitals are flattened in the index -->
+> <input name="myFieldName" type="TextLine">
+> ```
+>
+> Source: https://github.com/enonic/doc-cms/blob/master/docs/schemas/form-items.adoc
 
 **Occurrences rules:**
 - `minimum="0"` — field is optional
@@ -656,7 +688,9 @@ Present a set of mutually exclusive or multi-select options, each with optional 
 
 ## Mixins
 
-Reusable form fragments stored at `src/main/resources/site/mixins/[name]/[name].xml`.
+Reusable form fragments stored at:
+- **Legacy path:** `src/main/resources/site/mixins/[name]/[name].xml`
+- **CMS path:** `src/main/resources/cms/mixins/[name]/[name].yaml` (YAML format)
 
 ### Mixin Definition
 
@@ -725,6 +759,8 @@ X-data schemas are registered for use in `src/main/resources/site/site.xml`. Use
 - `allowContentTypes` accepts a regular expression to match content type names
 - `optional="true"` requires editors to manually enable the x-data in Content Wizard
 
+> **Note:** In the latest Enonic documentation, the CMS descriptor (`cms.yaml` at `src/main/resources/cms/cms.yaml`) replaces `site.xml` for registering mixins. The `cms.yaml` uses a `mixins:` section with the same `allowContentTypes` and `optional` attributes. Source: https://github.com/enonic/doc-cms/blob/master/docs/schemas/cms-descriptor.adoc
+
 ## Field Sets (Decorative Grouping)
 
 Group fields visually without affecting data structure:
@@ -754,3 +790,4 @@ Field sets do **not** need a `name` attribute since they are only visual and do 
 - Mixins: https://developer.enonic.com/docs/xp/7.x/cms/schemas/mixins
 - X-Data: https://developer.enonic.com/docs/xp/7.x/cms/x-data
 - Schema System: https://developer.enonic.com/docs/xp/7.x/cms/schemas
+- Official Documentation Source (YAML format): https://github.com/enonic/doc-cms
