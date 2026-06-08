@@ -40,19 +40,20 @@ metadata:
 
 **Step 5: Implement inbound webhook endpoint (if applicable)**
 1. Read `assets/http-service.template.ts` as a starting scaffold.
-2. Create an HTTP service controller at `src/main/resources/services/<serviceName>/<serviceName>.ts`.
-3. Export a `post(req)` function that parses the incoming JSON payload from `req.body`.
+2. Create an API controller at `src/main/resources/apis/<apiName>/<apiName>.ts`.
+3. Export a `POST(req)` function that parses the incoming JSON payload from `req.body`.
 4. Reject payloads exceeding a reasonable size limit (e.g., 1 MB) before parsing.
 5. Validate the inbound payload by checking required fields, authentication headers, or HMAC signatures before processing.
 6. Sanitize all string fields from the external payload before using them in content operations: trim whitespace, enforce maximum lengths, strip or escape HTML/script content, and reject values containing path traversal sequences (`..`, `/`, `\`).
 7. Use an allowlist of expected field names rather than passing the raw payload object to content APIs.
 8. Return appropriate HTTP status codes: `200` for success, `400` for malformed payloads, `401` for authentication failures, `413` for oversized payloads, `500` for unexpected errors.
 9. When inbound payloads trigger content creation or modification, use lib-content or lib-node APIs within a context run to ensure proper permissions. Never pass unsanitized external values as content names, paths, or keys.
+10. Create an API descriptor at `src/main/resources/apis/<apiName>/<apiName>.yaml` with `kind: "API"`, a `mount` list (e.g., `["web"]`), and an `allow` list restricting access to authorized principals.
 
 **Step 6: Wire async processing with lib-task (if applicable)**
 1. When event handling or webhook processing requires heavy or time-consuming work, wrap it in `executeFunction()` from lib-task.
 2. Report progress from long-running tasks using `progress()` to allow monitoring.
-3. Read `references/event-reference.md` for the task event lifecycle (`task.submitted`, `task.updated`, `task.finished`, `task.failed`).
+3. Read `references/event-reference.md` for the task event lifecycle (`task.submitted`, `task.updated`, `task.removed`, `task.finished`, `task.failed`).
 
 **Step 7: Validate the integration**
 1. Execute `node scripts/find-enonic-targets.mjs .` to confirm the project still resolves correctly.
@@ -60,13 +61,14 @@ metadata:
 3. Confirm that outbound HTTP calls use HTTPS and include error handling for network failures and non-2xx responses.
 4. Confirm that no actual secret values, API keys, or credentials appear in generated source code or configuration files—only placeholder tokens.
 5. Confirm that inbound webhook endpoints sanitize and allowlist all fields from external payloads before passing them to content APIs.
-6. If a webhook config file was created, confirm the event type patterns match the intended triggers.
-7. Run the workspace build to verify no compilation errors.
-8. Read `references/troubleshooting.md` when events do not fire, webhook deliveries fail, or inbound requests are rejected.
+6. If an API descriptor was created, confirm its `allow` list restricts access to authorized principals and the `mount` list matches the intended exposure.
+7. If a webhook config file was created, confirm the event type patterns match the intended triggers.
+8. Run the workspace build to verify no compilation errors.
+9. Read `references/troubleshooting.md` when events do not fire, webhook deliveries fail, or inbound requests are rejected.
 
 ## Error Handling
 * If `node scripts/find-enonic-targets.mjs .` finds no projects, confirm that `build.gradle` references `com.enonic.xp` plugins or that a `src/main/resources/site/` directory exists.
 * If events do not fire after registering a listener, read `references/troubleshooting.md` to check listener registration location, event type patterns, and cluster vs. local event scope.
 * If outbound HTTP calls fail, verify the target URL, network access from the XP instance, and that the operator has substituted placeholder tokens with real credentials.
-* If inbound webhook requests return 404, confirm the service controller path follows `services/<name>/<name>.ts` and the application is deployed.
+* If inbound webhook requests return 404, confirm the API controller path follows `apis/<name>/<name>.ts`, the API descriptor includes the correct `mount` list, and the application is deployed.
 * If background tasks fail silently, check task state using `taskLib.list()` and inspect logs for errors within the task function.

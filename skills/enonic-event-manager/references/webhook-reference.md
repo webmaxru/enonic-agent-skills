@@ -49,49 +49,54 @@ webhook.cdn-purge.secret = REPLACE_WITH_CDN_SECRET
 
 ---
 
-## Inbound Webhooks (HTTP Service Controllers)
+## Inbound Webhooks (Universal API Endpoints)
 
-Enonic XP applications can expose HTTP service endpoints to receive webhook payloads from external systems.
+Enonic XP applications can expose HTTP API endpoints to receive webhook payloads from external systems. In XP 8, the previous HTTP service pattern (`/_/service/`) has been replaced by Universal APIs.
 
-### Service Controller Location
-
-```
-src/main/resources/services/<serviceName>/<serviceName>.ts
-```
-
-The service is accessible at any URL depth via the mount pattern:
+### API Controller Location
 
 ```
-**/_/service/<appKey>/<serviceName>
+src/main/resources/apis/<apiName>/<apiName>.ts
 ```
 
-The `**` prefix means a service can be invoked from multiple locations, e.g., `domain.com/_/service/..` or `domain.com/some/path/_/service/..`. The URL context is available to the controller.
+The API is accessible at the web endpoint:
 
-To generate a service URL programmatically, use `serviceUrl()` from lib-portal:
+```
+/api/<appKey>:<apiName>
+```
+
+It is also available as a service point when mounted via a site, webapp, or admin tool descriptor:
+
+```
+/_/<appKey>:<apiName>
+```
+
+To generate an API URL programmatically, use `apiUrl()` from lib-portal:
 
 ```typescript
-import { serviceUrl } from '/lib/xp/portal';
+import { apiUrl } from '/lib/xp/portal';
 
-const url = serviceUrl({ service: 'myWebhookService' });
+const url = apiUrl({ api: 'com.example.myapp:myWebhookApi' });
 ```
 
 ### HTTP Request Object
 
-The request object passed to service controllers follows the standard Enonic XP HTTP request structure:
+The request object passed to API controllers follows the standard Enonic XP HTTP request structure:
 
-| Property       | Type   | Description                                      |
-|----------------|--------|--------------------------------------------------|
-| method         | string | HTTP method (GET, POST, PUT, DELETE)              |
-| scheme         | string | `http` or `https`                                |
-| host           | string | Host header value                                |
-| port           | string | Port number                                      |
-| path           | string | Request path                                     |
-| url            | string | Full request URL                                 |
-| remoteAddress  | string | Client IP (X-Forwarded-For honored)              |
-| body           | string | Request body (parse JSON with `JSON.parse()`)    |
-| params         | object | Query/form parameters                            |
-| headers        | object | HTTP headers (use `getHeader(name)` from XP 7.12)|
-| cookies        | object | Request cookies                                  |
+| Property       | Type     | Description                                      |
+|----------------|----------|--------------------------------------------------|
+| method         | string   | HTTP method (GET, POST, PUT, DELETE)              |
+| scheme         | string   | `http` or `https`                                |
+| host           | string   | Host header value                                |
+| port           | string   | Port number                                      |
+| path           | string   | Request path                                     |
+| url            | string   | Full request URL                                 |
+| remoteAddress  | string   | Client IP (X-Forwarded-For honored)              |
+| body           | string   | Request body (parse JSON with `JSON.parse()`)    |
+| params         | object   | Query/form parameters                            |
+| headers        | object   | HTTP headers (use `getHeader(name)` for case-insensitive lookup) |
+| cookies        | object   | Request cookies                                  |
+| locales        | string[] | Locale strings from `Accept-Language` header in decreasing preference order |
 
 ### HTTP Response Object
 
@@ -112,22 +117,22 @@ Before processing any inbound webhook payload:
 4. Return `401` immediately if authentication fails.
 5. Return `400` if the payload is malformed or missing required fields.
 
-### Securing Service Endpoints
+### Securing API Endpoints
 
-- Use a service descriptor XML to restrict access by role without custom code. Place the descriptor alongside the controller:
+- Use an API descriptor YAML file to restrict access by role. Place the descriptor alongside the controller:
 
-  `src/main/resources/services/<serviceName>/<serviceName>.xml`
+  `src/main/resources/apis/<apiName>/<apiName>.yaml`
 
-  ```xml
-  <service>
-    <allow>
-      <principal>role:system.admin</principal>
-      <principal>role:myapp.webhook-caller</principal>
-    </allow>
-  </service>
+  ```yaml
+  kind: "API"
+  title: "Webhook Receiver"
+  mount: ["web"]
+  allow:
+    - "role:system.admin"
+    - "role:myapp.webhook-caller"
   ```
 
-- Restrict access via vhost configuration to limit which hosts can reach the service.
+- Restrict access via vhost configuration to limit which hosts can reach the API.
 - Use API keys or HMAC signatures to authenticate incoming requests. Reject requests when authentication is not configured rather than falling through open.
 - Rate-limit inbound endpoints through XP's DoS filter or reverse proxy configuration.
 - Reject payloads exceeding a reasonable size limit (e.g., 1 MB) before parsing.
@@ -148,6 +153,8 @@ dependencies {
   include "com.enonic.lib:lib-http-client:3.2.2"
 }
 ```
+
+> For XP 8, check the latest compatible version of lib-http-client.
 
 Import:
 
