@@ -264,11 +264,16 @@ Key adapter imports:
 - `I18n.setLocale(locale)` — sets the locale for the current request (called in layouts).
 - `APP_NAME` — fully qualified app name from env config.
 - `APP_NAME_UNDERSCORED` — app name with dots replaced by underscores for GraphQL introspection.
+- `APP_NAME_DASHED` — app name with dots replaced by dashes (e.g., `com-example-myproject`).
+- `IS_DEV_MODE` — boolean flag, `true` when `MODE` env variable is `'development'`.
 - `PORTAL_COMPONENT_ATTRIBUTE` — HTML attribute for page editor component identification.
 - `CATCH_ALL` — wildcard content type name for debug/fallback views.
-- `richTextQuery(fieldName)` — generates GraphQL query fragment for rich text fields.
-- `validateData(data)` — validates `FetchContentResult` before rendering.
 - `getRequestLocaleInfo({contentPath, headers})` — extracts locale from request for middleware.
+- `getContentApiUrl(context)` — constructs the full Guillotine API URL for a given context, including project and branch segments.
+- `sanitizeGraphqlName(text)` — sanitizes a string to a valid GraphQL name by replacing non-alphanumeric characters with underscores.
+- `getLocaleMapping(locale)` — resolves locale to project/site mapping from `ENONIC_MAPPINGS`.
+- `getLocaleMappingByLocale(locale)` — alias for `getLocaleMapping`.
+- `getLocaleMappingByProjectId(projectId)` — resolves project ID to its locale mapping.
 
 Server-side imports (from `@enonic/nextjs-adapter/server`):
 - `fetchContent(params)` — fetches content and resolves component mappings.
@@ -276,11 +281,9 @@ Server-side imports (from `@enonic/nextjs-adapter/server`):
 - `fetchContentPathsForLocale(basePath, locale)` — generates paths for SSG for a single locale.
 - `fetchGuillotine(contentApiUrl, options?)` — makes a custom request to Guillotine; used internally by `fetchContent()`.
 - `fetchFromApi(apiUrl, body, options?)` — lower-level HTTP POST to any API endpoint.
-- `getLocaleMapping(locale)` — resolves locale to project/site mapping from `ENONIC_MAPPINGS`.
-- `getLocaleMappingByLocale(locale)` — alias for `getLocaleMapping`.
-- `getLocaleMappingByProjectId(projectId)` — resolves project ID to its locale mapping.
 
 Client-side imports (from `@enonic/nextjs-adapter/client`):
+- `LocaleContextProvider` — React context provider for locale data; wrap the layout to enable `useLocaleContext` in child components.
 - `useLocaleContext()` — React hook returning `{locale, localize}` for client-side components.
 
 View imports:
