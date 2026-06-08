@@ -269,6 +269,8 @@ Get a count of blog posts per category:
 
 ## 9. Children and Nested Hierarchies
 
+> **Note**: `hasChildren` is removed in Guillotine 8. Use `children` and check if the result is empty instead.
+
 ```graphql
 {
   guillotine {
@@ -276,7 +278,7 @@ Get a count of blog posts per category:
       _id
       _name
       displayName
-      hasChildren
+      hasChildren  # Guillotine 7 only — removed in v8
       children(first: 5) {
         displayName
       }
@@ -432,7 +434,7 @@ Fetch content matching any of several category values using `in` with `stringVal
 }
 ```
 
-## 15. Scaled Image URL for Media Content
+## 16. Scaled Image URL for Media Content
 
 Query image content and generate a scaled, absolute URL:
 
