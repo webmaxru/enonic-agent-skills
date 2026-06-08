@@ -43,20 +43,22 @@
 
 ## Inbound Webhook Issues
 
-### Service endpoint returns 404
+### API endpoint returns 404
 
-1. **Path convention:** The controller must be at `src/main/resources/services/<name>/<name>.ts` (file name must match directory name).
-2. **Application deployed:** Verify the application is running.
-3. **VHost mapping:** If vhosts are enabled, confirm the vhost configuration routes requests to the correct internal path (`/_/service/<appKey>/<serviceName>`).
+1. **Path convention:** The controller must be at `src/main/resources/apis/<name>/<name>.ts` (file name must match directory name).
+2. **API descriptor:** The descriptor at `src/main/resources/apis/<name>/<name>.yaml` must include the correct `mount` list (e.g., `["web"]`) for the endpoint being accessed.
+3. **Application deployed:** Verify the application is running.
+4. **VHost mapping:** If vhosts are enabled, confirm the vhost configuration routes requests to the correct internal path.
+
+### API endpoint returns 401 or 403
+
+- The API descriptor `allow` list must include the calling principal. Use `role:system.everyone` for public APIs.
+- Check that the expected header name matches exactly (headers may be case-transformed by proxies).
+- Use `req.getHeader('x-api-key')` for case-insensitive header lookups instead of direct `req.headers` access.
 
 ### Service returns 405 Method Not Allowed
 
-- Only exported functions matching the HTTP method are handled. For POST webhooks, export `function post(req)`. For GET, export `function get(req)`.
-
-### Authentication failures
-
-- Check that the expected header name matches exactly (headers may be case-transformed by proxies).
-- Use `req.getHeader('x-api-key')` (XP 7.12+) for case-insensitive header lookups instead of direct `req.headers` access.
+- Only exported functions matching the HTTP method are handled. For POST webhooks, export `function POST(req)`. For GET, export `function GET(req)`. Function names use uppercase HTTP method names.
 
 ---
 

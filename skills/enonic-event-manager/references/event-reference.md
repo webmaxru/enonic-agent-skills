@@ -8,7 +8,7 @@ Add to `build.gradle`:
 
 ```groovy
 dependencies {
-  include "com.enonic.xp:lib-event:${xpVersion}"
+  include xplibs.event
 }
 ```
 
@@ -139,7 +139,7 @@ const masterNodes = nodes.filter(n => n.branch === 'master');
 
 ```groovy
 dependencies {
-  include "com.enonic.xp:lib-task:${xpVersion}"
+  include xplibs.task
 }
 ```
 
@@ -170,7 +170,7 @@ const taskId = taskLib.executeFunction({
 
 ### submitTask(params)
 
-Submits a named task (defined by a task descriptor XML and controller) for asynchronous execution.
+Submits a named task (defined by a task descriptor YAML and controller) for asynchronous execution.
 
 **Parameters:** Object with `descriptor` (string — `<appKey>:<taskName>`), `name` (optional string — override task name; defaults to the descriptor key), `config` (object — task configuration properties).
 
@@ -190,21 +190,21 @@ const taskId = taskLib.submitTask({
 
 Named tasks are defined by a descriptor and a controller placed in `src/main/resources/tasks/<taskName>/`:
 
-- **Descriptor:** `<taskName>.xml` — defines the task description and an optional parameter form schema.
+- **Descriptor:** `<taskName>.yaml` — defines the task description and an optional parameter form schema.
 
-```xml
-<task>
-  <description>Background job</description>
-  <form>
-    <input type="Long" name="count">
-      <label>Number of items to process</label>
-      <occurrences minimum="1" maximum="1"/>
-    </input>
-  </form>
-</task>
+```yaml
+kind: "Task"
+description: "Background job"
+form:
+- type: "Long"
+  name: "count"
+  label: "Number of items to process"
+  occurrences:
+    min: 1
+    max: 1
 ```
 
-- **Controller:** `<taskName>.js` (or `.ts`) — exports a `run` function. Since XP 7.13.0, `taskId` is provided as a second argument.
+- **Controller:** `<taskName>.ts` (or `.js`) — exports a `run` function. The `taskId` is provided as a second argument.
 
 ```typescript
 exports.run = function (params, taskId) {
@@ -224,7 +224,7 @@ Reports progress from inside a running task.
 
 ### list(params?)
 
-Returns running tasks. Optional filter by `name` (string pattern) and `state` (`WAITING`, `RUNNING`, `FINISHED`, `FAILED`).
+Returns running tasks. Optional filter by `name` (string pattern) and `state` (`WAITING`, `RUNNING`, `FINISHED`, `FAILED`). On clustered environments an aggregated list is returned.
 
 ### get(taskId)
 
@@ -232,7 +232,7 @@ Returns the current state and progress details for the specified task.
 
 **Parameters:** `taskId` (string).
 
-**Returns:** `TaskInfo` object or `null` if the task was not found.
+**Returns:** `TaskInfo` object or `null` if the task was not found. `TaskInfo` includes: `id`, `name`, `description`, `state` (`WAITING` | `RUNNING` | `FINISHED` | `FAILED`), `application`, `user`, `startTime` (ISO-8601), `progress` (object with `current`, `total`, `info`), and `node` (cluster node identifier; absent when no cluster is configured).
 
 ### isRunning(task)
 
@@ -254,6 +254,7 @@ Causes the current execution thread to sleep for the specified number of millise
 |----------------|---------------------|
 | task.submitted | Task was submitted  |
 | task.updated   | Task was updated    |
+| task.removed   | Task was removed    |
 | task.finished  | Task completed      |
 | task.failed    | Task failed         |
 

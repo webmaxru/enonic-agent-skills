@@ -166,9 +166,9 @@ eventLib.listener({
 
 ## Example 4: Inbound Webhook — DAM Sync
 
-An HTTP service that receives payloads from an external DAM and creates media content in Enonic XP.
+An API endpoint that receives payloads from an external DAM and creates media content in Enonic XP.
 
-### services/dam-sync/dam-sync.ts
+### apis/dam-sync/dam-sync.ts
 
 ```typescript
 import contentLib from '/lib/xp/content';
@@ -190,7 +190,7 @@ function isValidUrl(value) {
   return value.startsWith('https://');
 }
 
-export function post(req) {
+export function POST(req) {
   if (!EXPECTED_API_KEY) {
     log.error('dam.sync.apiKey is not configured — rejecting request');
     return { status: 500, body: JSON.stringify({ error: 'Server misconfigured' }), contentType: 'application/json' };

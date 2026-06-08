@@ -1,11 +1,15 @@
 /**
- * HTTP Service Endpoint Template for Enonic XP
+ * HTTP API Endpoint Template for Enonic XP
  *
  * Place this file at:
- *   src/main/resources/services/<serviceName>/<serviceName>.ts
+ *   src/main/resources/apis/<apiName>/<apiName>.ts
  *
- * The service will be accessible at:
- *   /_/service/<appKey>/<serviceName>
+ * Create a matching descriptor at:
+ *   src/main/resources/apis/<apiName>/<apiName>.yaml
+ *
+ * The API will be accessible at:
+ *   /api/<appKey>:<apiName>          (web endpoint, if mount includes "web")
+ *   /_/<appKey>:<apiName>            (service point, if mounted in a site/webapp/admin descriptor)
  *
  * Note: This template uses TypeScript/ESM syntax. For .js targets, convert
  * `import X from 'Y'` to `var X = require('Y')` and `export function` to
@@ -31,7 +35,7 @@ const MAX_PAYLOAD_BYTES = 1048576; // 1 MB
 /**
  * Handle incoming POST requests (webhook payloads).
  */
-export function post(req) {
+export function POST(req) {
   // --- Authentication (required — reject if not configured) ---
   if (!EXPECTED_API_KEY) {
     log.error('webhook.apiKey is not configured — rejecting request');
@@ -125,7 +129,7 @@ function sanitizeString(value, maxLength) {
 }
 
 /**
- * Reject non-POST methods with 405.
+ * Catch-all for methods without a dedicated handler.
  */
 export function all(req) {
   return {
