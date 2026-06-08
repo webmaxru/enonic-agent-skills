@@ -20,7 +20,7 @@ metadata:
 1. Identify the content type name from the request. The name must be lowercase-hyphenated (e.g., `blog-post`).
 2. Identify the display name — a human-readable label (e.g., `Blog Post`).
 3. Determine the super-type. Default to `base:structured` unless the request specifies a folder (`base:folder`) or another built-in type.
-4. List all requested fields with their input types. Read `references/content-type-reference.md` to map natural-language field descriptions to the correct Enonic XP input type and configuration.
+4. List all requested fields with their input types. Read `references/content-type-reference.md` to map natural-language field descriptions to the correct Enonic XP input type and configuration. Use `snake_case` for all field names (e.g., `first_name`, `publish_date`).
 5. Identify any item sets (repeatable grouped fields), option sets (single-select or multi-select choices), or mixin references.
 6. If the request mentions a mixin, determine whether to generate the mixin file or reference an existing one.
 7. If the request mentions x-data, determine whether to generate the x-data file or reference an existing one.
@@ -39,7 +39,7 @@ metadata:
 8. For ContentSelector, ImageSelector, and MediaSelector inputs, include `<config>` with `allowContentType`, `allowPath`, `treeMode`, and `hideToggleIcon` as specified.
 9. For TextLine and TextArea, add `<config>` with `max-length`, `show-counter`, or `regexp` if validation constraints are requested.
 10. For Long and Double, add `<config>` with `min` and `max` if range constraints are requested.
-11. For DateTime, add `<config>` with `<timezone>true</timezone>` if timezone-aware storage is requested.
+11. For DateTime, add `<config>` with `<timezone>true</timezone>` if timezone-aware storage is requested. Prefer the `Instant` input type for new timezone-aware fields.
 12. If examples are needed for reference, read `references/examples.md`.
 
 **Step 4: Write the File**
