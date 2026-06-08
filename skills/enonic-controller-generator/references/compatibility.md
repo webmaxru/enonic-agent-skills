@@ -8,6 +8,58 @@
 - **XP 7.12+**: `request.getHeader(name)` for case-insensitive header lookup. `duplicate` function in lib-content.
 - **XP 7.15+**: `assetUrl` from lib-portal is deprecated; use `lib-asset` or `lib-static` instead. `patch` HTTP method supported in controllers. Response headers can be set to `null` to remove headers added by other controllers/filters. `@enonic-types/core` now includes TypeScript types for `Request` and `Response` objects.
 - **XP 7.16+**: GraalVM for JDK 21. No new controller-specific changes.
+- **XP 8**: Major breaking release — see the dedicated section below.
+
+## XP 8 Breaking Changes
+
+XP 8 is a major release that renames core concepts and changes file conventions. All patterns in this skill default to XP 7.x unless noted otherwise. When targeting XP 8, apply the following changes:
+
+### Resource path
+
+CMS resources move from `src/main/resources/site/` to `src/main/resources/cms/`:
+
+| Component | XP 7.x | XP 8 |
+|---|---|---|
+| Pages | `site/pages/<name>/` | `cms/pages/<name>/` |
+| Parts | `site/parts/<name>/` | `cms/parts/<name>/` |
+| Layouts | `site/layouts/<name>/` | `cms/layouts/<name>/` |
+| Processors | `site/processors/` | `cms/processors/` |
+| Site descriptor | `site/site.xml` | `cms/site.yaml` |
+
+### Descriptor format
+
+XML descriptors are replaced by YAML. The `<display-name>` element becomes `title`:
+
+```yaml
+# cms/pages/default/default.yaml
+kind: "Page"
+title: "Default Page"
+description: "Standard page with a main region"
+regions:
+  - name: "main"
+```
+
+### HTTP function exports
+
+Export names change from lowercase to uppercase:
+
+```ts
+// XP 7.x
+export function get(req) { ... }
+
+// XP 8
+export function GET(req) { ... }
+```
+
+### Portal API changes
+
+- `serviceUrl` is deprecated. Use `apiUrl` (new) for Universal APIs.
+- `baseUrl` is a new function that generates a base URL for the current context.
+- Text components are deprecated; use regular parts with a text field instead.
+
+### Request object
+
+- `locale` (string) — the resolved locale for the current request.
 
 ## TypeScript vs JavaScript
 
