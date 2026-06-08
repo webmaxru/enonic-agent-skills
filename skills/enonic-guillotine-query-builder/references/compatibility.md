@@ -39,6 +39,44 @@ Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript
 
 - **`maxQueryTokens` config** (v7.3.0): Configurable maximum number of raw tokens the parser accepts per query. Defaults to `15000`. Set via `maxQueryTokens` in `com.enonic.app.guillotine.cfg`.
 
+### Guillotine 7 Patch Releases
+
+- **v7.3.1**: Fixed execution failure when grammar tokens exceed 15,000.
+- **v7.3.2**: Fixed string index out of range error.
+- **v7.3.3 / v7.3.4**: GraphQL schema remains available if content type schema generation fails.
+
+## Guillotine 8.0 (Latest Stable)
+
+Requires **XP 8.0.0** or higher. Guillotine 8 will not install on XP 7.x.
+
+Source: https://developer.enonic.com/docs/guillotine/stable (release notes at https://github.com/enonic/app-guillotine/releases/tag/v8.0.0)
+
+### Key Changes from 7.x
+
+- **New Content fields**: `displayNameExpression`, `displayNameListExpression`, `displayNamePlaceholder`, `displayNamePlaceholderI18nKey`, `titleI18nKey`, `descriptionI18nKey`.
+- **CORS origin matching**: `cors.origin` now accepts multiple comma-separated values (e.g. `https://example.com, https://admin.example.com`), supports `*` to allow all origins, and `~`-prefixed regex patterns for dynamic matching (e.g. `~https://.*\.example\.com`).
+- **`cors.exposedHeaders`**: New option sets the `Access-Control-Expose-Headers` response header, exposing extra response headers beyond the CORS safelist.
+
+### Deprecations in 8.0
+
+| Field | Impact | Migration |
+|---|---|---|
+| `ContentType.displayName` | Superseded by `title` which carries the same value | Use `title` instead; `displayName` will be removed in a future major release |
+
+### Breaking Changes in 8.0
+
+| Change | Impact | Migration |
+|---|---|---|
+| Requires XP 8.0.0+ | Will not install on XP 7.x | Upgrade Enonic XP to 8.0.0 or higher |
+| `hasChildren` removed | Field removed from all Content types | Use `children` / `childrenConnection` and check if result is empty |
+| `inheritsPermissions` removed | Field removed from `Permissions` type | Remove from queries; no longer exposed through the GraphQL API |
+| `contentDisplayNameScript` removed | Field removed from `ContentType` | Remove from queries |
+| XData types renamed | `XData_*` types renamed to `Mixin_*` | Update inline fragments: e.g. `XData_base_gpsInfo_DataConfig` → `Mixin_base_gpsInfo_DataConfig` |
+| `Long` input type changed | `Long` form items return `Long` instead of `String` | Remove `parseInt` / string parsing for Long values |
+| `cors.enabled` removed | CORS now enabled by setting `cors.origin`; disabled when omitted | Set `cors.origin` to enable; omit to disable |
+| `cors.methods` default changed | Default changed from `POST, OPTIONS` to `GET, HEAD, POST` | Set explicitly if relying on old default |
+| `cors.allowedHeaders` behavior changed | Reflects request's `Access-Control-Request-Headers` when not configured | Set explicitly to keep `Content-Type` default |
+
 ## Guillotine 6.x
 
 ### Key Changes from 5.x

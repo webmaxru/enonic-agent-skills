@@ -3,7 +3,7 @@
 Condensed reference for composing Guillotine queries against Enonic XP.
 Source: https://developer.enonic.com/docs/guillotine/stable
 
-Guillotine 7.x is the current stable release (requires XP 7.14.0+).
+Guillotine 8.0 is the latest stable release (requires XP 8.0.0+). Guillotine 7.x (requires XP 7.14.0+) remains available for XP 7 deployments.
 
 ## Entry Point
 
@@ -67,7 +67,7 @@ All content types share these fields. Custom content types add a `data` field.
 | `_branch` | `String` | Branch name (`draft` or `master`) |
 | `displayName` | `String` | Display name |
 | `type` | `String` | Content type descriptor |
-| `contentType` | `ContentType` | Typed content type metadata (name, form, icon) |
+| `contentType` | `ContentType` | Typed content type metadata (name, form, icon). In Guillotine 8, query `title` instead of `displayName` on this type. |
 | `creator` | `PrincipalKey` | Content creator |
 | `modifier` | `PrincipalKey` | Last content modifier |
 | `owner` | `PrincipalKey` | Content owner |
@@ -75,7 +75,7 @@ All content types share these fields. Custom content types add a `data` field.
 | `modifiedTime` | `String` | ISO datetime |
 | `language` | `String` | Language code |
 | `valid` | `Boolean` | Content validity |
-| `hasChildren` | `Boolean` | Has children |
+| `hasChildren` | `Boolean` | Has children. **Removed in Guillotine 8** — use `children` / `childrenConnection` instead. |
 | `dataAsJson` | `JSON` | Raw data as JSON |
 | `xAsJson` | `JSON` | Extra data as JSON |
 | `pageAsJson(resolveTemplate: Boolean, resolveFragment: Boolean)` | `JSON` | Page specific information |
