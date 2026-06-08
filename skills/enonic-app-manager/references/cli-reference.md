@@ -32,8 +32,8 @@ enonic sandbox create [name] [-v <version>] [-t <template>] [--skip-template] [-
 | `-t, --template` | Use specific template (e.g., "Headless Demo") |
 | `--skip-template` | Skip template selection (no apps pre-installed) |
 | `-v, --version` | Specific XP distro version (e.g., `7.14.0`) |
-| `-i, --image` | Docker image to back the sandbox (e.g., `enonic/xp:latest-sdk`). Requires `docker` on `$PATH`. (CLI 4.0+) |
-| `--all` | Include pre-release versions in version list |
+| `-i, --image` | Docker image to back the sandbox (e.g., `enonic/xp:7.13.4-sdk`). Requires `docker` on `$PATH`. Mutually exclusive with `-v`. (CLI 4.0+, **EXPERIMENTAL**) |
+| `-a, --all` | Include pre-release versions in version list |
 | `--prod` | Run XP in non-development (production) mode |
 | `--skip-start` | Do not start sandbox after creation |
 | `-f, --force` | Non-interactive mode, accept defaults (auto-starts sandbox unless `--skip-start` is set) |
@@ -51,7 +51,9 @@ Examples:
 enonic sandbox ls
 ```
 
-Lists all sandboxes. Asterisk (`*`) marks the currently running sandbox.
+Lists all sandboxes. Asterisk (`*`) marks the currently running sandbox. Docker-backed sandboxes display `docker:<image>` instead of a distribution version.
+
+Docker-backed sandboxes run in a container named `enonic-sandbox-<name>`, with http/management/info ports mapped and the sandbox home folder bind-mounted at `/enonic-xp/home`.
 
 ### enonic sandbox start
 
@@ -84,9 +86,11 @@ Stops the currently running sandbox (only works for sandboxes started via CLI).
 enonic sandbox upgrade [name] [-v <version>] [-i <image>] [-a] [-f]
 ```
 
-Upgrades the XP distribution for a sandbox. Downgrades are not permitted. Use `-i <image>` to switch to a Docker-backed sandbox (CLI 4.0+).
+Upgrades the XP distribution for a sandbox. Downgrades are not permitted for distribution-backed sandboxes. Use `-i <image>` to switch to a Docker-backed sandbox (CLI 4.0+, **EXPERIMENTAL**). The `-v` and `-i` flags are mutually exclusive.
 
 ### enonic sandbox delete
+
+Aliases: `del`, `rm`
 
 ```
 enonic sandbox delete [name] [-f]
@@ -95,6 +99,8 @@ enonic sandbox delete [name] [-f]
 Deletes a sandbox and all its data permanently.
 
 ### enonic sandbox copy
+
+Alias: `cp`
 
 ```
 enonic sandbox copy [source] [target] [-f]
@@ -137,6 +143,8 @@ Full project creation wizard with all options.
 
 ### enonic project sandbox
 
+Aliases: `sbox`, `sb`
+
 ```
 enonic project sandbox [name] [-f]
 ```
@@ -149,7 +157,7 @@ Change the sandbox linked to the current project.
 enonic project build [-f]
 ```
 
-Compile code, run tests, create artifacts via Gradle.
+Compile code, run tests, create artifacts via Gradle. With `-f`, uses the system-wide Java and does not require a linked sandbox.
 
 ### enonic project clean
 
@@ -182,6 +190,8 @@ enonic project deploy [sandbox-name] [--prod] [--debug] [-c] [--skip-start] [-f]
 | `--skip-start` | Do not start sandbox |
 | `-f, --force` | Non-interactive mode |
 
+> **Note:** `--prod` and `--debug` are ignored if the sandbox is already running.
+
 ### enonic project install
 
 ```
@@ -205,6 +215,8 @@ enonic project gradle [tasks/flags ...]
 ```
 
 Run arbitrary Gradle tasks. All text after `gradle` is forwarded to `gradlew`.
+
+> **Note:** `--force` and `--help` are not supported by this command — they are forwarded to Gradle as-is.
 
 ### enonic project dev / enonic dev
 
@@ -310,3 +322,12 @@ enonic cloud app install [-j <jar-path>] [-t <timeout>] [-y]
 | `-j` | Jar to deploy (default: `./build/libs/*.jar`) |
 | `-t` | Upload timeout in seconds (default: 300) |
 | `-y` | Skip confirmation prompt |
+
+### Cloud Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `ENONIC_CLI_CLOUD_API_URL` | Cloud API URL |
+| `ENONIC_CLI_CLOUD_AUTH_AUD` | Cloud auth audience |
+| `ENONIC_CLI_CLOUD_AUTH_URL` | Cloud auth URL |
+| `ENONIC_CLI_CLOUD_AUTH_CLIENT` | Cloud auth client ID |

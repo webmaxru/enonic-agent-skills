@@ -4,7 +4,7 @@
 
 | CLI Feature | Minimum CLI Version | Notes |
 |-------------|-------------------|-------|
-| Docker-backed sandboxes (`--image`) | 4.0.0+ | Requires `docker` on `$PATH` |
+| Docker-backed sandboxes (`--image`) | 4.0.0+ | Requires `docker` on `$PATH`. **EXPERIMENTAL** |
 | Cloud commands (`enonic cloud`) | 4.0.0+ | Login, app install to Enonic Cloud |
 | XP 8 dump/snapshot task APIs | 4.0.0+ | Use `--compat 7` for XP 7 servers |
 | Sandbox templates | 3.0.0+ | `-t` flag for sandbox create |
