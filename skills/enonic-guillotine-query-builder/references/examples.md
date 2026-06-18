@@ -432,23 +432,36 @@ Fetch content matching any of several category values using `in` with `stringVal
 }
 ```
 
-## 15. Scaled Image URL for Media Content
+## 16. Sub-Aggregations (Nested)
 
-Query image content and generate a scaled, absolute URL:
+Nest a stats aggregation inside a terms aggregation to get per-category statistics:
 
 ```graphql
 {
   guillotine {
-    queryDsl(query: {
-      term: {
-        field: "type"
-        value: { string: "media:image" }
+    queryDslConnection(
+      query: {
+        term: {
+          field: "type"
+          value: { string: "com.enonic.app.myapp:Product" }
+        }
       }
-    }, first: 10) {
-      displayName
-      ... on media_Image {
-        imageUrl(scale: "block(800,200)", type: absolute)
-      }
+      first: 0
+      aggregations: [
+        {
+          name: "byCategory"
+          terms: { field: "data.category", size: 10 }
+          subAggregations: [
+            {
+              name: "priceStats"
+              stats: { field: "data.price" }
+            }
+          ]
+        }
+      ]
+    ) {
+      totalCount
+      aggregationsAsJson
     }
   }
 }
