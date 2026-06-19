@@ -41,6 +41,7 @@ Standard Next.XP project layout after scaffolding from `nextxp-template`:
 
 ```
 .env                                  # Environment variables
+next.config.js                        # Next.js configuration
 src/
     proxy.ts                          # Middleware routing by locale
     utils.ts                          # Token/path validation helpers
@@ -68,6 +69,28 @@ src/
                 route.ts              # Renderable check API route
             revalidate/
                 route.ts              # ISR revalidation API route
+```
+
+## Next.js Configuration (next.config.js)
+
+The `@enonic/nextjs-adapter` package must be transpiled by Next.js. The template includes these key settings:
+
+```javascript
+const nextConfig = {
+    transpilePackages: ['@enonic/nextjs-adapter'],
+};
+```
+
+If using path aliases for i18n phrases, configure the `@phrases` alias:
+
+```javascript
+const nextConfig = {
+    transpilePackages: ['@enonic/nextjs-adapter'],
+    webpack: (config) => {
+        config.resolve.alias['@phrases'] = path.resolve(__dirname, 'src/phrases');
+        return config;
+    },
+};
 ```
 
 ## Component Registry API
@@ -264,6 +287,8 @@ Key adapter imports:
 - `I18n.setLocale(locale)` — sets the locale for the current request (called in layouts).
 - `APP_NAME` — fully qualified app name from env config.
 - `APP_NAME_UNDERSCORED` — app name with dots replaced by underscores for GraphQL introspection.
+- `APP_NAME_DASHED` — app name with dots replaced by hyphens (used in some URL patterns).
+- `IS_DEV_MODE` — boolean indicating whether Next.js is running in development mode.
 - `PORTAL_COMPONENT_ATTRIBUTE` — HTML attribute for page editor component identification.
 - `CATCH_ALL` — wildcard content type name for debug/fallback views.
 - `richTextQuery(fieldName)` — generates GraphQL query fragment for rich text fields.
@@ -276,9 +301,6 @@ Server-side imports (from `@enonic/nextjs-adapter/server`):
 - `fetchContentPathsForLocale(basePath, locale)` — generates paths for SSG for a single locale.
 - `fetchGuillotine(contentApiUrl, options?)` — makes a custom request to Guillotine; used internally by `fetchContent()`.
 - `fetchFromApi(apiUrl, body, options?)` — lower-level HTTP POST to any API endpoint.
-- `getLocaleMapping(locale)` — resolves locale to project/site mapping from `ENONIC_MAPPINGS`.
-- `getLocaleMappingByLocale(locale)` — alias for `getLocaleMapping`.
-- `getLocaleMappingByProjectId(projectId)` — resolves project ID to its locale mapping.
 
 Client-side imports (from `@enonic/nextjs-adapter/client`):
 - `useLocaleContext()` — React hook returning `{locale, localize}` for client-side components.
@@ -296,7 +318,12 @@ Additional types and utilities:
 - `LocaleContextType` — type for the value returned by `useLocaleContext`.
 - `Replacer` — type for custom element replacement functions used with `RichTextView`'s `customReplacer` prop.
 - `RENDER_MODE` — enum-like constant for render mode detection (`NEXT`, `INLINE`, `EDIT`, `PREVIEW`, `LIVE`, `ADMIN`).
+- `sanitizeGraphqlName(name)` — converts a content type or app name to a GraphQL-safe identifier (dots to underscores, capitalize final segment).
+- `getContentApiUrl(contentApiUrl?)` — returns the resolved Guillotine API URL for the current context.
 - `UrlProcessor` — URL processing class; use `UrlProcessor.setSiteKey(key)` to set the site key for URL resolution.
+- `getLocaleMapping(locale)` — resolves locale to project/site mapping from `ENONIC_MAPPINGS`.
+- `getLocaleMappingByLocale(locale)` — alias for `getLocaleMapping`.
+- `getLocaleMappingByProjectId(projectId)` — resolves project ID to its locale mapping.
 
 ## Page Components with Regions
 
