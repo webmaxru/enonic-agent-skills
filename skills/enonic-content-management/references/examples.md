@@ -494,6 +494,71 @@ exports.run = function () {
 };
 ```
 
+## Duplicate Content to a New Parent (XP 7.12+)
+
+Use `contentLib.duplicate()` to create copies of content under a new parent path, useful for migration workflows that need to preserve the original.
+
+```typescript
+import contentLib from '/lib/xp/content';
+import contextLib from '/lib/xp/context';
+import { executeFunction, progress } from '/lib/xp/task';
+
+const BATCH_SIZE = 100;
+
+exports.run = function (params) {
+  const sourcePath = params.sourcePath;  // e.g. '/old-site/templates'
+  const targetPath = params.targetPath;  // e.g. '/new-site/templates'
+
+  executeFunction({
+    description: `Duplicate content from ${sourcePath} to ${targetPath}`,
+    func: () => {
+      contextLib.run({
+        branch: 'draft',
+        principals: ['role:system.admin']
+      }, () => {
+        const children = contentLib.getChildren({
+          key: sourcePath,
+          start: 0,
+          count: 1000
+        });
+
+        const total = children.total;
+        let duplicated = 0;
+        let failed = 0;
+
+        progress({ info: 'Starting content duplication', current: 0, total });
+
+        children.hits.forEach((child) => {
+          try {
+            contentLib.duplicate({
+              contentId: child._id,
+              parent: targetPath,
+              includeChildren: true
+            });
+            duplicated++;
+          } catch (e) {
+            log.error('Failed to duplicate %s: %s', child._path, e.message);
+            failed++;
+          }
+
+          progress({
+            info: `Duplicated ${duplicated}/${total}`,
+            current: duplicated + failed,
+            total
+          });
+        });
+
+        progress({
+          info: `Duplication complete. Duplicated: ${duplicated}, Failed: ${failed}`,
+          current: total,
+          total
+        });
+      });
+    }
+  });
+};
+```
+
 ## Resolve Outbound Dependencies Before Deletion
 
 Use `getOutboundDependencies()` (XP 7.2+) to identify referenced content before bulk deletion.

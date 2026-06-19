@@ -20,6 +20,7 @@ metadata:
    - **Bulk create**: Importing content from external sources (JSON, CSV, APIs).
    - **Bulk update**: Modifying existing content matching query criteria.
    - **Bulk delete**: Removing content matching query criteria.
+   - **Bulk duplicate**: Copying content to new paths with optional reparenting (XP 7.12+).
    - **Migration**: Moving or transforming content between paths, sites, or environments.
    - **Query/Aggregation**: Retrieving and analyzing content with NoQL and aggregations.
    - **Long-running task**: Any operation processing more than ~100 items that needs progress reporting.
