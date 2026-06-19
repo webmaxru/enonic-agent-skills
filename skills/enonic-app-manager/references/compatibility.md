@@ -4,9 +4,9 @@
 
 | CLI Feature | Minimum CLI Version | Notes |
 |-------------|-------------------|-------|
-| Docker-backed sandboxes (`--image`) | 4.0.0+ | Requires `docker` on `$PATH` |
+| Docker-backed sandboxes (`--image`) | 4.0.0+ | Requires `docker` on `$PATH`. **Experimental.** |
 | Cloud commands (`enonic cloud`) | 4.0.0+ | Login, app install to Enonic Cloud |
-| XP 8 dump/snapshot task APIs | 4.0.0+ | Use `--compat 7` for XP 7 servers |
+| XP 8 dump/snapshot task APIs | 4.0.0+ | Default target; use `--compat 7` for XP 7 servers |
 | Sandbox templates | 3.0.0+ | `-t` flag for sandbox create |
 | Service account keys (`--cred-file`) | 3.0.0+ | Requires XP 7.15+ |
 | Sandbox copy | 3.0.0+ | `enonic sandbox copy` command |
@@ -18,6 +18,7 @@ The Enonic CLI downloads and manages XP distributions automatically. Each sandbo
 
 | XP Version Range | Status | Java Requirement |
 |-----------------|--------|-----------------|
+| 8.x | In development (CLI 4.0+) | Java 21+ |
 | 7.16.x | Current stable | Java 21+ (GraalVM JDK 21) |
 | 7.15.x | Supported | Java 17+ |
 | 7.14.x | Supported | Java 17+ |
