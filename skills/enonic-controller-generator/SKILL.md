@@ -80,6 +80,7 @@ metadata:
 2. Verify the controller file name matches the descriptor directory name.
 3. Verify all region names in the controller/view match those declared in the XML descriptor.
 4. Read `references/examples.md` to cross-check the generated code against known-good patterns.
+5. Verify that each component's response body markup has a single root element.
 
 ## Error Handling
 

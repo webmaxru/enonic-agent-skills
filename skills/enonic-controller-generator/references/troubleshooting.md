@@ -58,6 +58,14 @@
 3. The application is not added to the site in Content Studio.
    - Fix: Go to the site content and add the application under the applications list.
 
+## Component Markup Has Multiple Root Elements
+
+**Symptoms:** The component renders incorrectly, produces broken HTML, or parts of the markup are silently dropped.
+
+**Causes:**
+1. The controller returns a response body with more than one root HTML element.
+   - Fix: Wrap all markup in a single root element (e.g., `<div>`, `<section>`). The site engine requires that markup from a component has a single root element.
+
 ## Config Values Are Undefined
 
 **Symptoms:** `component.config.fieldName` returns `undefined`.
