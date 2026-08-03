@@ -74,7 +74,7 @@ Common issues and diagnostic steps for the Next.js + Enonic XP integration (Next
 
 ### @enonic/nextjs-adapter import errors
 1. Run `npm install` to ensure the package is installed.
-2. Check `package.json` for `@enonic/nextjs-adapter` in dependencies (v4.x requires React 19 and Next.js 16).
+2. Check `package.json` for `@enonic/nextjs-adapter` in dependencies (v5.x requires React 19, Next.js 16, and Node.js ≥ 24.15.0).
 3. Verify the import path: some exports require subpath imports (e.g., `@enonic/nextjs-adapter/views/Region`, `@enonic/nextjs-adapter/server`, `@enonic/nextjs-adapter/client`).
 4. Server-side functions like `fetchContent` must be imported from `@enonic/nextjs-adapter/server`, not the main entry point.
 
