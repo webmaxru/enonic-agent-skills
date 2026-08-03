@@ -92,7 +92,7 @@ queryDsl(
 
 | Symptom | Fix |
 |---|---|
-| Cross-origin request blocked | CORS is enabled by default in Guillotine 7.2.0+. Verify `cors.enabled=true` in `com.enonic.app.guillotine.cfg`. Set `cors.origin` to the allowed origins if needed. |
+| Cross-origin request blocked | CORS is configured via `com.enonic.app.guillotine.cfg`. Set `cors.origin` to the allowed origins to enable CORS. Supports `*` for all origins and `~`-prefixed regex patterns. |
 | Query rejected with token limit error | The query exceeds `maxQueryTokens` (default `15000`, configurable in v7.3.0+). Simplify the query or increase the limit in `com.enonic.app.guillotine.cfg`. |
 
 ## Debugging Steps
