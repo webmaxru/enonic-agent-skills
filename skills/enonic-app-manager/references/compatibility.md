@@ -12,6 +12,11 @@
 | Sandbox copy | 3.0.0+ | `enonic sandbox copy` command |
 | Dev mode | 2.0.0+ | `enonic dev` command |
 
+## CLI 4.0 Behavioral Changes
+
+- `dump create`, `dump load`, `snapshot create`, and `snapshot restore` target XP 8 task-based APIs by default. Pass `--compat 7` (or `--compat 7.16`) to fall back to the legacy XP 7 format when talking to an XP 7 server.
+- `vacuum` no longer runs `SnapshotsVacuumTask` (removed in XP 8). Use `snapshot delete` to clean up snapshots instead.
+
 ## XP Distribution Compatibility
 
 The Enonic CLI downloads and manages XP distributions automatically. Each sandbox is pinned to a specific XP distribution version.
