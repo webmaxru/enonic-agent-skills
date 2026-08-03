@@ -3,7 +3,7 @@
 Condensed reference for composing Guillotine queries against Enonic XP.
 Source: https://developer.enonic.com/docs/guillotine/stable
 
-Guillotine 7.x is the current stable release (requires XP 7.14.0+).
+Guillotine 8.x is the current stable release (requires XP 8.0+). Guillotine 7.x (requires XP 7.14.0+) remains available for XP 7 installations.
 
 ## Entry Point
 
@@ -318,6 +318,7 @@ body(processHtml: { imageWidths: [600, 992], imageSizes: "(max-width: 600px) 100
 | `label` | `String` | Attachment label |
 | `size` | `Int` | Attachment size |
 | `mimeType` | `String` | Attachment MIME type |
+| `sha512` | `String` | Attachment SHA-512 checksum (Guillotine 8+) |
 | `attachmentUrl(download: Boolean, type: UrlType, params: Json)` | `String` | Attachment URL. `params` is `Json` type in Guillotine 7+ |
 
 ## ContentType Utility Fields

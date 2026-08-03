@@ -2,7 +2,23 @@
 
 Version differences and migration notes between major Guillotine releases.
 
-## Guillotine 7.x (Current Stable)
+## Guillotine 8.x (Current Stable)
+
+Requires **XP 8.0** or higher. Guillotine 8 is the XP 8–compatible release, based on the same Java engine as Guillotine 7.
+
+### Key Changes from 7.x
+
+- **XP 8 compatibility**: Guillotine 8 targets XP 8, while Guillotine 7.3.x remains available for XP 7 installations.
+- **Schema resilience**: The GraphQL schema remains available even if an individual content type schema generation fails, rather than breaking the entire schema.
+- **`sha512` attachment field**: The `Attachment` type now includes a `sha512` field returning the SHA-512 checksum of the attachment.
+
+### Breaking Changes in 8.0
+
+| Change | Impact | Migration |
+|---|---|---|
+| Requires XP 8 | Cannot run on XP 7.x | Use Guillotine 7.3.x for XP 7 installations |
+
+## Guillotine 7.x
 
 Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript to Java.
 
@@ -32,8 +48,8 @@ Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript
 
 ### Guillotine 7 Update 2
 
-- **CORS support** (v7.2.0): Built-in Cross-Origin Resource Sharing support with configurable allowed origins, methods, and headers. Enabled by default. Configure via `com.enonic.app.guillotine.cfg`:
-  - `cors.enabled` (default `true`), `cors.origin`, `cors.credentials` (default `false`), `cors.allowedHeaders` (default `Content-Type`), `cors.methods` (default `POST, OPTIONS`), `cors.maxAge`.
+- **CORS support** (v7.2.0): Built-in Cross-Origin Resource Sharing support with configurable allowed origins, methods, and headers. Configure via `com.enonic.app.guillotine.cfg`:
+  - `cors.origin` (comma-separated allowed origins; omit to disable CORS; supports `*` for all origins and `~`-prefixed regex patterns like `~https://.*\.example\.com`), `cors.credentials` (default `false`), `cors.allowedHeaders` (default: reflects `Access-Control-Request-Headers` from request), `cors.methods` (default `GET, HEAD, POST`), `cors.exposedHeaders` (extra response headers to expose beyond the CORS safelist), `cors.maxAge`.
 
 ### Guillotine 7 Update 3
 
