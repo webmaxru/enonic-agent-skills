@@ -239,6 +239,44 @@ Refreshes indices in the current repository.
 
 > **Note:** `com.enonic.cms.default` is the legacy default repository — now deprecated and hidden unless enabled via configuration. Pass an explicit `repo` of `com.enonic.cms.<project-name>` (e.g. `com.enonic.cms.myproject`) rather than relying on the default.
 
+### getBinary
+
+Returns a data stream for a repository attachment.
+
+**Parameters (object):**
+
+| Name | Type | Description |
+|------|------|-------------|
+| repoId | string | Repository ID |
+| binaryReference | string | Reference to the binary |
+
+**Returns:** `stream` — Stream of the attachment data.
+
+### modify
+
+Updates a repository.
+
+**Parameters (object):**
+
+| Name | Type | Description |
+|------|------|-------------|
+| id | string | Repository ID |
+| editor | function | Editor callback. Receives the current repository and must return the modified repository |
+
+**Returns:** `object` — The updated repository `{ id, branches[], data, transient }`.
+
+```ts
+import {modify} from '/lib/xp/repo';
+
+const result = modify({
+    id: 'my-repo',
+    editor: (repo) => {
+        repo.data = { ...repo.data, myString: 'modified' };
+        return repo;
+    }
+});
+```
+
 ### Events
 
 | Event | Description |

@@ -116,3 +116,97 @@ Returns the number of sockets in a group. *(XP 7.6.0+)*
 | group | string | Group name |
 
 **Returns:** `number`
+
+---
+
+## lib-sse *(XP 8.0+)*
+
+**Import:** `import sseLib from '/lib/xp/sse';`
+**Gradle:** `include xplibs.sse`
+
+> Server-Sent Events functions for real-time streaming to clients. Unlike WebSocket, SSE provides one-way server-to-client communication over standard HTTP. Every function takes a single object parameter.
+
+### Message Shape
+
+The `send` and `sendToGroup` functions accept a `message` object:
+
+| Name | Type | Description |
+|------|------|-------------|
+| event | string | Event name (optional) |
+| data | string | Event payload. A message with no `data` does not dispatch a client event |
+| id | string | Event id for `Last-Event-ID` reconnection tracking |
+| comment | string | SSE comment line (ignored by clients, useful for keep-alive pings) |
+
+### send
+
+Sends a message to a specific SSE connection. Safe no-op when the connection is closed.
+
+| Name | Type | Description |
+|------|------|-------------|
+| clientId | string | Client id from the `open` event |
+| message | object | Message to send (see Message Shape) |
+
+**Returns:** `void`
+
+### sendToGroup
+
+Sends a message to all connections in a named group.
+
+| Name | Type | Description |
+|------|------|-------------|
+| group | string | Group name |
+| message | object | Message to send (see Message Shape) |
+
+**Returns:** `void`
+
+### close
+
+Closes an SSE connection. Triggers a `close` event on the connection's `sseEvent` function.
+
+| Name | Type | Description |
+|------|------|-------------|
+| clientId | string | Client id |
+
+**Returns:** `void`
+
+### isOpen
+
+Checks whether an SSE connection is still open. Use to abort expensive work when the client disconnects.
+
+| Name | Type | Description |
+|------|------|-------------|
+| clientId | string | Client id |
+
+**Returns:** `boolean`
+
+### addToGroup
+
+Adds a connection to a named group.
+
+| Name | Type | Description |
+|------|------|-------------|
+| group | string | Group name |
+| clientId | string | Client id |
+
+**Returns:** `void`
+
+### removeFromGroup
+
+Removes a connection from a named group.
+
+| Name | Type | Description |
+|------|------|-------------|
+| group | string | Group name |
+| clientId | string | Client id |
+
+**Returns:** `void`
+
+### getGroupSize
+
+Returns the number of connections in a group.
+
+| Name | Type | Description |
+|------|------|-------------|
+| group | string | Group name |
+
+**Returns:** `number`

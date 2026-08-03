@@ -308,7 +308,7 @@ Sets the active version of a node.
 | Name | Type | Description |
 |------|------|-------------|
 | key | string | Path or ID |
-| versionID | string | Version to set as active |
+| versionId | string | Version to set as active |
 
 **Returns:** `boolean`
 
