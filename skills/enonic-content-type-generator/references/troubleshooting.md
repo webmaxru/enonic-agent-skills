@@ -51,6 +51,7 @@
 - `RadioButton` (not `radiobutton`)
 - `CheckBox` (not `checkbox`)
 - `DateTime` (not `datetime` or `Datetime`)
+- `Instant` (not `instant`)
 - `GeoPoint` (not `geopoint`)
 - `AttachmentUploader` (not `attachmentuploader`)
 - `MediaSelector` (not `mediaselector`)
@@ -89,16 +90,16 @@
 
 **Fix:** Verify the file is at the correct path:
 ```
-src/main/resources/site/content-types/[name]/[name].xml
+src/main/resources/cms/content-types/[name]/[name].xml
 ```
-The directory name and file name (without `.xml`) must match exactly.
+The directory name and file name (without `.xml`) must match exactly. Legacy projects may use the `site/content-types/` path instead.
 
 ### Mixin Not Found
 
 **Symptom:** Error referencing a mixin from a content type.
 
 **Fix:**
-1. Verify the mixin file exists at `src/main/resources/site/mixins/[name]/[name].xml`
+1. Verify the mixin file exists at `src/main/resources/cms/mixins/[name]/[name].xml` (or `site/mixins/` in legacy projects)
 2. The `name` in `<mixin name="..."/>` must match the mixin directory name exactly
 3. The mixin must belong to the same application or be qualified with the app namespace
 
@@ -112,15 +113,15 @@ The directory name and file name (without `.xml`) must match exactly.
 - `<occurrences>` on an `<option-set>` — controls how many instances of the whole option set
 - `<options minimum="..." maximum="...">` — controls how many options can be selected within one option-set instance
 
-### DateTime Stores Without Timezone
+### DateTime vs Instant
 
 **Symptom:** DateTime values lose timezone information when saved, or API returns `LocalDateTime` instead of `Instant`.
 
-**Fix:** By default DateTime stores values without timezone. Add `<timezone>true</timezone>` in the config to store timezone-aware values:
+**Fix:** `DateTime` always stores values without timezone (`LocalDateTime`). To store timezone-aware values, use the `Instant` input type instead:
 ```xml
-<config>
-  <timezone>true</timezone>
-</config>
+<input name="publishedAt" type="Instant">
+  <label>Published At</label>
+</input>
 ```
 
 ### ImageSelector `allowContentType` Ignored

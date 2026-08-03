@@ -20,10 +20,11 @@ metadata:
 1. Identify the content type name from the request. The name must be lowercase-hyphenated (e.g., `blog-post`).
 2. Identify the display name — a human-readable label (e.g., `Blog Post`).
 3. Determine the super-type. Default to `base:structured` unless the request specifies a folder (`base:folder`) or another built-in type.
-4. List all requested fields with their input types. Read `references/content-type-reference.md` to map natural-language field descriptions to the correct Enonic XP input type and configuration.
+4. List all requested fields with their input types. Read `references/content-type-reference.md` to map natural-language field descriptions to the correct Enonic XP input type and configuration. Use `snake_case` for field names.
 5. Identify any item sets (repeatable grouped fields), option sets (single-select or multi-select choices), or mixin references.
-6. If the request mentions a mixin, determine whether to generate the mixin file or reference an existing one.
-7. If the request mentions x-data, determine whether to generate the x-data file or reference an existing one.
+6. If a field requires timezone-aware date-time storage, use the `Instant` input type instead of `DateTime`.
+7. If the request mentions a mixin, determine whether to generate the mixin file or reference an existing one.
+8. If the request mentions x-data, determine whether to generate the x-data file or reference an existing one.
 
 **Step 3: Generate the Content Type XML**
 1. Read `assets/content-type.template.xml` to obtain the starter template.
@@ -32,23 +33,24 @@ metadata:
 4. Set the `<super-type>` element to the value determined in Step 2.
 5. Populate the `<form>` element with the identified inputs, item sets, option sets, field sets, and mixin references.
 6. For each input:
-   - Set the `name` attribute using camelCase.
+   - Set the `name` attribute using `snake_case` (lowercase with underscores).
    - Set the `type` attribute to the exact Enonic XP input type name (case-sensitive).
    - Add `<label>`, `<occurrences>`, `<help-text>`, `<default>`, and `<config>` as required.
 7. For ComboBox and RadioButton inputs, include all options inside `<config>`.
 8. For ContentSelector, ImageSelector, and MediaSelector inputs, include `<config>` with `allowContentType`, `allowPath`, `treeMode`, and `hideToggleIcon` as specified.
 9. For TextLine and TextArea, add `<config>` with `max-length`, `show-counter`, or `regexp` if validation constraints are requested.
 10. For Long and Double, add `<config>` with `min` and `max` if range constraints are requested.
-11. For DateTime, add `<config>` with `<timezone>true</timezone>` if timezone-aware storage is requested.
+11. For `Instant`, no `<config>` is needed — it always stores timezone-aware values.
 12. If examples are needed for reference, read `references/examples.md`.
 
 **Step 4: Write the File**
-1. Construct the target path: `[projectRoot]/src/main/resources/site/content-types/[name]/[name].xml`
-2. Create the directory if it does not exist.
-3. Write the generated XML to the file.
-4. If a mixin was generated, write it to: `[projectRoot]/src/main/resources/site/mixins/[name]/[name].xml`
-5. If x-data was generated, write it to: `[projectRoot]/src/main/resources/site/x-data/[name]/[name].xml`
-6. If x-data references are needed in `site.xml`, add `<x-data>` entries with `allowContentTypes` and `optional` attributes as specified.
+1. Determine the schema root directory. Check if the project uses `[projectRoot]/src/main/resources/cms/` (current convention) or `[projectRoot]/src/main/resources/site/` (legacy). Default to `cms/` for new projects.
+2. Construct the target path: `[schemaRoot]/content-types/[name]/[name].xml`
+3. Create the directory if it does not exist.
+4. Write the generated XML to the file.
+5. If a mixin was generated, write it to: `[schemaRoot]/mixins/[name]/[name].xml`
+6. If x-data was generated, write it to: `[schemaRoot]/x-data/[name]/[name].xml`
+7. If x-data references are needed, add entries to the CMS descriptor (`cms.yaml`) or legacy `site.xml` with `allowContentTypes` and `optional` attributes as specified.
 
 **Step 5: Validate Output**
 1. Verify the generated XML is well-formed.
