@@ -145,6 +145,7 @@ For making outbound HTTP calls from event listeners or service controllers.
 
 ```groovy
 dependencies {
+  // Use 3.2.2 for XP 7.x projects, 4.0.0 for XP 8.x projects
   include "com.enonic.lib:lib-http-client:3.2.2"
 }
 ```
