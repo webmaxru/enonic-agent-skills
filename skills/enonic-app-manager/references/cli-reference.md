@@ -26,6 +26,11 @@ Sandboxes are isolated local XP instances, each linked to a specific XP distribu
 enonic sandbox create [name] [-v <version>] [-t <template>] [--skip-template] [-i <image>] [-a] [--prod] [--skip-start] [-f]
 ```
 
+> **Note:** `-v` (distribution version) and `-i` (Docker image) are mutually exclusive. In non-interactive mode (`-f`), the source is decided by which flag is provided. Interactively, the CLI asks which source to use (Docker is offered only when `docker` is on `$PATH`).
+
+```
+```
+
 | Flag | Description |
 |------|-------------|
 | `name` | Sandbox name |
@@ -51,7 +56,7 @@ Examples:
 enonic sandbox ls
 ```
 
-Lists all sandboxes. Asterisk (`*`) marks the currently running sandbox.
+Lists all sandboxes. Asterisk (`*`) marks the currently running sandbox. Docker-backed sandboxes show their source as `docker:<image>` (e.g., `docker:enonic/xp:latest-sdk`).
 
 ### enonic sandbox start
 
@@ -84,13 +89,15 @@ Stops the currently running sandbox (only works for sandboxes started via CLI).
 enonic sandbox upgrade [name] [-v <version>] [-i <image>] [-a] [-f]
 ```
 
-Upgrades the XP distribution for a sandbox. Downgrades are not permitted. Use `-i <image>` to switch to a Docker-backed sandbox (CLI 4.0+).
+Upgrades the XP distribution for a sandbox. Downgrades are not permitted for distribution-backed sandboxes. Use `-v <version>` for distribution-backed sandboxes or `-i <image>` for Docker-backed sandboxes (CLI 4.0+). Using the wrong flag for the sandbox type is an error.
 
 ### enonic sandbox delete
 
 ```
 enonic sandbox delete [name] [-f]
 ```
+
+Aliases: `del`, `rm`
 
 Deletes a sandbox and all its data permanently.
 
@@ -99,6 +106,8 @@ Deletes a sandbox and all its data permanently.
 ```
 enonic sandbox copy [source] [target] [-f]
 ```
+
+Alias: `cp`
 
 Copies a sandbox with all content to a new sandbox.
 
@@ -181,6 +190,8 @@ enonic project deploy [sandbox-name] [--prod] [--debug] [-c] [--skip-start] [-f]
 | `-c, --continuous` | Watch changes and redeploy continuously |
 | `--skip-start` | Do not start sandbox |
 | `-f, --force` | Non-interactive mode |
+
+> **Important:** If the sandbox is already running, `--prod` and `--debug` parameters will be ignored. Ensure the sandbox is running in the desired mode beforehand.
 
 ### enonic project install
 
