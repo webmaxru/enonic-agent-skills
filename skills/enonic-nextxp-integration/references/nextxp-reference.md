@@ -256,7 +256,7 @@ Key adapter imports:
 - `LayoutProps` — props type for layout components.
 - `MacroProps` — props type for macro components.
 - `getUrl(path, meta)` — resolves URLs for both standalone and preview modes.
-- `getAsset(path, meta)` — resolves static asset URLs.
+- `getAsset(path, meta)` — resolves static asset URLs (marks URL as a resource to skip locale prefixing).
 - `richTextQuery(fieldName)` — generates the GraphQL query fragment for HTML area input types.
 - `validateData(props)` — validates `FetchContentResult`, throws errors or `notFound()` for invalid data.
 - `I18n.localize(key)` — localized string lookup from phrase files.
@@ -264,11 +264,19 @@ Key adapter imports:
 - `I18n.setLocale(locale)` — sets the locale for the current request (called in layouts).
 - `APP_NAME` — fully qualified app name from env config.
 - `APP_NAME_UNDERSCORED` — app name with dots replaced by underscores for GraphQL introspection.
+- `APP_NAME_DASHED` — app name with dots replaced by hyphens.
+- `IS_DEV_MODE` — boolean flag indicating whether Next.js is running in development mode.
+- `getContentApiUrl()` — constructs the Guillotine API URL from environment configuration.
+- `sanitizeGraphqlName(name)` — converts a content type name to a GraphQL-safe identifier.
+- `getRequestLocaleInfo({contentPath, headers})` — extracts locale from request for middleware.
+- `getLocaleMapping(locale)` — resolves locale to project/site mapping from `ENONIC_MAPPINGS`.
+- `getLocaleMappingByLocale(locale)` — alias for `getLocaleMapping`.
+- `getLocaleMappingByProjectId(projectId)` — resolves project ID to its locale mapping.
 - `PORTAL_COMPONENT_ATTRIBUTE` — HTML attribute for page editor component identification.
 - `CATCH_ALL` — wildcard content type name for debug/fallback views.
-- `richTextQuery(fieldName)` — generates GraphQL query fragment for rich text fields.
-- `validateData(data)` — validates `FetchContentResult` before rendering.
-- `getRequestLocaleInfo({contentPath, headers})` — extracts locale from request for middleware.
+- `RENDER_MODE` — enum-like constant for render mode detection (`NEXT`, `INLINE`, `EDIT`, `PREVIEW`, `LIVE`, `ADMIN`).
+- `RENDER_MODE_HEADER`, `XP_BASE_URL_HEADER`, `PROJECT_ID_HEADER`, `JSESSIONID_HEADER` — HTTP header constants used by the preview proxy.
+- `XP_COMPONENT_TYPE`, `XP_REQUEST_TYPE`, `PORTAL_REGION_ATTRIBUTE` — additional constants for component rendering.
 
 Server-side imports (from `@enonic/nextjs-adapter/server`):
 - `fetchContent(params)` — fetches content and resolves component mappings.
@@ -276,9 +284,6 @@ Server-side imports (from `@enonic/nextjs-adapter/server`):
 - `fetchContentPathsForLocale(basePath, locale)` — generates paths for SSG for a single locale.
 - `fetchGuillotine(contentApiUrl, options?)` — makes a custom request to Guillotine; used internally by `fetchContent()`.
 - `fetchFromApi(apiUrl, body, options?)` — lower-level HTTP POST to any API endpoint.
-- `getLocaleMapping(locale)` — resolves locale to project/site mapping from `ENONIC_MAPPINGS`.
-- `getLocaleMappingByLocale(locale)` — alias for `getLocaleMapping`.
-- `getLocaleMappingByProjectId(projectId)` — resolves project ID to its locale mapping.
 
 Client-side imports (from `@enonic/nextjs-adapter/client`):
 - `useLocaleContext()` — React hook returning `{locale, localize}` for client-side components.
@@ -295,8 +300,7 @@ Additional types and utilities:
 - `RichTextData` — type for the rich text data shape returned by `richTextQuery`.
 - `LocaleContextType` — type for the value returned by `useLocaleContext`.
 - `Replacer` — type for custom element replacement functions used with `RichTextView`'s `customReplacer` prop.
-- `RENDER_MODE` — enum-like constant for render mode detection (`NEXT`, `INLINE`, `EDIT`, `PREVIEW`, `LIVE`, `ADMIN`).
-- `UrlProcessor` — URL processing class; use `UrlProcessor.setSiteKey(key)` to set the site key for URL resolution.
+- `UrlProcessor` — URL processing class. Note: `UrlProcessor.setSiteKey()` is deprecated and has no effect; it will be removed in a future release.
 
 ## Page Components with Regions
 
