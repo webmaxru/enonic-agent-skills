@@ -3,7 +3,9 @@
 ## XML Structure
 
 Content types are XML files located at:
-`/src/main/resources/site/content-types/[name]/[name].xml`
+`/src/main/resources/cms/content-types/[name]/[name].xml`
+
+> **Note:** Legacy projects may use `/src/main/resources/site/content-types/` instead. New projects should use the `cms/` path.
 
 The directory name **must** match the file name (minus the `.xml` extension).
 
@@ -223,8 +225,11 @@ Complete list of available editor tools:
 | Type | Value Type | Description |
 |---|---|---|
 | `Date` | LocalDate | Date only (no time) |
-| `DateTime` | LocalDateTime / Instant | Date and time (local by default; timezone via config) |
+| `DateTime` | LocalDateTime | Date and time without timezone |
+| `Instant` | Instant | Date and time with timezone |
 | `Time` | LocalTime | Time only |
+
+> **Note:** In earlier versions of Enonic XP, `DateTime` had a `<timezone>` config option. The current API uses a separate `Instant` input type for timezone-aware values. Use `DateTime` for local date-time and `Instant` when timezone is needed.
 
 ### Date Config
 
@@ -242,15 +247,24 @@ Complete list of available editor tools:
 ```xml
 <input name="mydatetime" type="DateTime">
   <label>My DateTime</label>
-  <config>
-    <timezone>true</timezone>
-  </config>
-  <default>2011-09-12</default>
+  <default>2011-09-12T12:00</default>
 </input>
 ```
 
-- `timezone` — set to `true` to store value with timezone (produces `Instant`); default is `false` (produces `LocalDateTime`)
-- `default` supports ISO 8601 format (`yyyy-MM-ddThh:mm`, with optional timezone offset like `+01:00` or `Z`) or relative expressions (e.g., `+1year -12hours`, `now`)
+- `default` supports ISO 8601 format without timezone (`yyyy-MM-ddThh:mm`) or relative expressions (e.g., `+1year -12hours`, `now`)
+
+> **Note:** `DateTime` always stores a `LocalDateTime` (no timezone). For timezone-aware values, use the `Instant` input type instead.
+
+#### Instant Config
+
+```xml
+<input name="myinstant" type="Instant">
+  <label>My Instant</label>
+  <default>2025-06-15T12:00:00Z</default>
+</input>
+```
+
+- `default` supports ISO 8601 format with timezone offset (`yyyy-MM-ddThh:mm±hh:mm` or with `Z` for UTC) or relative expressions (e.g., `+1year -12hours`, `now`)
 
 **Relative expression unit strings:**
 
@@ -324,29 +338,31 @@ A relative expression is one or more offsets (e.g., `+3days -2hours`). The keywo
 <input name="mycustomselector" type="CustomSelector">
   <label>My Custom Selector</label>
   <config>
-    <service>my-custom-selector</service>
+    <extension>my-custom-selector</extension>
     <param value="genre">classic</param>
     <galleryMode>true</galleryMode>
   </config>
 </input>
 ```
 
-- `service` — name of a JavaScript service at `/resources/services/[name]/[name].js`; can reference another app with `com.myapp:servicename`
-- `param` — optional name-value parameters passed to the service as query params (repeatable)
+- `extension` — references an extension that provides the options; can reference another app with `com.myapp:extensionname`
+- `param` — optional name-value parameters passed to the extension as query params (repeatable)
 - `galleryMode` — `true` displays options as a three-column image gallery
 
-#### CustomSelector Service Request
+> **Deprecated:** The `service` config option is deprecated. Use `extension` instead. The `service` option referenced a JavaScript service at `/resources/services/[name]/[name].js`; `extension` references an extension registered under the `contentstudio.customselector` contract.
 
-In addition to `param` values, the service receives these query parameters:
+#### CustomSelector Extension Request
+
+In addition to `param` values, the extension receives these query parameters:
 
 - `ids` — array of item IDs already selected (service should return those items)
 - `start` — index of the first item expected (pagination)
 - `count` — maximum number of items expected (pagination)
 - `query` — search text typed by the user
 
-#### CustomSelector Service Response
+#### CustomSelector Extension Response
 
-The service controller must return JSON with `total`, `count`, and `hits` properties:
+The extension must return JSON with `total`, `count`, and `hits` properties:
 
 ```json
 {
@@ -413,6 +429,8 @@ Each hit must have `id` and `displayName`. Optional fields: `description`, `icon
   </config>
 </input>
 ```
+
+> **Naming convention:** Use `snake_case` (lowercase with underscores) for all `name` attributes. Capital letters are flattened during indexing, which can cause unexpected query behavior. The `snake_case` convention also ensures clean field names in the GraphQL API (Guillotine). For example, use `my_field_name` instead of `myFieldName`.
 
 **Occurrences rules:**
 - `minimum="0"` — field is optional
@@ -656,7 +674,9 @@ Present a set of mutually exclusive or multi-select options, each with optional 
 
 ## Mixins
 
-Reusable form fragments stored at `src/main/resources/site/mixins/[name]/[name].xml`.
+Reusable form fragments stored at `src/main/resources/cms/mixins/[name]/[name].xml`.
+
+> **Note:** Legacy projects may use `src/main/resources/site/mixins/`. New projects should use the `cms/` path.
 
 ### Mixin Definition
 
@@ -692,7 +712,9 @@ The mixin fields are merged inline at the position of `<mixin name="..."/>`.
 
 Extra data schemas that can be attached to any content type.
 
-Location: `src/main/resources/site/x-data/[name]/[name].xml`
+Location: `src/main/resources/cms/x-data/[name]/[name].xml`
+
+> **Note:** Legacy projects may use `src/main/resources/site/x-data/`. New projects should use the `cms/` path.
 
 ```xml
 <x-data>
@@ -708,9 +730,24 @@ Location: `src/main/resources/site/x-data/[name]/[name].xml`
 </x-data>
 ```
 
-### X-Data Registration in site.xml
+### X-Data Registration in CMS Descriptor
 
-X-data schemas are registered for use in `src/main/resources/site/site.xml`. Use `allowContentTypes` to restrict by content type pattern and `optional` to let editors enable it manually:
+X-data schemas are registered in the application's CMS descriptor (`src/main/resources/cms/cms.yaml`). In legacy projects using XML, registration is done in `site.xml`. Use `allowContentTypes` to restrict by content type pattern and `optional` to let editors enable it manually.
+
+YAML format (`cms.yaml`):
+
+```yaml
+kind: "CMS"
+mixins:
+  - name: "my-x-data-1"
+  - name: "my-x-data-2"
+    allowContentTypes: "^(?!base:folder$).*"
+  - name: "my-x-data-3"
+    allowContentTypes: "portal:site"
+    optional: true
+```
+
+Legacy XML format (`site.xml`):
 
 ```xml
 <site>
@@ -747,10 +784,10 @@ Field sets do **not** need a `name` attribute since they are only visual and do 
 
 ## Documentation Links
 
-- Content Types: https://developer.enonic.com/docs/xp/7.x/cms/content-types
-- Input Types: https://developer.enonic.com/docs/xp/7.x/cms/schemas/input-types
-- Option Sets: https://developer.enonic.com/docs/xp/7.x/cms/schemas/option-set
-- Item Sets: https://developer.enonic.com/docs/xp/7.x/cms/schemas/item-set
-- Mixins: https://developer.enonic.com/docs/xp/7.x/cms/schemas/mixins
-- X-Data: https://developer.enonic.com/docs/xp/7.x/cms/x-data
-- Schema System: https://developer.enonic.com/docs/xp/7.x/cms/schemas
+- Content Types: https://developer.enonic.com/docs/cms/stable/content/content-types
+- Form Items (Input Types): https://developer.enonic.com/docs/cms/stable/schemas/form-items
+- Option Sets: https://developer.enonic.com/docs/cms/stable/schemas/form-items/option-set
+- Item Sets: https://developer.enonic.com/docs/cms/stable/schemas/form-items/item-set
+- Mixins: https://developer.enonic.com/docs/cms/stable/content/mixins
+- CMS Descriptor: https://developer.enonic.com/docs/cms/stable/schemas/cms-descriptor
+- Schema System: https://developer.enonic.com/docs/cms/stable/schemas
