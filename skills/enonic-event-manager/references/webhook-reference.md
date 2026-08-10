@@ -149,6 +149,8 @@ dependencies {
 }
 ```
 
+> For Enonic XP 8, use `com.enonic.lib:lib-http-client:4.0.0` instead. The API is unchanged; v4.0.0 updates internal dependencies for XP 8 compatibility.
+
 Import:
 
 ```typescript
