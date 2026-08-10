@@ -6,7 +6,7 @@
 
 **Causes:**
 1. The descriptor file name does not match the parent directory name.
-   - Fix: Ensure `parts/my-part/my-part.xml` — both names must be identical.
+   - Fix: Ensure `parts/my-part/my-part.yaml` (XP 8) or `parts/my-part/my-part.xml` (XP 7) — both names must be identical.
 2. The controller file name does not match the descriptor.
    - Fix: Ensure `parts/my-part/my-part.ts` (or `.js`) matches the descriptor directory.
 3. The part is not added to a region on the page.
@@ -22,7 +22,7 @@
 2. The controller does not pass region data to the view or does not use `data-portal-region`.
    - Fix: Ensure the Thymeleaf view includes `data-portal-region="<name>"` on the container element.
 3. The page descriptor is not in the correct path.
-   - Fix: Verify the descriptor is at `src/main/resources/site/pages/<page-name>/<page-name>.xml`.
+   - Fix: Verify the descriptor is at `src/main/resources/cms/pages/<page-name>/<page-name>.yaml` (XP 8) or `src/main/resources/site/pages/<page-name>/<page-name>.xml` (XP 7).
 
 ## Layout Regions Not Rendering
 
@@ -51,8 +51,8 @@
 **Symptoms:** The processor function never runs; no page contributions are injected.
 
 **Causes:**
-1. The processor is not declared in `site.xml`.
-   - Fix: Add `<response-processor name="<name>" order="10"/>` inside `<processors>`.
+1. The processor is not declared in the site descriptor.
+   - Fix: Add processor entry in `cms/site.yaml` (XP 8) or `<response-processor name="<name>" order="10"/>` inside `<processors>` in `site.xml` (XP 7).
 2. The controller does not export `responseProcessor`.
    - Fix: Ensure `exports.responseProcessor = function (req, res) { ... }`.
 3. The application is not added to the site in Content Studio.
@@ -64,6 +64,16 @@
 
 **Causes:**
 1. The field name in the descriptor does not match the property accessed in the controller.
-   - Fix: Ensure `<input name="heading">` in the XML matches `config.heading` in the controller.
-2. The form field has `minimum="0"` and the editor did not fill it in.
+   - Fix: Ensure `<input name="heading">` (XP 7) or `name: "heading"` (XP 8) matches `config.heading` in the controller.
+2. The form field has `minimum="0"` (XP 7) or `min: 0` (XP 8) and the editor did not fill it in.
    - Fix: Add a null check or default: `config.heading || 'Default Heading'`.
+
+## HTTP Function Not Invoked (XP 8)
+
+**Symptoms:** The component returns a blank page or 404 even though the file exists.
+
+**Causes:**
+1. The HTTP function uses lowercase method names (`get`, `post`) instead of uppercase.
+   - Fix: Rename `export function get(req)` to `export function GET(req)`.
+2. The component markup does not have a single root element.
+   - Fix: Wrap the returned HTML in a single container element.

@@ -1,13 +1,15 @@
 // Page controller template for Enonic XP
 // Replace <PAGE_NAME> with the actual page name (e.g., "default")
-// Pair with descriptor: src/main/resources/site/pages/<PAGE_NAME>/<PAGE_NAME>.xml
+// XP 8: Pair with descriptor: src/main/resources/cms/pages/<PAGE_NAME>/<PAGE_NAME>.yaml
+// XP 7: Pair with descriptor: src/main/resources/site/pages/<PAGE_NAME>/<PAGE_NAME>.xml
 
 import { getContent, pageUrl } from '/lib/xp/portal';
 import thymeleafLib from '/lib/thymeleaf';
 
 const view = resolve('<PAGE_NAME>.html');
 
-export function get(req) {
+// XP 8: Use uppercase GET. XP 7: Use lowercase get.
+export function GET(req) {
   const content = getContent();
 
   const model = {
@@ -23,7 +25,17 @@ export function get(req) {
 }
 
 /*
---- Paired XML Descriptor ---
+--- Paired YAML Descriptor (XP 8) ---
+File: src/main/resources/cms/pages/<PAGE_NAME>/<PAGE_NAME>.yaml
+
+kind: "Page"
+title: "PAGE_DISPLAY_NAME"
+description: "PAGE_DESCRIPTION"
+form: []
+regions:
+  - name: "main"
+
+--- Paired XML Descriptor (XP 7) ---
 File: src/main/resources/site/pages/<PAGE_NAME>/<PAGE_NAME>.xml
 
 <page>

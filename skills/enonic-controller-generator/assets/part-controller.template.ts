@@ -1,13 +1,15 @@
 // Part controller template for Enonic XP
 // Replace <PART_NAME> with the actual part name (e.g., "hero-banner")
-// Pair with descriptor: src/main/resources/site/parts/<PART_NAME>/<PART_NAME>.xml
+// XP 8: Pair with descriptor: src/main/resources/cms/parts/<PART_NAME>/<PART_NAME>.yaml
+// XP 7: Pair with descriptor: src/main/resources/site/parts/<PART_NAME>/<PART_NAME>.xml
 
 import { getComponent, imageUrl } from '/lib/xp/portal';
 import thymeleafLib from '/lib/thymeleaf';
 
 const view = resolve('<PART_NAME>.html');
 
-export function get(req) {
+// XP 8: Use uppercase GET. XP 7: Use lowercase get.
+export function GET(req) {
   const component = getComponent();
   const config = component.config;
 
@@ -23,7 +25,22 @@ export function get(req) {
 }
 
 /*
---- Paired XML Descriptor ---
+--- Paired YAML Descriptor (XP 8) ---
+File: src/main/resources/cms/parts/<PART_NAME>/<PART_NAME>.yaml
+
+kind: "Part"
+title: "PART_DISPLAY_NAME"
+description: "PART_DESCRIPTION"
+form:
+  # Add form items here
+  # - name: "heading"
+  #   type: "TextLine"
+  #   label: "Heading"
+  #   occurrences:
+  #     min: 1
+  #     max: 1
+
+--- Paired XML Descriptor (XP 7) ---
 File: src/main/resources/site/parts/<PART_NAME>/<PART_NAME>.xml
 
 <part>

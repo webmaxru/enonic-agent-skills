@@ -1,13 +1,15 @@
 // Layout controller template for Enonic XP
 // Replace <LAYOUT_NAME> with the actual layout name (e.g., "two-column")
-// Pair with descriptor: src/main/resources/site/layouts/<LAYOUT_NAME>/<LAYOUT_NAME>.xml
+// XP 8: Pair with descriptor: src/main/resources/cms/layouts/<LAYOUT_NAME>/<LAYOUT_NAME>.yaml
+// XP 7: Pair with descriptor: src/main/resources/site/layouts/<LAYOUT_NAME>/<LAYOUT_NAME>.xml
 
 import { getComponent } from '/lib/xp/portal';
 import thymeleafLib from '/lib/thymeleaf';
 
 const view = resolve('<LAYOUT_NAME>.html');
 
-export function get(req) {
+// XP 8: Use uppercase GET. XP 7: Use lowercase get.
+export function GET(req) {
   const component = getComponent();
 
   const model = {
@@ -23,7 +25,18 @@ export function get(req) {
 }
 
 /*
---- Paired XML Descriptor ---
+--- Paired YAML Descriptor (XP 8) ---
+File: src/main/resources/cms/layouts/<LAYOUT_NAME>/<LAYOUT_NAME>.yaml
+
+kind: "Layout"
+title: "LAYOUT_DISPLAY_NAME"
+description: "LAYOUT_DESCRIPTION"
+form: []
+regions:
+  - name: "left"
+  - name: "right"
+
+--- Paired XML Descriptor (XP 7) ---
 File: src/main/resources/site/layouts/<LAYOUT_NAME>/<LAYOUT_NAME>.xml
 
 <layout>
