@@ -432,7 +432,7 @@ Fetch content matching any of several category values using `in` with `stringVal
 }
 ```
 
-## 15. Scaled Image URL for Media Content
+## 16. Scaled Image URL for Media Content
 
 Query image content and generate a scaled, absolute URL:
 
