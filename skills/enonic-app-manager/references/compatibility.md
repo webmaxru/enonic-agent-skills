@@ -7,6 +7,7 @@
 | Docker-backed sandboxes (`--image`) | 4.0.0+ | Requires `docker` on `$PATH` |
 | Cloud commands (`enonic cloud`) | 4.0.0+ | Login, app install to Enonic Cloud |
 | XP 8 dump/snapshot task APIs | 4.0.0+ | Use `--compat 7` for XP 7 servers |
+| Vacuum (no SnapshotsVacuumTask) | 4.0.0+ | Use `snapshot delete` to clean up snapshots instead |
 | Sandbox templates | 3.0.0+ | `-t` flag for sandbox create |
 | Service account keys (`--cred-file`) | 3.0.0+ | Requires XP 7.15+ |
 | Sandbox copy | 3.0.0+ | `enonic sandbox copy` command |
