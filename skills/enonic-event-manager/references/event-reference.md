@@ -80,6 +80,7 @@ Node events are emitted when repository nodes (including content) change.
 | node.moved      | A node was moved or renamed                      |
 | node.sorted     | A node's children sort order changed             |
 | node.stateUpdated | A node's state was updated                     |
+| node.permissionsUpdated | A node's permissions were updated        |
 
 ### Event Object Structure
 
@@ -105,8 +106,10 @@ Node events are emitted when repository nodes (including content) change.
 ```
 
 Additional properties appear on specific event types:
+- **`node.pushed`**: Each node entry may include `currentTargetPath` (string) — the existing path of the node on the target branch, present when the node was already published before.
 - **`node.moved`**: Each node entry includes `newPath` (string) — the destination path after the move or rename.
 - **`node.stateUpdated`**: The `data` object includes `state` (string) — the new state value.
+- **`node.permissionsUpdated`**: Emitted when a node's access permissions are changed. The event data includes the node `id`, `path`, `branch`, and `repo` but is structured at the top level of `data` rather than inside a `nodes` array.
 
 ### Path Filtering
 
