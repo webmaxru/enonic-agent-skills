@@ -1,6 +1,62 @@
 # Enonic XP Controller Examples
 
-## Page Controller with Region
+## Page Controller with Region (XP 8)
+
+### Descriptor — `src/main/resources/cms/pages/default/default.yaml`
+
+```yaml
+kind: "Page"
+title: "Default Page"
+description: "Standard page with a main region"
+form: []
+regions:
+  - name: "main"
+```
+
+### Controller (TypeScript) — `src/main/resources/cms/pages/default/default.ts`
+
+```ts
+import { getContent, pageUrl } from '/lib/xp/portal';
+import thymeleafLib from '/lib/thymeleaf';
+
+const view = resolve('default.html');
+
+export function GET(req) {
+  const content = getContent();
+  const model = {
+    displayName: content.displayName,
+    mainRegion: content.page.regions.main
+  };
+  return {
+    body: thymeleafLib.render(view, model),
+    contentType: 'text/html'
+  };
+}
+```
+
+### View — `src/main/resources/cms/pages/default/default.html`
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <title data-th-text="${displayName}">Page Title</title>
+</head>
+<body>
+  <main data-portal-region="main">
+    <div data-th-each="component : ${mainRegion.components}"
+         data-th-remove="tag"
+         data-portal-component="${component.path}">
+    </div>
+  </main>
+</body>
+</html>
+```
+
+---
+
+## Page Controller with Region (XP 7)
 
 ### Descriptor — `src/main/resources/site/pages/default/default.xml`
 

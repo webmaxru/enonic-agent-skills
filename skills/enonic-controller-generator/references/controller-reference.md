@@ -2,21 +2,47 @@
 
 ## Project File Layout
 
+### XP 8 (Current)
+
+Controllers (called "HTTP functions" in XP 8) and descriptors live under `src/main/resources/cms/`:
+
+```
+src/main/resources/cms/
+├── pages/
+│   └── <page-name>/
+│       ├── <page-name>.yaml       # Page descriptor (YAML)
+│       └── <page-name>.ts         # Page HTTP function (or .js)
+├── parts/
+│   └── <part-name>/
+│       ├── <part-name>.yaml       # Part descriptor (YAML)
+│       └── <part-name>.ts         # Part HTTP function (or .js)
+├── layouts/
+│   └── <layout-name>/
+│       ├── <layout-name>.yaml     # Layout descriptor (YAML)
+│       └── <layout-name>.ts       # Layout HTTP function (or .js)
+├── processors/
+│   └── <processor-name>.ts        # Response processor
+├── site.yaml                      # Site descriptor (declares processors, mappings)
+└── cms.yaml                       # CMS descriptor (activates mixins, app form)
+```
+
+### XP 7 (Legacy)
+
 Controllers and descriptors live under `src/main/resources/site/`:
 
 ```
 src/main/resources/site/
 ├── pages/
 │   └── <page-name>/
-│       ├── <page-name>.xml        # Page descriptor (regions, form)
+│       ├── <page-name>.xml        # Page descriptor (XML)
 │       └── <page-name>.ts         # Page controller (or .js)
 ├── parts/
 │   └── <part-name>/
-│       ├── <part-name>.xml        # Part descriptor (form only, no regions)
+│       ├── <part-name>.xml        # Part descriptor (XML)
 │       └── <part-name>.ts         # Part controller (or .js)
 ├── layouts/
 │   └── <layout-name>/
-│       ├── <layout-name>.xml      # Layout descriptor (regions, form)
+│       ├── <layout-name>.xml      # Layout descriptor (XML)
 │       └── <layout-name>.ts       # Layout controller (or .js)
 ├── processors/
 │   └── <processor-name>.js        # Response processor controller
@@ -25,10 +51,30 @@ src/main/resources/site/
 
 ## HTTP Handler Conventions
 
-Controllers export named functions matching HTTP methods:
+Controllers export named functions matching HTTP methods. In XP 8, method names are uppercase; in XP 7, they are lowercase.
+
+### XP 8 (Current)
 
 ```ts
 // TypeScript style
+export function GET(req: Request): Response { ... }
+export function POST(req: Request): Response { ... }
+export function DELETE(req: Request): Response { ... }
+export function PATCH(req: Request): Response { ... }
+export function PUT(req: Request): Response { ... }
+```
+
+```js
+// JavaScript (CommonJS) style
+exports.GET = function (req) { ... };
+exports.POST = function (req) { ... };
+exports.DELETE = function (req) { ... };
+exports.PATCH = function (req) { ... };
+```
+
+### XP 7 (Legacy)
+
+```ts
 export function get(req: Request): Response { ... }
 export function post(req: Request): Response { ... }
 export function delete(req: Request): Response { ... }
@@ -36,21 +82,21 @@ export function patch(req: Request): Response { ... }  // XP 7.15+
 ```
 
 ```js
-// JavaScript (CommonJS) style
 exports.get = function (req) { ... };
 exports.post = function (req) { ... };
 exports.delete = function (req) { ... };
 exports.patch = function (req) { ... };  // XP 7.15+
 ```
 
-A special `all` export handles any HTTP method not explicitly declared.
+A special `all` (XP 7) or `ALL` (XP 8) export handles any HTTP method not explicitly declared.
 
-Supported methods: `get`, `post`, `put`, `delete`, `head`, `options`, and `patch` (XP 7.15+).
+Supported methods: `GET`, `POST`, `PUT`, `DELETE`, `HEAD`, `OPTIONS`, `PATCH`.
 
 The handler receives an HTTP Request object and must return an HTTP Response object:
 
 ```ts
-export function get(req) {
+// XP 8
+export function GET(req) {
   return {
     body: '<html>...</html>',
     contentType: 'text/html',
@@ -76,6 +122,8 @@ export function get(req) {
 | `params` | object | Query/form parameters |
 | `headers` | object | HTTP request headers |
 | `cookies` | object | HTTP request cookies |
+| `contentPath` | string | Path of the content being rendered (site service, XP 8+) |
+| `locales` | array | Locale strings in decreasing preference order from `Accept-Language` (XP 8+) |
 
 Since XP 7.12, the request object also exposes `getHeader(name)` — a case-insensitive header lookup function. Prefer it over accessing `headers` directly. Note: modifying the `headers` object does not affect the result of `getHeader(name)` calls.
 
@@ -86,7 +134,7 @@ Since XP 7.12, the request object also exposes `getHeader(name)` — a case-inse
 | `status` | number | `200` | HTTP status code |
 | `body` | string/object | | Response body |
 | `contentType` | string | `text/plain; charset=utf-8` | MIME type |
-| `headers` | object | | Response headers (value can be `null` to remove a header, XP 7.15+) |
+| `headers` | object | | Response headers (value can be `null` or `undefined` to remove a header) |
 | `cookies` | object | | Response cookies (see cookie options below) |
 | `redirect` | string | | URI to redirect to (sets status 303) |
 | `postProcess` | boolean | `true` | Site engine: process component placeholder tags in the body |
@@ -267,6 +315,32 @@ Duplicate contributions are automatically removed during the merge step. If the 
 
 ## Response Processors
 
+### XP 8
+
+Place implementation files at: `src/main/resources/cms/processors/<name>.ts` (or `.js`)
+
+Export `responseProcessor`:
+```ts
+exports.responseProcessor = (req, res) => {
+  var script = '<script src="https://cdn.example.com/tracker.js"></script>';
+  if (!res.pageContributions.bodyEnd) {
+    res.pageContributions.bodyEnd = [];
+  }
+  res.pageContributions.bodyEnd.push(script);
+  return res;
+};
+```
+
+Register in `cms/site.yaml`:
+```yaml
+kind: "Site"
+processors:
+  - name: "tracker"
+    order: 10
+```
+
+### XP 7 (Legacy)
+
 Place controller files at: `src/main/resources/site/processors/<name>.js`
 
 Export `responseProcessor`:
@@ -281,10 +355,6 @@ exports.responseProcessor = function (req, res) {
 };
 ```
 
-Response processors run between component rendering and the contributions filter. Setting `applyFilters: false` in the response skips further processors and filters.
-
-Execution order is determined by the `order` attribute (lower = higher priority) combined with app order on the site.
-
 Register in `site.xml`:
 ```xml
 <site>
@@ -295,9 +365,70 @@ Register in `site.xml`:
 </site>
 ```
 
-## XML Descriptor Reference
+Response processors run between component rendering and the contributions filter. Setting `applyFilters: false` in the response skips further processors and filters.
 
-### Page Descriptor
+Execution order is determined by the `order` attribute (lower = higher priority) combined with app order on the site.
+
+## Descriptor Reference
+
+### XP 8 — YAML Descriptors
+
+#### Page Descriptor
+
+```yaml
+kind: "Page"
+title: "My Page"
+description: "Front page"
+form: []
+regions:
+  - name: "main"
+```
+
+The `title` field supports localization via the `text`/`i18n` object pattern:
+```yaml
+title:
+  text: "My Page"
+  i18n: "component.page.name"
+```
+
+#### Part Descriptor
+
+```yaml
+kind: "Part"
+title: "My Part"
+description: "Displays a hero banner"
+form:
+  - name: "heading"
+    type: "TextLine"
+    label: "Heading"
+    occurrences:
+      min: 1
+      max: 1
+```
+
+Parts support `allowOnContentType` to limit which content types they can be placed on:
+```yaml
+kind: "Part"
+title: "Article Part"
+form: []
+allowOnContentType:
+  - "${app}:article*"
+```
+
+#### Layout Descriptor
+
+```yaml
+kind: "Layout"
+title: "Two Column Layout"
+form: []
+regions:
+  - name: "left"
+  - name: "right"
+```
+
+### XP 7 — XML Descriptors (Legacy)
+
+#### Page Descriptor
 
 ```xml
 <page>
@@ -342,4 +473,20 @@ The `i18n` attribute on `<display-name>` is optional and specifies a localizatio
 
 ### Form Schema Elements
 
-Common input types for component forms: `TextLine`, `TextArea`, `HtmlArea`, `ImageSelector`, `ContentSelector`, `CheckBox`, `ComboBox`, `Date`, `DateTime`, `Long`, `Double`.
+Common input types for component forms:
+
+**String outputs:** `TextLine`, `TextArea`, `HtmlArea`, `ComboBox`, `RadioButton`, `Tag`, `CustomSelector`, `ContentTypeFilter`
+
+**Reference outputs:** `ContentSelector`, `ImageSelector`, `MediaSelector`
+
+**Attachment Reference:** `AttachmentUploader`
+
+**Numeric outputs:** `Long`, `Double`
+
+**Boolean:** `CheckBox`
+
+**Date/Time:** `Date` (LocalDate), `Time` (LocalTime), `DateTime`, `Instant`
+
+**Other:** `GeoPoint`, `ItemSet` (nested group), `OptionSet` (selectable groups), `FieldSet` (visual grouping only, no output)
+
+Use `snake_case` for all form item names — capitals are flattened during indexing.

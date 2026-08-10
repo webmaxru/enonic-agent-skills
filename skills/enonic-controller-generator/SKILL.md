@@ -4,7 +4,7 @@ description: Generates Enonic XP controller files (TypeScript/JavaScript) and pa
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.4"
+  version: "1.5"
 ---
 
 # Enonic XP Controller Generator
@@ -15,6 +15,7 @@ metadata:
 1. Execute `node scripts/find-enonic-targets.mjs <workspace-root>` to locate the project root and existing components.
 2. If the script exits with code 1 (no markers found), inform the user that no Enonic XP project was detected and stop.
 3. Record the `sitePath` from stdout — all generated files target directories relative to this path.
+4. Determine the XP version: if `sitePath` contains `/cms/`, the project uses XP 8; if it contains `/site/`, it uses XP 7. Read `references/compatibility.md` for version-specific differences.
 
 **Step 2: Determine Component Type**
 1. Identify which component type the user requires:
@@ -34,13 +35,14 @@ metadata:
    - For parts: **form fields** (name, type, occurrences).
    - For response processors: **page contribution target** (`bodyEnd`, `headEnd`, etc.) and the content to inject.
 
-**Step 4: Generate the XML Descriptor**
-1. Read `references/controller-reference.md` for the XML descriptor schema.
-2. Create the descriptor file:
-   - Page: `<sitePath>/pages/<name>/<name>.xml`
-   - Part: `<sitePath>/parts/<name>/<name>.xml`
-   - Layout: `<sitePath>/layouts/<name>/<name>.xml`
-3. Include `<display-name>`, `<description>`, `<form>` (with inputs for parts), and `<regions>` (for pages and layouts).
+**Step 4: Generate the Descriptor**
+1. Read `references/controller-reference.md` for the descriptor schema.
+2. For XP 8 projects, generate a YAML descriptor; for XP 7 projects, generate an XML descriptor.
+3. Create the descriptor file:
+   - Page: `<sitePath>/pages/<name>/<name>.yaml` (XP 8) or `<name>.xml` (XP 7)
+   - Part: `<sitePath>/parts/<name>/<name>.yaml` (XP 8) or `<name>.xml` (XP 7)
+   - Layout: `<sitePath>/layouts/<name>/<name>.yaml` (XP 8) or `<name>.xml` (XP 7)
+4. Include `title` (XP 8) or `<display-name>` (XP 7), `description`, `form` (with inputs for parts), and `regions` (for pages and layouts).
 
 **Step 5: Generate the Controller**
 1. Read the appropriate template from `assets/`:
@@ -48,7 +50,8 @@ metadata:
    - `assets/part-controller.template.ts` for parts.
    - `assets/layout-controller.template.ts` for layouts.
 2. Replace placeholders with the actual component name, config field mappings, region names, and library imports.
-3. If JavaScript was requested, convert the ES module syntax to CommonJS (`require`/`exports`).
+3. For XP 8 projects, use uppercase HTTP method exports (`GET`, `POST`). For XP 7, use lowercase (`get`, `post`).
+4. If JavaScript was requested, convert the ES module syntax to CommonJS (`require`/`exports`).
 4. Read `references/controller-reference.md` for the Portal API surface (functions, import paths).
 5. Place the controller at:
    - Page: `<sitePath>/pages/<name>/<name>.ts` (or `.js`)
@@ -62,9 +65,11 @@ metadata:
 3. For region iteration, use `data-th-each="component : ${region.components}"` with `data-portal-component="${component.path}"`.
 
 **Step 7: Wire Response Processors (if applicable)**
-1. If generating a response processor, check whether `<sitePath>/site.xml` exists.
-2. If it exists, add a `<response-processor>` entry inside the `<processors>` block.
-3. If it does not exist, create `<sitePath>/site.xml` with the processor declaration.
+1. If generating a response processor, check whether the site descriptor exists.
+   - XP 8: `<sitePath>/site.yaml`
+   - XP 7: `<sitePath>/site.xml`
+2. If it exists, add a processor entry.
+3. If it does not exist, create it with the processor declaration.
 
 **Step 8: Update build.gradle Dependencies**
 1. Check the project's `build.gradle` for existing library includes.
@@ -83,7 +88,7 @@ metadata:
 
 ## Error Handling
 
-* If `scripts/find-enonic-targets.mjs` exits with code 1 (`NO_PROJECT`), inform the user that no Enonic XP project was found and suggest creating the standard directory structure under `src/main/resources/site/`.
+* If `scripts/find-enonic-targets.mjs` exits with code 1 (`NO_PROJECT`), inform the user that no Enonic XP project was found and suggest creating the standard directory structure under `src/main/resources/cms/` (XP 8) or `src/main/resources/site/` (XP 7).
 * If a component with the same name already exists at the target path, warn the user and ask whether to overwrite or rename.
 * If the user reports a 404 on a part or missing regions, read `references/troubleshooting.md` to diagnose common causes.
 * If the generated controller fails at runtime with view resolution errors, verify the view file is co-located with the controller and the `resolve()` call uses the correct filename.
