@@ -23,7 +23,7 @@ A typical blog post with title, author reference, publish date, rich-text body, 
         <allowContentType>${app}:author</allowContentType>
       </config>
     </input>
-    <input name="publishDate" type="DateTime">
+    <input name="publish_date" type="DateTime">
       <label>Publish Date</label>
       <occurrences minimum="1" maximum="1"/>
     </input>
@@ -35,7 +35,7 @@ A typical blog post with title, author reference, publish date, rich-text body, 
       <label>Tags</label>
       <occurrences minimum="0" maximum="0"/>
     </input>
-    <input name="featuredImage" type="ImageSelector">
+    <input name="featured_image" type="ImageSelector">
       <label>Featured Image</label>
       <occurrences minimum="0" maximum="1"/>
     </input>
@@ -107,11 +107,11 @@ An event that lets the editor choose between in-person (with address and coordin
       <label>Description</label>
       <occurrences minimum="0" maximum="1"/>
     </input>
-    <option-set name="locationType">
+    <option-set name="location_type">
       <label>Location Type</label>
       <occurrences minimum="1" maximum="1"/>
       <options minimum="1" maximum="1">
-        <option name="inPerson">
+        <option name="in_person">
           <label>In-Person</label>
           <items>
             <input name="address" type="TextArea">
@@ -153,11 +153,11 @@ A person content type with repeatable contact info entries.
   <description>Person with contact information</description>
   <super-type>base:structured</super-type>
   <form>
-    <input name="firstName" type="TextLine">
+    <input name="first_name" type="TextLine">
       <label>First Name</label>
       <occurrences minimum="1" maximum="1"/>
     </input>
-    <input name="lastName" type="TextLine">
+    <input name="last_name" type="TextLine">
       <label>Last Name</label>
       <occurrences minimum="1" maximum="1"/>
     </input>
@@ -169,7 +169,7 @@ A person content type with repeatable contact info entries.
       <label>Biography</label>
       <occurrences minimum="0" maximum="1"/>
     </input>
-    <item-set name="contactInfo">
+    <item-set name="contact_info">
       <label>Contact Info</label>
       <occurrences minimum="0" maximum="0"/>
       <items>
@@ -196,15 +196,15 @@ A reusable mixin for SEO metadata that can be added to any content type.
 <mixin>
   <display-name>SEO Metadata</display-name>
   <form>
-    <input name="metaTitle" type="TextLine">
+    <input name="meta_title" type="TextLine">
       <label>Meta Title</label>
       <occurrences minimum="0" maximum="1"/>
     </input>
-    <input name="metaDescription" type="TextArea">
+    <input name="meta_description" type="TextArea">
       <label>Meta Description</label>
       <occurrences minimum="0" maximum="1"/>
     </input>
-    <input name="ogImage" type="ImageSelector">
+    <input name="og_image" type="ImageSelector">
       <label>OG Image</label>
       <occurrences minimum="0" maximum="1"/>
     </input>
@@ -246,5 +246,35 @@ A content type that acts as an organizational container.
   <allow-child-content>true</allow-child-content>
   <allow-child-content-type>${app}:article</allow-child-content-type>
   <form/>
+</content-type>
+```
+
+## Example 7: Event with Instant (Timezone-Aware)
+
+An event using the `Instant` input type for timezone-aware date/time storage.
+
+```xml
+<content-type>
+  <display-name>Conference Session</display-name>
+  <description>A conference session with timezone-aware scheduling</description>
+  <super-type>base:structured</super-type>
+  <form>
+    <input name="title" type="TextLine">
+      <label>Session Title</label>
+      <occurrences minimum="1" maximum="1"/>
+    </input>
+    <input name="start_time" type="Instant">
+      <label>Start Time</label>
+      <occurrences minimum="1" maximum="1"/>
+    </input>
+    <input name="end_time" type="Instant">
+      <label>End Time</label>
+      <occurrences minimum="0" maximum="1"/>
+    </input>
+    <input name="description" type="HtmlArea">
+      <label>Description</label>
+      <occurrences minimum="0" maximum="1"/>
+    </input>
+  </form>
 </content-type>
 ```

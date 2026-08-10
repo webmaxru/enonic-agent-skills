@@ -223,8 +223,11 @@ Complete list of available editor tools:
 | Type | Value Type | Description |
 |---|---|---|
 | `Date` | LocalDate | Date only (no time) |
-| `DateTime` | LocalDateTime / Instant | Date and time (local by default; timezone via config) |
+| `DateTime` | LocalDateTime | Date and time without timezone |
+| `Instant` | Instant | Date and time with timezone |
 | `Time` | LocalTime | Time only |
+
+> **Note:** In earlier XP versions, `DateTime` with `<config><timezone>true</timezone></config>` was used for timezone-aware values. The dedicated `Instant` input type is now the recommended approach for timezone-aware date/time storage.
 
 ### Date Config
 
@@ -242,15 +245,24 @@ Complete list of available editor tools:
 ```xml
 <input name="mydatetime" type="DateTime">
   <label>My DateTime</label>
-  <config>
-    <timezone>true</timezone>
-  </config>
-  <default>2011-09-12</default>
+  <default>2011-09-12T12:00</default>
 </input>
 ```
 
-- `timezone` — set to `true` to store value with timezone (produces `Instant`); default is `false` (produces `LocalDateTime`)
-- `default` supports ISO 8601 format (`yyyy-MM-ddThh:mm`, with optional timezone offset like `+01:00` or `Z`) or relative expressions (e.g., `+1year -12hours`, `now`)
+- `default` supports ISO 8601 format without timezone (`yyyy-MM-ddThh:mm`) or relative expressions (e.g., `+1year -12hours`, `now`)
+
+> **Note:** `DateTime` always produces a `LocalDateTime` (no timezone). For timezone-aware storage, use `Instant` instead.
+
+#### Instant Config
+
+```xml
+<input name="myinstant" type="Instant">
+  <label>My Instant</label>
+  <default>2025-06-15T12:00:00+01:00</default>
+</input>
+```
+
+- `default` supports ISO 8601 format with timezone (`yyyy-MM-ddThh:mm±hh:mm` or `Z` suffix) or relative expressions (e.g., `+1year -12hours`, `now`)
 
 **Relative expression unit strings:**
 
@@ -324,29 +336,32 @@ A relative expression is one or more offsets (e.g., `+3days -2hours`). The keywo
 <input name="mycustomselector" type="CustomSelector">
   <label>My Custom Selector</label>
   <config>
-    <service>my-custom-selector</service>
+    <extension>my-custom-selector</extension>
     <param value="genre">classic</param>
     <galleryMode>true</galleryMode>
   </config>
 </input>
 ```
 
-- `service` — name of a JavaScript service at `/resources/services/[name]/[name].js`; can reference another app with `com.myapp:servicename`
-- `param` — optional name-value parameters passed to the service as query params (repeatable)
+- `extension` — references an extension that provides the options; can reference another app with `com.myapp:extensionname`
+- `service` — **deprecated**; use `extension` instead. Legacy property that references a JavaScript service at `/resources/services/[name]/[name].js`
+- `param` — optional name-value parameters passed to the extension as query params (repeatable)
 - `galleryMode` — `true` displays options as a three-column image gallery
 
-#### CustomSelector Service Request
+#### CustomSelector Extension
 
-In addition to `param` values, the service receives these query parameters:
+The `extension` property references an extension implementing the `contentstudio.customselector` contract. The extension receives query parameters and returns a JSON response.
+
+In addition to `param` values, the extension receives these query parameters:
 
 - `ids` — array of item IDs already selected (service should return those items)
 - `start` — index of the first item expected (pagination)
 - `count` — maximum number of items expected (pagination)
 - `query` — search text typed by the user
 
-#### CustomSelector Service Response
+#### CustomSelector Extension Response
 
-The service controller must return JSON with `total`, `count`, and `hits` properties:
+The extension must return JSON with `total`, `count`, and `hits` properties:
 
 ```json
 {
@@ -413,6 +428,8 @@ Each hit must have `id` and `displayName`. Optional fields: `description`, `icon
   </config>
 </input>
 ```
+
+> **Naming convention:** Use `snake_case` (lowercase with underscores) for all `name` attributes. Capital letters are flattened during indexing, which can cause unexpected query behavior. The `snake_case` convention also ensures clean field names in the GraphQL API.
 
 **Occurrences rules:**
 - `minimum="0"` — field is optional
@@ -708,17 +725,30 @@ Location: `src/main/resources/site/x-data/[name]/[name].xml`
 </x-data>
 ```
 
-### X-Data Registration in site.xml
+### X-Data Registration in site.xml / cms.yaml
 
-X-data schemas are registered for use in `src/main/resources/site/site.xml`. Use `allowContentTypes` to restrict by content type pattern and `optional` to let editors enable it manually:
+X-data schemas are registered in the application's CMS descriptor. In the newer YAML format, this is `src/main/resources/cms/cms.yaml`. In the legacy XML format, use `src/main/resources/site/site.xml`. Use `allowContentTypes` to restrict by content type pattern and `optional` to let editors enable it manually:
 
 ```xml
+<!-- Legacy XML format in site.xml -->
 <site>
   <x-data name="my-x-data-1" />
   <x-data name="my-x-data-2" allowContentTypes="^(?!base:folder$).*" />
   <x-data name="my-x-data-3" allowContentTypes="portal:site" optional="true" />
   <form/>
 </site>
+```
+
+```yaml
+# YAML format in cms.yaml
+kind: "CMS"
+mixins:
+  - name: "my-x-data-1"
+  - name: "my-x-data-2"
+    allowContentTypes: "^(?!base:folder$).*"
+  - name: "my-x-data-3"
+    allowContentTypes: "portal:site"
+    optional: true
 ```
 
 - Without `allowContentTypes` and `optional`, x-data is enabled for all content types with no option to remove it
@@ -754,3 +784,5 @@ Field sets do **not** need a `name` attribute since they are only visual and do 
 - Mixins: https://developer.enonic.com/docs/xp/7.x/cms/schemas/mixins
 - X-Data: https://developer.enonic.com/docs/xp/7.x/cms/x-data
 - Schema System: https://developer.enonic.com/docs/xp/7.x/cms/schemas
+
+> **Note:** Enonic XP now supports YAML as the primary schema definition format alongside the legacy XML format documented here. The YAML format uses `kind: "ContentType"` with form items defined as YAML lists. Both formats are fully supported at runtime. See the official documentation for YAML examples.

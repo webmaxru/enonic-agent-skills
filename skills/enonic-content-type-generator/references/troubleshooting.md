@@ -27,11 +27,14 @@
 
 **Symptom:** Schema fails to compile.
 
-**Fix:** The `name` attribute on `<input>`, `<item-set>`, and `<option-set>` must be a valid XML name — alphanumeric with no spaces. Use camelCase or underscores:
+**Fix:** The `name` attribute on `<input>`, `<item-set>`, and `<option-set>` must be a valid XML name — alphanumeric with no spaces. Use snake_case (recommended) or camelCase:
 ```xml
-<!-- Good -->
-<input name="firstName" type="TextLine">
+<!-- Good (snake_case — recommended) -->
+<input name="first_name" type="TextLine">
 <input name="phone_number" type="TextLine">
+
+<!-- Acceptable (camelCase) -->
+<input name="firstName" type="TextLine">
 
 <!-- Bad -->
 <input name="first name" type="TextLine">
@@ -51,6 +54,7 @@
 - `RadioButton` (not `radiobutton`)
 - `CheckBox` (not `checkbox`)
 - `DateTime` (not `datetime` or `Datetime`)
+- `Instant` (not `instant`)
 - `GeoPoint` (not `geopoint`)
 - `AttachmentUploader` (not `attachmentuploader`)
 - `MediaSelector` (not `mediaselector`)
@@ -116,12 +120,15 @@ The directory name and file name (without `.xml`) must match exactly.
 
 **Symptom:** DateTime values lose timezone information when saved, or API returns `LocalDateTime` instead of `Instant`.
 
-**Fix:** By default DateTime stores values without timezone. Add `<timezone>true</timezone>` in the config to store timezone-aware values:
+**Fix:** `DateTime` always stores values without timezone (as `LocalDateTime`). For timezone-aware storage, use the `Instant` input type instead:
 ```xml
-<config>
-  <timezone>true</timezone>
-</config>
+<input name="published_at" type="Instant">
+  <label>Published At</label>
+  <occurrences minimum="1" maximum="1"/>
+</input>
 ```
+
+> **Note:** The legacy approach of adding `<config><timezone>true</timezone></config>` to a `DateTime` input is deprecated. Use the dedicated `Instant` type for timezone-aware values.
 
 ### ImageSelector `allowContentType` Ignored
 

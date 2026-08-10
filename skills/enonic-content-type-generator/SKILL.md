@@ -24,6 +24,7 @@ metadata:
 5. Identify any item sets (repeatable grouped fields), option sets (single-select or multi-select choices), or mixin references.
 6. If the request mentions a mixin, determine whether to generate the mixin file or reference an existing one.
 7. If the request mentions x-data, determine whether to generate the x-data file or reference an existing one.
+8. For timezone-aware date/time fields, use the `Instant` input type. For local date/time (no timezone), use `DateTime`.
 
 **Step 3: Generate the Content Type XML**
 1. Read `assets/content-type.template.xml` to obtain the starter template.
@@ -32,14 +33,14 @@ metadata:
 4. Set the `<super-type>` element to the value determined in Step 2.
 5. Populate the `<form>` element with the identified inputs, item sets, option sets, field sets, and mixin references.
 6. For each input:
-   - Set the `name` attribute using camelCase.
+   - Set the `name` attribute using snake_case (e.g., `first_name`, `phone_number`).
    - Set the `type` attribute to the exact Enonic XP input type name (case-sensitive).
    - Add `<label>`, `<occurrences>`, `<help-text>`, `<default>`, and `<config>` as required.
 7. For ComboBox and RadioButton inputs, include all options inside `<config>`.
 8. For ContentSelector, ImageSelector, and MediaSelector inputs, include `<config>` with `allowContentType`, `allowPath`, `treeMode`, and `hideToggleIcon` as specified.
 9. For TextLine and TextArea, add `<config>` with `max-length`, `show-counter`, or `regexp` if validation constraints are requested.
 10. For Long and Double, add `<config>` with `min` and `max` if range constraints are requested.
-11. For DateTime, add `<config>` with `<timezone>true</timezone>` if timezone-aware storage is requested.
+11. For DateTime, no additional config is needed (it always stores without timezone). For timezone-aware storage, use `Instant` instead.
 12. If examples are needed for reference, read `references/examples.md`.
 
 **Step 4: Write the File**
