@@ -39,7 +39,7 @@ exports.run = function () {
 
           result.hits.forEach((hit) => {
             try {
-              contentLib.modify({
+              contentLib.update({
                 key: hit._id,
                 editor: (c) => {
                   c.data.category = 'archived';

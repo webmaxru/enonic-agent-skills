@@ -7,12 +7,16 @@
 | `contentLib.query()` | 6.0 | Core function, always available |
 | `contentLib.create()` | 6.0 | `refresh` parameter available from 6.0 |
 | `contentLib.modify()` | 6.0 | Editor callback pattern |
-| `contentLib.publish()` | 6.0 | `sourceBranch`/`targetBranch` not in use since 7.12 (ignored, publish always goes draft→master). `excludeChildrenIds` parameter added in 7.12 |
+| `contentLib.publish()` | 6.0 | `sourceBranch`/`targetBranch` not in use since 7.12 (ignored, publish always goes draft→master). `excludeDescendantsOf` replaces deprecated `excludeChildrenIds`. `message` parameter available for publish commit messages |
 | `contentLib.archive()` | 7.8 | Archive/restore workflow |
 | `contentLib.restore()` | 7.8 | Restore from archive |
 | `contentLib.getOutboundDependencies()` | 7.2 | List outbound content references for dependency resolution |
-| `contentLib.duplicate()` | 7.12 | Includes `variant`, `parent`, `name` options from 7.12 |
-| `taskLib.executeFunction()` | 7.7 | Replaces deprecated `taskLib.submit()` |
+| `contentLib.duplicate()` | 7.12 | Includes `variant`, `parent`, `name`, `includeChildren` options |
+| `contentLib.update()` | 6.0 | Replaces deprecated `modify()` — same implementation, use `update()` in new code |
+| `contentLib.patch()` | — | Patch content properties directly; unlike `update()`, does not reset workflow state |
+| `contentLib.updateWorkflow()` | — | Set workflow state on draft branch; required before publishing after `update()` changes |
+| `contentLib.updateMetadata()` | — | Update `owner` and `variantOf` on both branches |
+| `taskLib.executeFunction()` | 7.7 | Deprecated in XP 8.1.0 — does not work on GraalJS engine. Use `submitTask()` instead |
 | `taskLib.submitTask()` | 7.7 | Replaces deprecated `taskLib.submitNamed()` |
 | `taskLib.sleep()` | 7.0 | Only works inside a task context |
 | `repo.duplicate()` | 7.12 | Node-level duplication with `dataProcessor` callback and `refresh` option |

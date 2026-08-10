@@ -102,16 +102,22 @@ if (info) {
 
 ## Publish Failures
 
-**Error:** Items appear in `failedContents` array of `contentLib.publish()` result.
+**Error:** Items appear in `failedContents` array of `contentLib.publish()` result, or `pushedContents` is empty despite no exception.
 
 **Causes:**
-- Content validation failure (invalid required fields).
+- Content validation failure (invalid required fields, `valid` is `false`).
+- Workflow state is not `READY` — `update()` resets state to `IN_PROGRESS` after any genuine change.
 - Missing parent content in target branch.
 - Permission issues on specific content items.
+- With `includeDependencies: true` (default), a single invalid dependency blocks the entire batch.
+
+**Important:** Publishing is **all-or-nothing**. If any item in the resolved set is ineligible, nothing is published — `pushedContents` is empty, all ids go to `failedContents`, and no exception is thrown.
 
 **Resolution:**
-- Check `requireValid` — set to `false` during modify if content is temporarily invalid during migration.
+- After `contentLib.update()`, call `contentLib.updateWorkflow()` to set state to `READY` before publishing.
+- Check `requireValid` — set to `false` during update if content is temporarily invalid during migration.
 - Publish parent paths before child content.
+- Set `includeDependencies: false` for bulk operations to avoid cascade failures.
 - Review the `failedContents` array and retry individual items:
 
 ```typescript
@@ -125,6 +131,14 @@ const result = contentLib.publish({
 if (result.failedContents.length > 0) {
   log.warning('Failed to publish: %s', JSON.stringify(result.failedContents));
 }
+
+// If items were updated, mark them ready before retrying
+result.failedContents.forEach((id) => {
+  contentLib.updateWorkflow({
+    key: id,
+    editor: (w) => { w.state = 'READY'; return w; }
+  });
+});
 ```
 
 ## Node Push Failures

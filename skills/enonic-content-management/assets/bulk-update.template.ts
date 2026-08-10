@@ -10,6 +10,9 @@ import contextLib from '/lib/xp/context';
 import { connect } from '/lib/xp/node';
 import { executeFunction, progress, isRunning } from '/lib/xp/task';
 
+// Note: executeFunction() is deprecated in XP 8.1.0 and does not work on GraalJS.
+// For new code, use named tasks with submitTask() instead.
+
 const TASK_DESCRIPTION = '[PLACEHOLDER: Describe the migration task]';
 const BATCH_SIZE = 100;
 
@@ -54,7 +57,7 @@ export function run(): string {
 
           result.hits.forEach((hit) => {
             try {
-              contentLib.modify({
+              contentLib.update({
                 key: hit._id,
                 editor: (content) => {
                   // [PLACEHOLDER: Apply modifications]

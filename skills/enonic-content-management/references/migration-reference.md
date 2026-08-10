@@ -14,7 +14,8 @@ import contentLib from '/lib/xp/content';
 |----------|---------|
 | `contentLib.query()` | Query content with NoQL, filters, aggregations |
 | `contentLib.create()` | Create a content item |
-| `contentLib.modify()` | Modify content via editor callback |
+| `contentLib.update()` | Update content via editor callback (replaces deprecated `modify()`) |
+| `contentLib.modify()` | Deprecated predecessor of `update()` — same implementation, use `update()` in new code |
 | `contentLib.delete()` | Delete content by key (path or id) |
 | `contentLib.move()` | Rename or relocate content |
 | `contentLib.publish()` | Push content from draft to master |
@@ -25,6 +26,9 @@ import contentLib from '/lib/xp/content';
 | `contentLib.getOutboundDependencies()` | List outbound content references by key (XP 7.2+) |
 | `contentLib.archive()` | Archive content (XP 7.8+) |
 | `contentLib.restore()` | Restore archived content (XP 7.8+) |
+| `contentLib.patch()` | Patch content properties directly without workflow side-effects |
+| `contentLib.updateWorkflow()` | Set workflow state (`READY`, `IN_PROGRESS`, etc.) on draft branch |
+| `contentLib.updateMetadata()` | Update metadata (`owner`, `variantOf`) on both branches |
 
 ### Query Parameters
 
@@ -60,14 +64,17 @@ contentLib.create({
     checks: {}
   },
   requireValid: true,          // Validate against content type (default: true)
-  refresh: true                // Index refresh — set false for bulk operations
+  refresh: true,               // Index refresh — set false for bulk operations
+  idGenerator: (name) => name  // Optional — custom suffix generator for auto-named content
 });
 ```
 
-### Modify Pattern
+### Update Pattern
+
+> `update()` replaces the deprecated `modify()`. Both are backed by the same implementation. Use `update()` in new code.
 
 ```typescript
-contentLib.modify({
+contentLib.update({
   key: '/path/to/content',     // Path or id
   editor: (content) => {
     content.data.field = 'new value';
@@ -78,9 +85,27 @@ contentLib.modify({
 });
 ```
 
+> **Important:** A genuine update resets `workflow.state` to `IN_PROGRESS` and stamps `modifier`/`modifiedTime`. An editor that returns the content unchanged is a no-op. Since `publish()` refuses content that is not `READY`, call `contentLib.updateWorkflow()` to set state back to `READY` before publishing.
+
+Only these properties are writable in the editor callback: `displayName`, `language`, `data`, `x`, `page`. Setting `workflow`, `publish`, `owner` or other properties in the editor is silently ignored.
+
+### UpdateWorkflow Pattern
+
+```typescript
+contentLib.updateWorkflow({
+  key: '/path/to/content',
+  editor: (w) => {
+    w.state = 'READY';
+    return w;
+  }
+});
+```
+
 ### Publish Pattern
 
 > **XP 7.12+ change:** `sourceBranch` and `targetBranch` are no longer in use. Publish always pushes from `draft` to `master`. These parameters are silently ignored on XP 7.12+. Keep them for backward compatibility with XP < 7.12.
+
+> **Publishing is all-or-nothing.** XP validates the entire resolved set before pushing. If a single item is ineligible (`valid` is `false` or `workflow.state` is not `READY`), the whole publish is abandoned: `pushedContents` comes back empty, every id lands in `failedContents`, and no exception is thrown. With `includeDependencies: true` (default), an invalid dependency you never named is enough to block everything. Use `contentLib.updateWorkflow()` to mark items as `READY` before publishing.
 
 ```typescript
 contentLib.publish({
@@ -88,7 +113,8 @@ contentLib.publish({
   sourceBranch: 'draft',              // Ignored on XP 7.12+
   targetBranch: 'master',             // Ignored on XP 7.12+
   includeDependencies: false,          // Set false for bulk to avoid cascade
-  excludeChildrenIds: ['id-3'],        // Exclude descendants of specific items (XP 7.12+)
+  excludeDescendantsOf: ['id-3'],      // Exclude descendants of specific items (replaces deprecated excludeChildrenIds)
+  message: 'Bulk update migration',   // Optional publish commit message
   schedule: {                          // Optional scheduling
     from: new Date().toISOString(),
     to: '2025-12-31T23:59:59Z'
@@ -362,6 +388,8 @@ const published = contextLib.run({
 
 ## Task Controller Pattern
 
+> **`executeFunction()` is deprecated** as of XP 8.1.0 and does not work on the GraalJS engine. Use named tasks with `submitTask()` instead for new code. The examples below still show `executeFunction()` for XP 7.x backward compatibility.
+
 ### Inline Task with Progress
 
 ```typescript
@@ -395,10 +423,9 @@ Place in `src/main/resources/tasks/{taskName}/{taskName}.js`:
 ```typescript
 import { progress } from '/lib/xp/task';
 
-exports.run = function(params, taskId) {
+exports.run = function(params) {
   // params come from submitTask config
-  // taskId is provided as second argument (XP 7.13+)
-  progress({ info: 'Starting ' + taskId, current: 0, total: params.total });
+  progress({ info: 'Starting', current: 0, total: params.total });
   // ... processing ...
 };
 ```
@@ -410,7 +437,7 @@ import { submitTask } from '/lib/xp/task';
 
 submitTask({
   descriptor: 'myMigrationTask',
-  config: { query: targetQuery, batchSize: 100 }
+  config: { query: targetQuery, batchSize: 100 }  // Must match the task descriptor XML schema
 });
 ```
 
