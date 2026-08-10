@@ -14,7 +14,7 @@ metadata:
 **Step 1: Scan the workspace for existing Guillotine usage**
 1. Execute `node scripts/find-guillotine-targets.mjs .` to inventory files containing Guillotine markers (query strings, library imports, endpoint references).
 2. If a Node runtime is unavailable, search the workspace manually for `guillotine`, `queryDsl`, `queryDslConnection`, or `/lib/guillotine` in `.ts`, `.js`, `.graphql`, and `.gql` files.
-3. Note the Guillotine version in use: if `query(query: "...")` string-based fields are found, the project uses the deprecated 5.x-style API; if `queryDsl` / `queryDslConnection` are found, the project uses 6.x+ DSL. Check for `exports.extensions` in `guillotine/guillotine.js` to detect Guillotine 7 Extensions API usage.
+3. Note the Guillotine version in use: if `query(query: "...")` string-based fields are found, the project uses the deprecated 5.x-style API; if `queryDsl` / `queryDslConnection` are found, the project uses 6.x+ DSL. Check for `exports.extensions` in `guillotine/guillotine.js` to detect Guillotine 7+ Extensions API usage. Check the XP version or Guillotine app version for Guillotine 8 (requires XP 8.0.0+).
 4. If both styles coexist, flag the deprecated usage for migration.
 
 **Step 2: Load the Guillotine API reference**
@@ -67,7 +67,8 @@ metadata:
 4. Verify `DSLExpressionValueInput` objects contain exactly one value type field.
 5. Check that aggregation and highlight are only used on connection variants.
 6. For Guillotine 7+ projects, verify `pageUrl` / `mediaUrl` / `imageUrl` / `attachmentUrl` use `Json` type for `params` argument, not `String`.
-7. Read `references/troubleshooting.md` if the query returns unexpected nulls, empty results, or type errors.
+7. For Guillotine 8+ projects, verify `hasChildren` is not used (removed; use `children` / `childrenConnection` instead), XData inline fragments use `Mixin_*` type names (not `XData_*`), and `ContentType` queries use `title` instead of the deprecated `displayName`.
+8. Read `references/troubleshooting.md` if the query returns unexpected nulls, empty results, or type errors.
 
 ## Error Handling
 * If `get` returns null, verify the key is a valid content path or ID and that the correct branch (draft vs master) is targeted.

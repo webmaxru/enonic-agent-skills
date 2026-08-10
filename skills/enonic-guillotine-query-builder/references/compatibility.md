@@ -2,7 +2,35 @@
 
 Version differences and migration notes between major Guillotine releases.
 
-## Guillotine 7.x (Current Stable)
+## Guillotine 8.x (Current Stable)
+
+Requires **XP 8.0.0** or higher. Guillotine 8 will not install on XP 7.x.
+
+### Key Changes from 7.x
+
+- **New Content fields on `ContentType`**: `title` (replaces deprecated `displayName`), `displayNameExpression`, `displayNameListExpression`, `displayNamePlaceholder`, `displayNamePlaceholderI18nKey`, `titleI18nKey`, `descriptionI18nKey`.
+- **`hasChildren` removed**: The `hasChildren: Boolean` field has been removed from all types implementing `Content`. Use `children` / `childrenConnection` and check whether the result is empty.
+- **`inheritsPermissions` removed**: The `inheritsPermissions` field has been removed from the `Permissions` type.
+- **`contentDisplayNameScript` removed**: Removed from `ContentType` (always returned `null`).
+- **XData type rename**: Generated types for X-data configs renamed from `XData_*` to `Mixin_*` (e.g. `XData_base_gpsInfo_DataConfig` → `Mixin_base_gpsInfo_DataConfig`).
+- **`Long` input type change**: For `Input` form items of type `Long`, the returned value type changed from `String` to `Long`.
+- **CORS rework**: `cors.enabled` removed (CORS now enabled by setting `cors.origin`, disabled when omitted). Default `cors.methods` changed from `POST, OPTIONS` to `GET, HEAD, POST`. When `cors.allowedHeaders` is not set, the request's `Access-Control-Request-Headers` is reflected. New `cors.exposedHeaders` option for `Access-Control-Expose-Headers`. `cors.origin` now accepts multiple comma-separated values, `*`, and `~`-prefixed regex patterns.
+
+### Breaking Changes in 8.0
+
+| Change | Impact | Migration |
+|---|---|---|
+| Requires XP 8.0.0 | Will not install on XP 7.x | Upgrade XP first |
+| `hasChildren` removed | Queries using `hasChildren` will fail | Use `children { _id }` or `childrenConnection` instead |
+| `inheritsPermissions` removed | Queries using this field will fail | Remove from queries |
+| `contentDisplayNameScript` removed | Queries using this field will fail | Remove from queries |
+| `ContentType.displayName` deprecated | Still works but will be removed | Use `title` instead |
+| XData types renamed `XData_*` → `Mixin_*` | Inline fragments on old names will fail | Update type names in queries |
+| `Long` input returns `Long` not `String` | Client code parsing as string will break | Remove `parseInt()` / string parsing |
+| `cors.enabled` removed | CORS disabled when `cors.origin` not set | Set `cors.origin` explicitly to enable CORS |
+| `cors.methods` default changed | Default is now `GET, HEAD, POST` | Set explicitly if relying on old `POST, OPTIONS` default |
+
+## Guillotine 7.x (Previous Stable)
 
 Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript to Java.
 

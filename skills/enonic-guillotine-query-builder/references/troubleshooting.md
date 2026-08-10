@@ -79,6 +79,18 @@ queryDsl(
 | Custom field not appearing | In Guillotine 7, use `exports.extensions` in `guillotine/guillotine.js`. For 6.x, verify the `creationCallbacks` key matches the exact generated type name. Use Query Playground introspection to confirm. |
 | Type not found in dictionary | Ensure `context.dictionary` is passed to `createSchema` (6.x only). In Guillotine 7, types are registered through the Extensions API. |
 
+## Guillotine 8 Migration Issues
+
+| Symptom | Fix |
+|---|---|
+| `hasChildren` field not found | `hasChildren` was removed in Guillotine 8. Use `children { _id }` or `childrenConnection` and check whether the result is empty. |
+| `inheritsPermissions` field not found | Removed in Guillotine 8. Remove from queries. |
+| `contentDisplayNameScript` field not found | Removed in Guillotine 8. Remove from queries. |
+| XData inline fragment type error (e.g. `XData_base_gpsInfo_DataConfig`) | XData types renamed from `XData_*` to `Mixin_*` in Guillotine 8. Update inline fragment type names. |
+| `Long` input field returns number instead of string | In Guillotine 8, `Long` input types return `Long` (number), not `String`. Remove `parseInt()` or string parsing from client code. |
+| CORS no longer working after upgrade to 8.x | `cors.enabled` was removed. CORS is now enabled by setting `cors.origin` in `com.enonic.app.guillotine.cfg`. Omitting `cors.origin` disables CORS entirely. |
+| CORS allowed methods changed | Default `cors.methods` changed from `POST, OPTIONS` to `GET, HEAD, POST`. Set explicitly if needed. |
+
 ## Guillotine 7 Migration Issues
 
 | Symptom | Fix |
@@ -92,7 +104,7 @@ queryDsl(
 
 | Symptom | Fix |
 |---|---|
-| Cross-origin request blocked | CORS is enabled by default in Guillotine 7.2.0+. Verify `cors.enabled=true` in `com.enonic.app.guillotine.cfg`. Set `cors.origin` to the allowed origins if needed. |
+| Cross-origin request blocked | In Guillotine 8+, set `cors.origin` in `com.enonic.app.guillotine.cfg` (omitting disables CORS). In Guillotine 7.2.0–7.x, verify `cors.enabled=true`. |
 | Query rejected with token limit error | The query exceeds `maxQueryTokens` (default `15000`, configurable in v7.3.0+). Simplify the query or increase the limit in `com.enonic.app.guillotine.cfg`. |
 
 ## Debugging Steps
