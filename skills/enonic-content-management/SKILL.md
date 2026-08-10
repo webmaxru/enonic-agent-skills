@@ -48,7 +48,7 @@ metadata:
 2. Set `count` to a batch size between 50 and 200 depending on the complexity of per-item processing.
 3. Loop until `result.hits.length === 0` or `start >= result.total`, incrementing `start` by the batch size each iteration.
 4. For `contentLib.create()` in bulk, set `refresh: false` to avoid per-item index refresh; call a manual refresh after the batch completes.
-5. For `contentLib.modify()`, use the editor callback pattern to safely transform each content item.
+5. For `contentLib.update()` (formerly `modify()`), use the editor callback pattern to safely transform each content item. Note: `update()` resets `workflow.state` to `IN_PROGRESS`; call `contentLib.updateWorkflow()` to set state to `READY` before publishing.
 6. For `contentLib.publish()`, batch keys into groups of 50–100 to avoid timeout on large publish sets.
 7. Track success and failure counts for reporting.
 8. Read `assets/bulk-update.template.ts` for the reusable batch update controller template. Note: templates use TypeScript/ESM syntax (`import`, `const`, arrow functions); adapt to CommonJS JavaScript (`require()`, `var`, `function()`) for XP runtime deployment as `.js` files.
@@ -56,16 +56,15 @@ metadata:
 **Step 5: Handle branch operations and publishing**
 1. Run content modifications in the `draft` branch context.
 2. After modifications complete, publish changed items to `master` using `contentLib.publish()`. On XP < 7.12, pass `sourceBranch: 'draft'` and `targetBranch: 'master'`. On XP 7.12+, these parameters are ignored (publish always goes draft→master).
-3. Set `includeDependencies: false` when publishing bulk-updated items to avoid unintended dependency publishing.
+3. Set `includeDependencies: false` when publishing bulk-updated items to avoid unintended dependency publishing. Use `message` parameter to annotate the publish commit.
 4. For operations comparing draft and master state, use `repo.diff()` from `lib-node` with `target: 'master'` and `includeChildren: true`.
 
 **Step 6: Wrap long-running operations in a task controller**
-1. Use `taskLib.executeFunction()` for inline task functions or `taskLib.submitTask()` for named task descriptors.
+1. Use `taskLib.executeFunction()` for inline task functions (deprecated in XP 8.1.0 — does not work on GraalJS engine) or `taskLib.submitTask()` for named task descriptors. Prefer `submitTask()` for new code.
 2. Report progress using `taskLib.progress({ info, current, total })` at regular intervals during batch processing.
 3. Read `assets/task-migration.template.ts` for the reusable task controller template with progress reporting.
 4. Check for existing running instances with `taskLib.isRunning()` before starting a duplicate operation.
 5. Use `taskLib.sleep()` for throttling between batches if the operation generates excessive load.
-6. For named tasks on XP 7.13+, the `run` function receives `taskId` as its second argument: `exports.run = function(params, taskId) { ... }`.
 
 **Step 7: Validate and report results**
 1. After the operation completes, log a summary: items processed, items created/updated/deleted, items failed, total duration.
