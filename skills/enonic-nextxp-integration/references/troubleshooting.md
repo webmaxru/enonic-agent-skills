@@ -7,10 +7,11 @@ Common issues and diagnostic steps for the Next.js + Enonic XP integration (Next
 ### Blank page in Content Studio preview
 1. Confirm the Next.js dev server is running (`npm run dev`) and accessible at the configured URL (default: `http://127.0.0.1:3000`).
 2. Verify the Next.XP app is installed in Enonic XP and added to the site in Content Studio.
-3. Check that `ENONIC_API_TOKEN` in `.env` matches the secret configured in the Next.XP app (default: `mySecretKey`).
+3. Check that `ENONIC_API_TOKEN` in `.env` matches the secret configured in the Next.XP app (default: `mySecretKey`). A token mismatch causes Content Studio to return a 407 error.
 4. Open the browser developer tools in Content Studio and check for CORS errors or network request failures.
 5. Check the Next.js server console for errors during the preview request.
 6. Verify the `/api/preview/route.ts` API route exists in the Next.js project.
+7. Confirm the configured URL is reachable from the XP host — `localhost` refers to the XP host or container, not the editor's computer.
 
 ### Preview works but links are broken
 1. Ensure all component links use `getUrl(path, meta)` from `@enonic/nextjs-adapter` instead of hardcoded paths.
@@ -21,6 +22,7 @@ Common issues and diagnostic steps for the Next.js + Enonic XP integration (Next
 1. Preview mode should automatically query the `draft` branch. Verify the Next.XP proxy is active.
 2. Check that the content item has been saved (even if not published) in Content Studio.
 3. Verify the Guillotine API endpoint is accessible and returning content for the draft branch.
+4. Confirm `/api/preview` enables Draft Mode and the proxy cookie is preserved. Check for the `Content-Studio-Mode` header.
 
 ## Data Fetching Issues
 
@@ -74,7 +76,7 @@ Common issues and diagnostic steps for the Next.js + Enonic XP integration (Next
 
 ### @enonic/nextjs-adapter import errors
 1. Run `npm install` to ensure the package is installed.
-2. Check `package.json` for `@enonic/nextjs-adapter` in dependencies (v4.x requires React 19 and Next.js 16).
+2. Check `package.json` for `@enonic/nextjs-adapter` in dependencies (v5.x requires React 19, Next.js 16, and Node.js 24.15.0+).
 3. Verify the import path: some exports require subpath imports (e.g., `@enonic/nextjs-adapter/views/Region`, `@enonic/nextjs-adapter/server`, `@enonic/nextjs-adapter/client`).
 4. Server-side functions like `fetchContent` must be imported from `@enonic/nextjs-adapter/server`, not the main entry point.
 
@@ -99,6 +101,11 @@ Common issues and diagnostic steps for the Next.js + Enonic XP integration (Next
 2. Verify all `ENONIC_*` environment variables are set in the Vercel project settings.
 3. Confirm the Enonic Cloud ingress is accessible from the internet.
 4. Test the Guillotine API endpoint directly from a browser or curl to rule out network issues.
+
+### Published changes remain cached
+1. Confirm the site uses the Next.XP app and the XP master node subscribed successfully.
+2. Verify `/api/revalidate` is reachable from the XP host and the shared token matches.
+3. In a cluster, confirm which XP node is master because only that node sends revalidation events.
 
 ### Enonic Cloud app installation fails
 1. Verify CLI authentication: `enonic cloud login`.

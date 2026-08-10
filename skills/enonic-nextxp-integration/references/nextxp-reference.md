@@ -2,12 +2,12 @@
 
 Canonical reference for the Next.js + Enonic XP integration framework (Next.XP). Covers adapter configuration, component registry, rendering modes, Guillotine queries, preview architecture, and deployment.
 
-Source: https://developer.enonic.com/learn/next.xp/stable
+Source: https://developer.enonic.com/docs/next.xp/stable
 
 ## Architecture Overview
 
 Next.XP connects two systems:
-- **Enonic XP** (backend): Content management, content types, Guillotine GraphQL API, draft/master branches, Content Studio editorial UI.
+- **Enonic XP 8** (backend): Content management, content types (YAML schemas in `src/main/resources/cms/`), Guillotine 8 GraphQL API, draft/master branches, Content Studio editorial UI.
 - **Next.js** (frontend): React-based rendering, server-side rendering (SSR), static site generation (SSG), App Router.
 
 The `@enonic/nextjs-adapter` npm package bridges them by handling content fetching, component resolution, preview mode, and URL rewriting.
@@ -263,19 +263,23 @@ Key adapter imports:
 - `I18n.getLocale()` — returns current locale in server-side components.
 - `I18n.setLocale(locale)` — sets the locale for the current request (called in layouts).
 - `APP_NAME` — fully qualified app name from env config.
+- `APP_NAME_DASHED` — app name with dots replaced by dashes for descriptor-safe usage.
 - `APP_NAME_UNDERSCORED` — app name with dots replaced by underscores for GraphQL introspection.
 - `PORTAL_COMPONENT_ATTRIBUTE` — HTML attribute for page editor component identification.
+- `PORTAL_REGION_ATTRIBUTE` — HTML attribute for page editor region identification.
 - `CATCH_ALL` — wildcard content type name for debug/fallback views.
 - `richTextQuery(fieldName)` — generates GraphQL query fragment for rich text fields.
 - `validateData(data)` — validates `FetchContentResult` before rendering.
+- `sanitizeGraphqlName(text)` — converts text into a valid GraphQL name by replacing unsupported characters.
 - `getRequestLocaleInfo({contentPath, headers})` — extracts locale from request for middleware.
+- `getContentApiUrl(context)` — returns the Guillotine URL for the context's project and branch.
 
 Server-side imports (from `@enonic/nextjs-adapter/server`):
 - `fetchContent(params)` — fetches content and resolves component mappings.
-- `fetchContentPathsForAllLocales(basePath)` — generates paths for SSG across all locales.
-- `fetchContentPathsForLocale(basePath, locale)` — generates paths for SSG for a single locale.
-- `fetchGuillotine(contentApiUrl, options?)` — makes a custom request to Guillotine; used internally by `fetchContent()`.
-- `fetchFromApi(apiUrl, body, options?)` — lower-level HTTP POST to any API endpoint.
+- `fetchContentPathsForAllLocales(query?, countPerLocale?)` — generates paths for SSG across all locales.
+- `fetchContentPathsForLocale(mapping, query?, count?)` — generates paths for SSG for a single locale mapping.
+- `fetchGuillotine(contentApiUrl, options?)` — makes a custom request to Guillotine with query minification and error normalization; used internally by `fetchContent()`.
+- `fetchFromApi(apiUrl, options?)` — lower-level JSON POST to any API endpoint with structured error handling.
 - `getLocaleMapping(locale)` — resolves locale to project/site mapping from `ENONIC_MAPPINGS`.
 - `getLocaleMappingByLocale(locale)` — alias for `getLocaleMapping`.
 - `getLocaleMappingByProjectId(projectId)` — resolves project ID to its locale mapping.
@@ -291,12 +295,12 @@ View imports:
 - `PropsView` from `@enonic/nextjs-adapter/views/PropsView` — debug view that displays raw props.
 
 Additional types and utilities:
-- `MetaData` — type for runtime metadata (apiUrl, baseUrl, locale, defaultLocale, renderMode).
+- `MetaData` — type for runtime metadata (project, site, branch, baseUrl, locale, defaultLocale, renderMode).
 - `RichTextData` — type for the rich text data shape returned by `richTextQuery`.
 - `LocaleContextType` — type for the value returned by `useLocaleContext`.
 - `Replacer` — type for custom element replacement functions used with `RichTextView`'s `customReplacer` prop.
 - `RENDER_MODE` — enum-like constant for render mode detection (`NEXT`, `INLINE`, `EDIT`, `PREVIEW`, `LIVE`, `ADMIN`).
-- `UrlProcessor` — URL processing class; use `UrlProcessor.setSiteKey(key)` to set the site key for URL resolution.
+- `UrlProcessor` — URL processing class used by `getUrl()`, `getAsset()`, and rich-text views.
 
 ## Page Components with Regions
 
@@ -456,7 +460,7 @@ export default FactBox;
 1. Content Studio loads preview via the Next.XP proxy app installed in Enonic XP.
 2. Next.XP proxy activates Next.js preview mode via the `/api/preview` route using the shared `ENONIC_API_TOKEN`.
 3. In preview mode, Next.js queries the `draft` branch of the Guillotine API (unpublished content visible).
-4. The Next.XP proxy rewrites static asset URLs to resolve correctly within Content Studio.
+4. The proxy forwards the editor's XP session to Next.js, which passes it as the `JSESSIONID` cookie on Guillotine requests. Guillotine evaluates queries with the editor's permissions.
 5. `getUrl()` in component code handles link rewriting for `/preview`, `/inline`, and `/edit` base paths.
 
 ### Setup Steps
