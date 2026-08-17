@@ -30,6 +30,12 @@ ENONIC_MAPPINGS=en:intro/hmdb
 ENONIC_API=http://127.0.0.1:8080/site/
 ```
 
+Optional variables:
+```
+# Logging level for adapter diagnostics
+ENONIC_LOGGING=verbose
+```
+
 Multiple locale mappings example:
 ```
 ENONIC_MAPPINGS=en:intro/hmdb,no:intro-no/hmdb
@@ -143,6 +149,16 @@ ComponentRegistry.addMacro(`${APP_NAME}:factbox`, {
 ```
 
 Register macros before any component that uses `RichTextView`.
+
+### Generic Component
+
+```typescript
+ComponentRegistry.addComponent('my-component', {
+    view: MyComponent
+});
+```
+
+Use `addComponent()` for components that don't fit the specific `addPart`, `addLayout`, `addPage`, `addContentType`, or `addMacro` categories.
 
 ## Guillotine GraphQL Query Patterns
 
@@ -264,11 +280,25 @@ Key adapter imports:
 - `I18n.setLocale(locale)` — sets the locale for the current request (called in layouts).
 - `APP_NAME` — fully qualified app name from env config.
 - `APP_NAME_UNDERSCORED` — app name with dots replaced by underscores for GraphQL introspection.
+- `APP_NAME_DASHED` — app name with dots replaced by dashes.
+- `sanitizeGraphqlName(name)` — converts content type names to valid GraphQL type names.
+- `IS_DEV_MODE` — boolean indicating development mode.
+- `LOGGING` — logging level from `ENONIC_LOGGING` env var.
+- `encryptParams(params, secret)` — AES-256-GCM encryption for preview parameters.
+- `decryptParams(blob, secret)` — decryption counterpart for encrypted preview parameters.
 - `PORTAL_COMPONENT_ATTRIBUTE` — HTML attribute for page editor component identification.
 - `CATCH_ALL` — wildcard content type name for debug/fallback views.
+- `JSESSIONID_HEADER`, `PROJECT_ID_HEADER`, `RENDER_MODE_HEADER`, `XP_BASE_URL_HEADER` — header constants for XP communication.
+- `XP_COMPONENT_TYPE` — enum with values PART, LAYOUT, TEXT, FRAGMENT, PAGE.
+- `XP_REQUEST_TYPE` — enum with values COMPONENT, TYPE, PAGE.
+- `RENDER_MODE` — enum-like constant for render mode detection (`NEXT`, `INLINE`, `EDIT`, `PREVIEW`, `LIVE`, `ADMIN`).
 - `richTextQuery(fieldName)` — generates GraphQL query fragment for rich text fields.
 - `validateData(data)` — validates `FetchContentResult` before rendering.
 - `getRequestLocaleInfo({contentPath, headers})` — extracts locale from request for middleware.
+- `getLocaleMapping(locale)` — resolves locale to project/site mapping from `ENONIC_MAPPINGS`.
+- `getLocaleMappingByLocale(locale)` — alias for `getLocaleMapping`.
+- `getLocaleMappingByProjectId(projectId)` — resolves project ID to its locale mapping.
+- `UrlProcessor` — URL processing class; use `UrlProcessor.setSiteKey(key)` to set the site key for URL resolution.
 
 Server-side imports (from `@enonic/nextjs-adapter/server`):
 - `fetchContent(params)` — fetches content and resolves component mappings.
@@ -276,9 +306,6 @@ Server-side imports (from `@enonic/nextjs-adapter/server`):
 - `fetchContentPathsForLocale(basePath, locale)` — generates paths for SSG for a single locale.
 - `fetchGuillotine(contentApiUrl, options?)` — makes a custom request to Guillotine; used internally by `fetchContent()`.
 - `fetchFromApi(apiUrl, body, options?)` — lower-level HTTP POST to any API endpoint.
-- `getLocaleMapping(locale)` — resolves locale to project/site mapping from `ENONIC_MAPPINGS`.
-- `getLocaleMappingByLocale(locale)` — alias for `getLocaleMapping`.
-- `getLocaleMappingByProjectId(projectId)` — resolves project ID to its locale mapping.
 
 Client-side imports (from `@enonic/nextjs-adapter/client`):
 - `useLocaleContext()` — React hook returning `{locale, localize}` for client-side components.
@@ -295,8 +322,7 @@ Additional types and utilities:
 - `RichTextData` — type for the rich text data shape returned by `richTextQuery`.
 - `LocaleContextType` — type for the value returned by `useLocaleContext`.
 - `Replacer` — type for custom element replacement functions used with `RichTextView`'s `customReplacer` prop.
-- `RENDER_MODE` — enum-like constant for render mode detection (`NEXT`, `INLINE`, `EDIT`, `PREVIEW`, `LIVE`, `ADMIN`).
-- `UrlProcessor` — URL processing class; use `UrlProcessor.setSiteKey(key)` to set the site key for URL resolution.
+- `FetchOptions` — type for fetch configuration with Next.js `revalidate` and `tags` options.
 
 ## Page Components with Regions
 
@@ -489,6 +515,30 @@ nextjs.marketB.url=https://your.other-next-site.com
 ```
 
 Assign a named configuration to a site in Content Studio: edit the site → click the pencil icon next to the `Next.XP` app → select the named configuration from the list.
+
+### New Preview App (app-preview-nextjs)
+
+An alternative preview app (`com.enonic.app.preview.nextjs`) is available for Enonic XP 8.0+. It uses AES-256-GCM encrypted redirect URLs instead of proxy-based preview:
+
+- Config file: `com.enonic.app.preview.nextjs.cfg`
+- Preview URL format: appends `?xp=<encrypted-blob>` to the Next.js URL
+- Uses `encryptParams()` / `decryptParams()` from `@enonic/nextjs-adapter`
+- Fetches URL mappings dynamically from the Next.js app at `GET /api/mappings`
+
+The `/api/mappings` endpoint must return:
+```json
+{
+  "mappings": [
+    {
+      "sources": ["type:app:article", "/articles/.*"],
+      "target": "/blog/${_name}",
+      "matchAny": true
+    }
+  ]
+}
+```
+
+Mapping source patterns support content field constraints (`type:app:article`, `data.category:foo`), path regex (`/articles/.*`), and target variables (`${_id}`, `${_name}`, `${_path}`, `${type}`, `${displayName}`, `${language}`, `${data.<field>}`).
 
 ## Static Site Generation (SSG) and Incremental Static Regeneration (ISR)
 
@@ -688,7 +738,6 @@ Props:
 - `meta` — `MetaData` from `FetchContentResult`.
 - `tag` — HTML wrapper tag (default: `'div'`). Optional.
 - `className` — CSS class for the wrapper. Optional.
-- `renderMacroInEditMode` — whether macros render in Content Studio edit mode (default: `true`). Optional.
 - `customReplacer` — function for custom element processing (not invoked for image, link, macro nodes). Optional.
 
 ## Macro Registration
