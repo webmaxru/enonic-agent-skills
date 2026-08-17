@@ -76,7 +76,7 @@ Common issues and diagnostic steps for the Next.js + Enonic XP integration (Next
 1. Run `npm install` to ensure the package is installed.
 2. Check `package.json` for `@enonic/nextjs-adapter` in dependencies (v4.x requires React 19 and Next.js 16).
 3. Verify the import path: some exports require subpath imports (e.g., `@enonic/nextjs-adapter/views/Region`, `@enonic/nextjs-adapter/server`, `@enonic/nextjs-adapter/client`).
-4. Server-side functions like `fetchContent` must be imported from `@enonic/nextjs-adapter/server`, not the main entry point.
+4. Server-side functions like `fetchContent` must be imported from `@enonic/nextjs-adapter/server`, not the main entry point. Locale mapping functions (`getLocaleMapping`, `getLocaleMappingByLocale`, `getLocaleMappingByProjectId`) are imported from the main `@enonic/nextjs-adapter` entry point.
 
 ### TypeScript errors in component files
 1. Ensure `FetchContentResult`, `PageProps`, and `PartProps` types are imported from `@enonic/nextjs-adapter`.
