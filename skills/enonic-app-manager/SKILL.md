@@ -37,7 +37,7 @@ metadata:
    - **Copy:** `enonic sandbox copy <source> <target>`
 3. When creating a sandbox, prompt for the XP version if not specified. Use `-f` flag for non-interactive execution when the version and name are known. Note: with `-f`, the sandbox auto-starts after creation unless `--skip-start` is also provided.
 4. If the request mentions templates, list available templates or use `-t <template>` flag. Use `--skip-template` to create a bare sandbox with no pre-installed apps.
-5. If the request mentions Docker, use `-i <image>` (e.g., `enonic/xp:latest-sdk`) to back the sandbox with a Docker image instead of a downloaded XP distribution. Requires `docker` on `$PATH`.
+5. If the request mentions Docker, use `-i <image>` (e.g., `enonic/xp:latest-sdk`) to back the sandbox with a Docker image instead of a downloaded XP distribution. The `--image` flag is mutually exclusive with `--version` and marked as [EXPERIMENTAL] in CLI 4.0+. Requires `docker` on `$PATH`.
 
 **Step 4: Project Scaffolding**
 1. For new project creation, use the simplified command: `enonic create <name> [-r <starter>] [-s <sandbox>] [-f]`
@@ -49,7 +49,7 @@ metadata:
 1. Determine the appropriate development command:
    - **Dev mode (hot-reload):** `enonic dev` — starts the sandbox in detached mode and runs the app with file watching. Execute from the project root.
    - **Build only:** `enonic project build`
-   - **Deploy to sandbox:** `enonic project deploy [sandbox-name] [-c]` — use `-c` for continuous deployment.
+   - **Deploy to sandbox:** `enonic project deploy [sandbox-name] [-c]` — use `-c` for continuous deployment. Note: `--prod` and `--debug` are ignored if the sandbox is already running.
    - **Install to running XP:** `enonic project install`
    - **Run tests:** `enonic project test`
    - **Clean build artifacts:** `enonic project clean`

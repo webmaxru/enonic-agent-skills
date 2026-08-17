@@ -32,7 +32,7 @@ enonic sandbox create [name] [-v <version>] [-t <template>] [--skip-template] [-
 | `-t, --template` | Use specific template (e.g., "Headless Demo") |
 | `--skip-template` | Skip template selection (no apps pre-installed) |
 | `-v, --version` | Specific XP distro version (e.g., `7.14.0`) |
-| `-i, --image` | Docker image to back the sandbox (e.g., `enonic/xp:latest-sdk`). Requires `docker` on `$PATH`. (CLI 4.0+) |
+| `-i, --image` | [EXPERIMENTAL] Docker image to back the sandbox (e.g., `enonic/xp:latest-sdk`). Mutually exclusive with `--version`. Requires `docker` on `$PATH`. (CLI 4.0+) |
 | `--all` | Include pre-release versions in version list |
 | `--prod` | Run XP in non-development (production) mode |
 | `--skip-start` | Do not start sandbox after creation |
@@ -51,7 +51,7 @@ Examples:
 enonic sandbox ls
 ```
 
-Lists all sandboxes. Asterisk (`*`) marks the currently running sandbox.
+Lists all sandboxes. Asterisk (`*`) marks the currently running sandbox. Docker-backed sandboxes show `docker:<image>` as their source.
 
 ### enonic sandbox start
 
@@ -84,7 +84,7 @@ Stops the currently running sandbox (only works for sandboxes started via CLI).
 enonic sandbox upgrade [name] [-v <version>] [-i <image>] [-a] [-f]
 ```
 
-Upgrades the XP distribution for a sandbox. Downgrades are not permitted. Use `-i <image>` to switch to a Docker-backed sandbox (CLI 4.0+).
+Upgrades the XP distribution for a sandbox. Downgrades are not permitted. Use `-i <image>` to switch Docker-backed sandboxes to a different image (CLI 4.0+). The flag that applies depends on how the sandbox was created: `--version` for distribution-backed sandboxes, `--image` for Docker-backed sandboxes. Using the wrong flag is an error.
 
 ### enonic sandbox delete
 
@@ -151,6 +151,8 @@ enonic project build [-f]
 
 Compile code, run tests, create artifacts via Gradle.
 
+> **Note:** When running with `--force` flag, sandbox is not required. In that case system-wide Java version will be used.
+
 ### enonic project clean
 
 ```
@@ -172,6 +174,8 @@ Alias for `gradlew test`.
 ```
 enonic project deploy [sandbox-name] [--prod] [--debug] [-c] [--skip-start] [-f]
 ```
+
+**Important:** If the sandbox is already running, `--prod` and `--debug` parameters will be ignored.
 
 | Flag | Description |
 |------|-------------|
