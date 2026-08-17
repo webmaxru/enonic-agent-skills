@@ -13,6 +13,9 @@
  *   - EVENT_TYPE: the event pattern to listen for
  *   - PATH_PREFIX: content path prefix to filter on
  *   - The processing logic inside the callback
+ *
+ * Note: executeFunction() is deprecated as of XP 8.1.0 and unsupported on
+ * GraalJS. For new projects, use named tasks with submitTask() instead.
  */
 
 import eventLib from '/lib/xp/event';

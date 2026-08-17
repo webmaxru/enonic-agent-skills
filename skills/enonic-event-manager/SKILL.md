@@ -25,10 +25,10 @@ metadata:
 **Step 3: Implement outbound event listener (if applicable)**
 1. Read `assets/event-listener.template.ts` as a starting scaffold.
 2. Register the event listener in the application's `main.ts` (or `main.js`) controller using lib-event's `listener()` function.
-3. Use the `type` parameter with a pattern matching the target node events (e.g., `node.pushed`, `node.created`, `node.updated`, `node.deleted`).
+3. Use the `type` parameter with a pattern matching the target node events (e.g., `node.pushed`, `node.created`, `node.updated`, `node.deleted`, `node.renamed`).
 4. Filter events by path within the callback by checking `event.data.nodes[].path` to restrict processing to the intended content tree.
 5. When the listener must call an external HTTP endpoint, use lib-httpClient's `request()` function inside the callback or delegate to a background task.
-6. For long-running processing, delegate work from the event callback to a background task using lib-task's `executeFunction()` to avoid blocking the event thread.
+6. For long-running processing, delegate work from the event callback to a background task. Prefer named tasks with lib-task's `submitTask()` over `executeFunction()`, which is deprecated as of XP 8.1.0 and unsupported on the GraalJS engine.
 7. Read `references/examples.md` for complete integration patterns including CDN invalidation, search reindexing, and notification dispatch.
 
 **Step 4: Configure outbound webhooks (if applicable)**
@@ -50,9 +50,9 @@ metadata:
 9. When inbound payloads trigger content creation or modification, use lib-content or lib-node APIs within a context run to ensure proper permissions. Never pass unsanitized external values as content names, paths, or keys.
 
 **Step 6: Wire async processing with lib-task (if applicable)**
-1. When event handling or webhook processing requires heavy or time-consuming work, wrap it in `executeFunction()` from lib-task.
+1. When event handling or webhook processing requires heavy or time-consuming work, prefer named tasks with `submitTask()` over the deprecated `executeFunction()`.
 2. Report progress from long-running tasks using `progress()` to allow monitoring.
-3. Read `references/event-reference.md` for the task event lifecycle (`task.submitted`, `task.updated`, `task.finished`, `task.failed`).
+3. Read `references/event-reference.md` for the task event lifecycle (`task.submitted`, `task.updated`, `task.removed`, `task.finished`, `task.failed`).
 
 **Step 7: Validate the integration**
 1. Execute `node scripts/find-enonic-targets.mjs .` to confirm the project still resolves correctly.
