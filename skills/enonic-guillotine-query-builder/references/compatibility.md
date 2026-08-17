@@ -2,7 +2,30 @@
 
 Version differences and migration notes between major Guillotine releases.
 
-## Guillotine 7.x (Current Stable)
+## Guillotine 8.x (Current Stable)
+
+Requires **XP 8.1.0** or higher. Guillotine 8 is the same Java-based engine as 7.x, updated for XP 8 compatibility.
+
+### Key Changes from 7.x
+
+- **XP 8 compatibility**: Guillotine 8 requires XP 8 and is not compatible with XP 7.
+- **Deprecated fields removed**: `query` and `queryConnection` fields (deprecated since 6 Update 1) are fully removed. Only `queryDsl` / `queryDslConnection` remain.
+- **URL parts fields**: New `pageUrlParts`, `imageUrlParts`, `mediaUrlParts`, and `attachmentUrlParts` fields return URL-escaped segments (`path`, `queryString`, `fingerprint`) for client-side URL construction on any origin.
+- **CORS configuration updated**: `cors.enabled` is removed; CORS is controlled by whether `cors.origin` is set. New `cors.exposedHeaders` option. `cors.origin` supports `~`-prefixed regex patterns (e.g. `~https://.*\.example\.com`). Default for `cors.methods` changed to `GET, HEAD, POST`.
+- **`media.defaultBaseUrl` support**: Instance-wide base URL for media URLs configurable via `com.enonic.xp.portal.cfg`.
+- **`queryplayground.ui.mode` config**: Controls whether Query Playground is enabled (`on`/`off`). Default is `on` for SDK, `off` for server distributions.
+- **Schema resilience**: GraphQL schema remains available even if content type schema generation fails for individual types.
+
+### Breaking Changes in 8.0
+
+| Change | Impact | Migration |
+|---|---|---|
+| XP 8 required | Not compatible with XP 7 | Upgrade to XP 8.1.0+ |
+| `query` / `queryConnection` removed | String-based query fields no longer exist | Use `queryDsl` / `queryDslConnection` with DSL syntax |
+| `cors.enabled` removed | CORS no longer toggled with a boolean | Omit `cors.origin` to disable CORS; set `cors.origin` to enable |
+| `cors.methods` default changed | Default is now `GET, HEAD, POST` instead of `POST, OPTIONS` | Update client CORS expectations if relying on previous defaults |
+
+## Guillotine 7.x
 
 Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript to Java.
 
@@ -32,8 +55,8 @@ Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript
 
 ### Guillotine 7 Update 2
 
-- **CORS support** (v7.2.0): Built-in Cross-Origin Resource Sharing support with configurable allowed origins, methods, and headers. Enabled by default. Configure via `com.enonic.app.guillotine.cfg`:
-  - `cors.enabled` (default `true`), `cors.origin`, `cors.credentials` (default `false`), `cors.allowedHeaders` (default `Content-Type`), `cors.methods` (default `POST, OPTIONS`), `cors.maxAge`.
+- **CORS support** (v7.2.0): Built-in Cross-Origin Resource Sharing support. Configure via `com.enonic.app.guillotine.cfg`:
+  - `cors.enabled` (default `true`; removed in 8.x), `cors.origin`, `cors.credentials` (default `false`), `cors.allowedHeaders` (default `Content-Type`), `cors.methods` (default `POST, OPTIONS`), `cors.maxAge`.
 
 ### Guillotine 7 Update 3
 

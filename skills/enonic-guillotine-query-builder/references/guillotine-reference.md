@@ -3,7 +3,7 @@
 Condensed reference for composing Guillotine queries against Enonic XP.
 Source: https://developer.enonic.com/docs/guillotine/stable
 
-Guillotine 7.x is the current stable release (requires XP 7.14.0+).
+Guillotine 8.x is the current stable release (requires XP 8.1.0+). Guillotine 7.x remains available for XP 7.14.0+.
 
 ## Entry Point
 
@@ -41,7 +41,7 @@ Or set the HTTP header `X-Guillotine-SiteKey: <IdOrPathToSite>` (6.x+).
 | `getType(name: String!): ContentType` | Content type metadata |
 | `getTypes: [ContentType]` | All available content types |
 
-> `query` and `queryConnection` are **deprecated** since Guillotine 6 Update 1. Use `queryDsl` / `queryDslConnection` instead.
+> `query` and `queryConnection` were **deprecated** in Guillotine 6 Update 1 and **removed** in Guillotine 8.0. Use `queryDsl` / `queryDslConnection` instead.
 
 ## Common Arguments
 
@@ -318,6 +318,7 @@ body(processHtml: { imageWidths: [600, 992], imageSizes: "(max-width: 600px) 100
 | `label` | `String` | Attachment label |
 | `size` | `Int` | Attachment size |
 | `mimeType` | `String` | Attachment MIME type |
+| `sha512` | `String` | Attachment SHA-512 checksum |
 | `attachmentUrl(download: Boolean, type: UrlType, params: Json)` | `String` | Attachment URL. `params` is `Json` type in Guillotine 7+ |
 
 ## ContentType Utility Fields
@@ -346,6 +347,39 @@ These fields are accessed via inline fragments on the specific media type:
   imageUrl(scale: "block(800,200)", type: absolute)
 }
 ```
+
+## URL Parts Fields (Guillotine 8+)
+
+To build URLs on any origin yourself, use `pageUrlParts`, `imageUrlParts`, `mediaUrlParts`, and `attachmentUrlParts` instead of the ready-made URL fields. They return properly URL-escaped segments — including the media fingerprint — so the full URL is a simple concatenation: `url = base + path + queryString`.
+
+| Field | Available On | Returns |
+|---|---|---|
+| `pageUrlParts` | All content | `path`, `queryString` |
+| `imageUrlParts(scale: String!, ...)` | `media_Image` | `path`, `queryString`, `fingerprint` |
+| `mediaUrlParts(...)` | `media:*` types | `path`, `queryString`, `fingerprint` |
+| `attachmentUrlParts(...)` | Attachment | `path`, `queryString`, `fingerprint` |
+
+```graphql
+{
+  guillotine {
+    get(key: "contentid") {
+      pageUrlParts {
+        path
+        queryString
+      }
+      ... on media_Image {
+        imageUrlParts(scale: "block(800,200)") {
+          path
+          queryString
+          fingerprint
+        }
+      }
+    }
+  }
+}
+```
+
+A default base URL for media URLs can be configured instance-wide with `media.defaultBaseUrl` in `com.enonic.xp.portal.cfg`.
 
 ## Key Enum Types
 
