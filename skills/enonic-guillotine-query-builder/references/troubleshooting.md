@@ -21,9 +21,9 @@ GraphQL type names use underscores, not the original descriptor format. Addition
 - Correct: `com_enonic_app_myapp_BlogPost`
 - Built-in: `portal:template-folder` → `portal_TemplateFolder`
 
-## Deprecated Query Fields
+## Deprecated / Removed Query Fields
 
-**Warning**: `query` and `queryConnection` fields are deprecated in Guillotine 6 Update 1.
+**Warning**: `query` and `queryConnection` fields were deprecated in Guillotine 6 Update 1 and **removed** in Guillotine 8.0.
 
 Replace:
 ```graphql
@@ -88,11 +88,19 @@ queryDsl(
 | `siteConfig` not available | Site configuration is no longer obtainable from `dataAsJson`, `site`, or `portal_Site.dataAsJson` fields in Guillotine 7. Use the `getSiteConfig` function from the Content Lib (`/lib/xp/content`) instead. |
 | URLs changed from relative to absolute | Guillotine 7 generates absolute (server) URLs by default for all URL fields and `processedHtml`. Adjust client URL handling. |
 
+## Guillotine 8 Migration Issues
+
+| Symptom | Fix |
+|---|---|
+| `query` or `queryConnection` field not found | These fields are fully removed in Guillotine 8. Migrate to `queryDsl` / `queryDslConnection` with DSL syntax. See `references/compatibility.md`. |
+| `cors.enabled` config has no effect | In Guillotine 8, CORS is controlled by whether `cors.origin` is set. Remove `cors.enabled` and configure `cors.origin` directly. |
+| Need to build URLs on a custom domain | Use `pageUrlParts` / `imageUrlParts` / `mediaUrlParts` / `attachmentUrlParts` fields to get URL-escaped segments, then concatenate with your base URL. Or configure `media.defaultBaseUrl` in `com.enonic.xp.portal.cfg`. |
+
 ## CORS and Request Issues
 
 | Symptom | Fix |
 |---|---|
-| Cross-origin request blocked | CORS is enabled by default in Guillotine 7.2.0+. Verify `cors.enabled=true` in `com.enonic.app.guillotine.cfg`. Set `cors.origin` to the allowed origins if needed. |
+| Cross-origin request blocked | In Guillotine 7.2.0+, verify `cors.enabled=true` in `com.enonic.app.guillotine.cfg`. In Guillotine 8+, CORS is enabled by setting `cors.origin`. Supports `*`, literal origins, and `~`-prefixed regex patterns. |
 | Query rejected with token limit error | The query exceeds `maxQueryTokens` (default `15000`, configurable in v7.3.0+). Simplify the query or increase the limit in `com.enonic.app.guillotine.cfg`. |
 
 ## Debugging Steps
