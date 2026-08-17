@@ -8,7 +8,7 @@ Add to `build.gradle`:
 
 ```groovy
 dependencies {
-  include "com.enonic.xp:lib-event:${xpVersion}"
+  include xplibs.event
 }
 ```
 
@@ -28,7 +28,7 @@ Creates an event listener.
 |------------|----------|--------------------------------------------------------------------------|
 | type       | string   | Pattern: `.` is literal, `*` matches any sequence. Example: `node.*`     |
 | callback   | function | Function receiving the event object                                      |
-| localOnly  | boolean  | If `true`, only local events; default `false`                            |
+| localOnly  | boolean  | Optional. If `true`, only local events; default `false`                  |
 
 **Returns:** `void`
 
@@ -53,8 +53,8 @@ Sends a custom event (prefixed with `custom.`).
 | Key         | Type    | Description                              |
 |-------------|---------|------------------------------------------|
 | type        | string  | Event type (auto-prefixed `custom.`)     |
-| distributed | boolean | `true` to distribute across cluster      |
-| data        | object  | Additional event payload                 |
+| distributed | boolean | Optional. `true` to distribute across cluster; default `false` |
+| data        | object  | Optional. Additional event payload       |
 
 **Example:**
 
@@ -77,7 +77,8 @@ Node events are emitted when repository nodes (including content) change.
 | node.deleted    | A node was deleted                               |
 | node.pushed     | A node was pushed (published) to another branch   |
 | node.duplicated | A node was duplicated                            |
-| node.moved      | A node was moved or renamed                      |
+| node.moved      | A node was moved in the tree structure            |
+| node.renamed    | A node was renamed                                |
 | node.sorted     | A node's children sort order changed             |
 | node.stateUpdated | A node's state was updated                     |
 
@@ -105,7 +106,8 @@ Node events are emitted when repository nodes (including content) change.
 ```
 
 Additional properties appear on specific event types:
-- **`node.moved`**: Each node entry includes `newPath` (string) — the destination path after the move or rename.
+- **`node.moved`**: Each node entry includes `newPath` (string) — the destination path after the move.
+- **`node.renamed`**: Each node entry includes `newPath` (string) — the path after the rename.
 - **`node.stateUpdated`**: The `data` object includes `state` (string) — the new state value.
 
 ### Path Filtering
@@ -139,7 +141,7 @@ const masterNodes = nodes.filter(n => n.branch === 'master');
 
 ```groovy
 dependencies {
-  include "com.enonic.xp:lib-task:${xpVersion}"
+  include xplibs.task
 }
 ```
 
@@ -150,6 +152,8 @@ import taskLib from '/lib/xp/task';
 ```
 
 ### executeFunction(params)
+
+> **Deprecated (XP 8.1.0):** `executeFunction()` is deprecated and will be removed together with the Nashorn engine. It is not supported on the GraalJS engine — a function value cannot leave the script context that created it. Use named tasks with `submitTask()` instead.
 
 Executes a function asynchronously in the background.
 
@@ -190,18 +194,18 @@ const taskId = taskLib.submitTask({
 
 Named tasks are defined by a descriptor and a controller placed in `src/main/resources/tasks/<taskName>/`:
 
-- **Descriptor:** `<taskName>.xml` — defines the task description and an optional parameter form schema.
+- **Descriptor:** `<taskName>.yaml` — defines the task description and an optional parameter form schema.
 
-```xml
-<task>
-  <description>Background job</description>
-  <form>
-    <input type="Long" name="count">
-      <label>Number of items to process</label>
-      <occurrences minimum="1" maximum="1"/>
-    </input>
-  </form>
-</task>
+```yaml
+kind: "Task"
+description: "Background job"
+form:
+- type: "Long"
+  name: "count"
+  label: "Number of items to process"
+  occurrences:
+    min: 1
+    max: 1
 ```
 
 - **Controller:** `<taskName>.js` (or `.ts`) — exports a `run` function. Since XP 7.13.0, `taskId` is provided as a second argument.
@@ -254,6 +258,7 @@ Causes the current execution thread to sleep for the specified number of millise
 |----------------|---------------------|
 | task.submitted | Task was submitted  |
 | task.updated   | Task was updated    |
+| task.removed   | Task was removed    |
 | task.finished  | Task completed      |
 | task.failed    | Task failed         |
 
