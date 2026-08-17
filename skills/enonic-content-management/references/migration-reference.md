@@ -23,6 +23,7 @@ import contentLib from '/lib/xp/content';
 | `contentLib.get()` | Fetch a single content item (supports `versionId` for historical versions) |
 | `contentLib.getChildren()` | Fetch children with pagination |
 | `contentLib.getOutboundDependencies()` | List outbound content references by key (XP 7.2+) |
+| `contentLib.duplicate()` | Duplicate content with optional variant, reparenting, and rename (XP 7.12+) |
 | `contentLib.archive()` | Archive content (XP 7.8+) |
 | `contentLib.restore()` | Restore archived content (XP 7.8+) |
 
@@ -32,16 +33,20 @@ import contentLib from '/lib/xp/content';
 contentLib.query({
   start: 0,          // Pagination offset (default: 0)
   count: 10,         // Page size (default: 10)
-  query: '',         // NoQL string or DSL object
+  query: '',         // NoQL string or DSL object (object format XP 7.9+)
   filters: {},       // Boolean, exists, notExists, hasValue, ids
-  sort: '',          // Sort expression or DSL
+  sort: '',          // Sort expression (string) or Sort DSL object (XP 7.9+)
   aggregations: {},  // Aggregation definitions
   contentTypes: [],  // Content type filter array
   highlight: {}      // Highlighting config (field-level hit highlighting)
 });
 ```
 
+> *(XP 7.9+)* `query` and `sort` accept a JSON DSL object as an alternative to string-based NoQL. See the Query DSL section in compatibility notes.
+
 > *(XP 7.5.0+)* If `sort` was specified, results will contain `_sort` and `_score: null`. Otherwise `_score` will have a relevant value.
+
+**Returns:** `{ total, count, hits[], aggregations }`. Each hit contains `_id`, `_name`, `_path`, `_score`, and `type`.
 
 ### Create Parameters
 
@@ -78,12 +83,25 @@ contentLib.modify({
 });
 ```
 
+### Duplicate Pattern (XP 7.12+)
+
+```typescript
+contentLib.duplicate({
+  contentId: 'content-id',          // Required
+  includeChildren: true,            // Default: true (ignored if variant=true)
+  variant: false,                   // Default: false — creates a variant if true
+  parent: '/new-parent-path',       // Optional destination parent
+  name: 'new-name'                  // Optional new content name
+});
+// Returns: { contentName, sourceContentPath, duplicatedContents }
+```
+
 ### Publish Pattern
 
 > **XP 7.12+ change:** `sourceBranch` and `targetBranch` are no longer in use. Publish always pushes from `draft` to `master`. These parameters are silently ignored on XP 7.12+. Keep them for backward compatibility with XP < 7.12.
 
 ```typescript
-contentLib.publish({
+const result = contentLib.publish({
   keys: ['/site/page1', 'content-id-2'],
   sourceBranch: 'draft',              // Ignored on XP 7.12+
   targetBranch: 'master',             // Ignored on XP 7.12+
@@ -94,6 +112,7 @@ contentLib.publish({
     to: '2025-12-31T23:59:59Z'
   }
 });
+// Returns: { pushedContents: string[], failedContents: string[] }
 ```
 
 ## Node API (lib-node) Quick Reference
@@ -133,6 +152,7 @@ const multiRepo = multiRepoConnect({
 | `repo.diff()` | Compare node versions across branches |
 | `repo.exists()` | Check node existence |
 | `repo.get()` | Fetch nodes by id or path |
+| `repo.duplicate()` | Duplicate a node with optional `dataProcessor` callback and `refresh` option (XP 7.12+) |
 | `repo.findChildren()` | Fetch children with pagination; supports `recursive` (XP 7.7+) and `countOnly` options |
 | `repo.findVersions()` | Fetch version history of a node |
 | `repo.refresh()` | Refresh indices after bulk updates |
