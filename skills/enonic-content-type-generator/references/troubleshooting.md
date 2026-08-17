@@ -27,16 +27,21 @@
 
 **Symptom:** Schema fails to compile.
 
-**Fix:** The `name` attribute on `<input>`, `<item-set>`, and `<option-set>` must be a valid XML name — alphanumeric with no spaces. Use camelCase or underscores:
+**Fix:** The `name` attribute on `<input>`, `<item-set>`, and `<option-set>` must be a valid XML name — alphanumeric with no spaces. Use `snake_case` (recommended) or camelCase:
 ```xml
-<!-- Good -->
-<input name="firstName" type="TextLine">
+<!-- Good (recommended) -->
+<input name="first_name" type="TextLine">
 <input name="phone_number" type="TextLine">
+
+<!-- Acceptable (legacy) -->
+<input name="firstName" type="TextLine">
 
 <!-- Bad -->
 <input name="first name" type="TextLine">
 <input name="first-name" type="TextLine">
 ```
+
+> **Note:** The official Enonic documentation recommends `snake_case` because capital letters are flattened during indexing, which can cause unexpected query behavior.
 
 ### Incorrect `type` Case
 
@@ -56,6 +61,7 @@
 - `MediaSelector` (not `mediaselector`)
 - `CustomSelector` (not `customselector`)
 - `ContentTypeFilter` (not `contenttypefilter`)
+- `Instant` (not `instant`)
 
 ### Duplicate `name` Attributes
 
@@ -116,11 +122,12 @@ The directory name and file name (without `.xml`) must match exactly.
 
 **Symptom:** DateTime values lose timezone information when saved, or API returns `LocalDateTime` instead of `Instant`.
 
-**Fix:** By default DateTime stores values without timezone. Add `<timezone>true</timezone>` in the config to store timezone-aware values:
+**Fix:** DateTime is designed to store values **without timezone** (produces `LocalDateTime`). For timezone-aware storage, use the `Instant` input type instead:
 ```xml
-<config>
-  <timezone>true</timezone>
-</config>
+<input name="publishedAt" type="Instant">
+  <label>Published At</label>
+  <occurrences minimum="0" maximum="1"/>
+</input>
 ```
 
 ### ImageSelector `allowContentType` Ignored

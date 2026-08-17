@@ -1,11 +1,20 @@
 # Enonic XP Content Type Reference
 
-## XML Structure
+## Schema Format
+
+Enonic XP supports two schema formats: **YAML** (current recommended format) and **XML** (legacy format, still supported). The official documentation now uses YAML for all examples. This reference covers both formats.
+
+### YAML Format (Recommended)
+
+Content type YAML files are located at:
+`/src/main/resources/cms/content-types/[name]/[name].yaml`
+
+### XML Format (Legacy)
 
 Content types are XML files located at:
 `/src/main/resources/site/content-types/[name]/[name].xml`
 
-The directory name **must** match the file name (minus the `.xml` extension).
+The directory name **must** match the file name (minus the extension).
 
 ### Root Element
 
@@ -223,8 +232,11 @@ Complete list of available editor tools:
 | Type | Value Type | Description |
 |---|---|---|
 | `Date` | LocalDate | Date only (no time) |
-| `DateTime` | LocalDateTime / Instant | Date and time (local by default; timezone via config) |
+| `DateTime` | LocalDateTime | Date and time without timezone |
+| `Instant` | Instant | Date and time with timezone |
 | `Time` | LocalTime | Time only |
+
+> **Note:** In the current Enonic XP documentation, `DateTime` is explicitly for dates without timezone (produces `LocalDateTime`). For timezone-aware storage, use the `Instant` input type instead.
 
 ### Date Config
 
@@ -240,17 +252,29 @@ Complete list of available editor tools:
 #### DateTime Config
 
 ```xml
-<input name="mydatetime" type="DateTime">
+<input name="my_datetime" type="DateTime">
   <label>My DateTime</label>
-  <config>
-    <timezone>true</timezone>
-  </config>
   <default>2011-09-12</default>
 </input>
 ```
 
-- `timezone` — set to `true` to store value with timezone (produces `Instant`); default is `false` (produces `LocalDateTime`)
-- `default` supports ISO 8601 format (`yyyy-MM-ddThh:mm`, with optional timezone offset like `+01:00` or `Z`) or relative expressions (e.g., `+1year -12hours`, `now`)
+- DateTime stores values **without timezone** and produces `LocalDateTime`
+- `default` supports ISO 8601 format (`yyyy-MM-ddThh:mm`, without timezone offset) or relative expressions (e.g., `+1year -12hours`, `now`)
+
+> **Note:** The `<timezone>` config option has been removed. For timezone-aware storage, use the `Instant` input type instead.
+
+#### Instant Config
+
+```xml
+<input name="my_instant" type="Instant">
+  <label>My Instant</label>
+  <default>2025-06-15T12:00:00</default>
+</input>
+```
+
+- Instant stores values **with timezone** and produces `Instant`
+- `default` supports ISO 8601 format with timezone (`yyyy-MM-ddThh:mm±hh:mm`, e.g., `2016-12-31T23:59+01:00`) or relative expressions (e.g., `+1year -12hours`, `now`)
+- Use `Z` or `+00:00` for UTC
 
 **Relative expression unit strings:**
 
@@ -403,7 +427,7 @@ Each hit must have `id` and `displayName`. Optional fields: `description`, `icon
 ### Common Input Attributes
 
 ```xml
-<input name="fieldName" type="InputType">
+<input name="field_name" type="InputType">
   <label i18n="key">Display Label</label>        <!-- required -->
   <help-text>Explanation for editors</help-text>   <!-- optional -->
   <occurrences minimum="0" maximum="1"/>           <!-- optional; defaults 0..1 -->
@@ -413,6 +437,8 @@ Each hit must have `id` and `displayName`. Optional fields: `description`, `icon
   </config>
 </input>
 ```
+
+> **Naming convention:** Use `snake_case` (lowercase with underscores) for all `name` attributes. Capital letters are flattened during indexing, which can cause unexpected query behavior. The `snake_case` convention also ensures clean field names in the GraphQL API.
 
 **Occurrences rules:**
 - `minimum="0"` — field is optional
@@ -656,7 +682,7 @@ Present a set of mutually exclusive or multi-select options, each with optional 
 
 ## Mixins
 
-Reusable form fragments stored at `src/main/resources/site/mixins/[name]/[name].xml`.
+Reusable form fragments stored at `src/main/resources/cms/mixins/[name]/[name].yaml` (YAML) or `src/main/resources/site/mixins/[name]/[name].xml` (XML legacy).
 
 ### Mixin Definition
 
@@ -677,6 +703,18 @@ Reusable form fragments stored at `src/main/resources/site/mixins/[name]/[name].
 
 ### Mixin Reference (in content type)
 
+In YAML (recommended):
+
+```yaml
+form:
+  - type: "TextLine"
+    name: "name"
+    label: "Name"
+  - include: "address"
+```
+
+In XML (legacy):
+
 ```xml
 <form>
   <input type="TextLine" name="name">
@@ -692,7 +730,7 @@ The mixin fields are merged inline at the position of `<mixin name="..."/>`.
 
 Extra data schemas that can be attached to any content type.
 
-Location: `src/main/resources/site/x-data/[name]/[name].xml`
+Location: `src/main/resources/cms/x-data/[name]/[name].yaml` (YAML) or `src/main/resources/site/x-data/[name]/[name].xml` (XML legacy)
 
 ```xml
 <x-data>
@@ -708,9 +746,22 @@ Location: `src/main/resources/site/x-data/[name]/[name].xml`
 </x-data>
 ```
 
-### X-Data Registration in site.xml
+### X-Data Registration
 
-X-data schemas are registered for use in `src/main/resources/site/site.xml`. Use `allowContentTypes` to restrict by content type pattern and `optional` to let editors enable it manually:
+X-data schemas are registered in the CMS descriptor. In YAML projects, use `src/main/resources/cms/cms.yaml`:
+
+```yaml
+kind: "CMS"
+mixins:
+  - name: "my-x-data-1"
+  - name: "my-x-data-2"
+    allowContentTypes: "^(?!base:folder$).*"
+  - name: "my-x-data-3"
+    allowContentTypes: "portal:site"
+    optional: true
+```
+
+In XML legacy projects, use `src/main/resources/site/site.xml`:
 
 ```xml
 <site>
@@ -747,10 +798,11 @@ Field sets do **not** need a `name` attribute since they are only visual and do 
 
 ## Documentation Links
 
-- Content Types: https://developer.enonic.com/docs/xp/7.x/cms/content-types
-- Input Types: https://developer.enonic.com/docs/xp/7.x/cms/schemas/input-types
-- Option Sets: https://developer.enonic.com/docs/xp/7.x/cms/schemas/option-set
-- Item Sets: https://developer.enonic.com/docs/xp/7.x/cms/schemas/item-set
-- Mixins: https://developer.enonic.com/docs/xp/7.x/cms/schemas/mixins
-- X-Data: https://developer.enonic.com/docs/xp/7.x/cms/x-data
-- Schema System: https://developer.enonic.com/docs/xp/7.x/cms/schemas
+- Content Types: https://developer.enonic.com/docs/cms/stable/content/content-types
+- Input Types (Form Items): https://developer.enonic.com/docs/cms/stable/schemas/form-items
+- Option Sets: https://developer.enonic.com/docs/cms/stable/schemas/form-items/option-set
+- Item Sets: https://developer.enonic.com/docs/cms/stable/schemas/form-items/item-set
+- Mixins: https://developer.enonic.com/docs/cms/stable/content/mixins
+- CMS Descriptor: https://developer.enonic.com/docs/cms/stable/schemas/cms-descriptor
+- Schema System: https://developer.enonic.com/docs/cms/stable/schemas
+- Source: https://github.com/enonic/doc-cms
