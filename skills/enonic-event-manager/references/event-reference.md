@@ -79,7 +79,7 @@ Node events are emitted when repository nodes (including content) change.
 | node.duplicated | A node was duplicated                            |
 | node.moved      | A node was moved or renamed                      |
 | node.sorted     | A node's children sort order changed             |
-| node.stateUpdated | A node's state was updated                     |
+| node.permissionsUpdated | A node's permissions were updated        |
 
 ### Event Object Structure
 
@@ -106,7 +106,7 @@ Node events are emitted when repository nodes (including content) change.
 
 Additional properties appear on specific event types:
 - **`node.moved`**: Each node entry includes `newPath` (string) — the destination path after the move or rename.
-- **`node.stateUpdated`**: The `data` object includes `state` (string) — the new state value.
+- **`node.permissionsUpdated`**: The event data includes `id`, `path`, `branch`, and `repo` at the top level (not nested under `nodes`).
 
 ### Path Filtering
 
@@ -254,6 +254,7 @@ Causes the current execution thread to sleep for the specified number of millise
 |----------------|---------------------|
 | task.submitted | Task was submitted  |
 | task.updated   | Task was updated    |
+| task.removed   | Task was removed    |
 | task.finished  | Task completed      |
 | task.failed    | Task failed         |
 
