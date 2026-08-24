@@ -2,7 +2,28 @@
 
 Version differences and migration notes between major Guillotine releases.
 
-## Guillotine 7.x (Current Stable)
+## Guillotine 8.x (Current Stable)
+
+Requires **XP 8.0** or higher. Guillotine 8 is the XP 8-compatible successor to Guillotine 7.
+
+### Key Changes from 7.x
+
+- **XP 8 compatibility**: Guillotine 8 requires XP 8 and is not compatible with XP 7.
+- **`query` / `queryConnection` removed**: The deprecated string-based query fields are fully removed. Only `queryDsl` / `queryDslConnection` are available.
+- **Schema resilience**: The GraphQL schema remains available even if content type schema generation fails for individual types.
+- **CORS configuration improvements**: `cors.origin` now supports `*` (allow all origins) and `~`-prefixed regex patterns (e.g. `~https://.*\.example\.com`). New `cors.exposedHeaders` option for exposing additional response headers. Default `cors.methods` changed to `GET, HEAD, POST`. Omit `cors.origin` to disable CORS.
+- **Query Playground config**: New `queryplayground.ui.mode` option (`on` or `off`) to enable/disable the Query Playground. Defaults to `on` for Enonic SDK, `off` for server distributions.
+- **`modifyUnknownField` default**: The `graphql.extensions.modifyUnknownField` config now defaults to `throw`.
+
+### Breaking Changes in 8.0
+
+| Change | Impact | Migration |
+|---|---|---|
+| Requires XP 8 | Not compatible with XP 7 | Upgrade to XP 8 before upgrading Guillotine |
+| `query` / `queryConnection` removed | String-based query fields no longer exist | Migrate all queries to `queryDsl` / `queryDslConnection` with DSL syntax |
+| CORS default methods changed | Default allowed methods now `GET, HEAD, POST` | Update `cors.methods` in `com.enonic.app.guillotine.cfg` if relying on `OPTIONS` being default |
+
+## Guillotine 7.x
 
 Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript to Java.
 
@@ -28,12 +49,12 @@ Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript
 
 - **`siteKey` argument**: New optional `siteKey` argument on the `guillotine` field, usable instead of the `X-Guillotine-SiteKey` header.
 - **NPM type definitions**: Guillotine types available on NPM as `@enonic-types/guillotine`. Install with `npm install @enonic/guillotine-types --save-dev`.
-- **`modifyUnknownFields` config**: New option to control handling of unknown fields (throw error, ignore, or log warning).
+- **`modifyUnknownField` config**: New option (`graphql.extensions.modifyUnknownField`) to control handling of unknown fields (`throw` (default), `ignore`, or `warn`).
 
 ### Guillotine 7 Update 2
 
-- **CORS support** (v7.2.0): Built-in Cross-Origin Resource Sharing support with configurable allowed origins, methods, and headers. Enabled by default. Configure via `com.enonic.app.guillotine.cfg`:
-  - `cors.enabled` (default `true`), `cors.origin`, `cors.credentials` (default `false`), `cors.allowedHeaders` (default `Content-Type`), `cors.methods` (default `POST, OPTIONS`), `cors.maxAge`.
+- **CORS support** (v7.2.0): Built-in Cross-Origin Resource Sharing support with configurable allowed origins, methods, and headers. Configure via `com.enonic.app.guillotine.cfg`:
+  - `cors.origin` (comma-separated origins; supports `*` for all origins and `~`-prefixed regex patterns; omit to disable CORS), `cors.credentials` (default `false`), `cors.allowedHeaders` (default: reflects `Access-Control-Request-Headers`), `cors.methods` (default `GET, HEAD, POST`), `cors.exposedHeaders` (extra response headers beyond CORS safelist), `cors.maxAge`.
 
 ### Guillotine 7 Update 3
 

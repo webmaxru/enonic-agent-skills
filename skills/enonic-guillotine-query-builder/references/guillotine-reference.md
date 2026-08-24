@@ -3,7 +3,7 @@
 Condensed reference for composing Guillotine queries against Enonic XP.
 Source: https://developer.enonic.com/docs/guillotine/stable
 
-Guillotine 7.x is the current stable release (requires XP 7.14.0+).
+Guillotine 8.x is the current stable release (requires XP 8.0+). Guillotine 7.x is maintained for XP 7.14.0+.
 
 ## Entry Point
 
@@ -41,7 +41,7 @@ Or set the HTTP header `X-Guillotine-SiteKey: <IdOrPathToSite>` (6.x+).
 | `getType(name: String!): ContentType` | Content type metadata |
 | `getTypes: [ContentType]` | All available content types |
 
-> `query` and `queryConnection` are **deprecated** since Guillotine 6 Update 1. Use `queryDsl` / `queryDslConnection` instead.
+> `query` and `queryConnection` were **deprecated** in Guillotine 6 Update 1 and **removed** in Guillotine 8. Use `queryDsl` / `queryDslConnection` instead.
 
 ## Common Arguments
 
