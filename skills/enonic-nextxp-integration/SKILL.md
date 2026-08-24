@@ -28,7 +28,7 @@ metadata:
 3. Install the `@enonic/nextjs-adapter` package if not already present: `npm install @enonic/nextjs-adapter`.
 4. Import `@enonic/nextjs-adapter/baseMappings` at the top of `src/components/_mappings.ts` to register built-in component renderers.
 5. Verify the Next.js project was scaffolded from the `nextxp-template` or contains the expected file structure: `src/components/_mappings.ts`, `src/app/[locale]/[[...contentPath]]/page.tsx`, and API routes under `src/app/api/`.
-6. Read `references/compatibility.md` to confirm version requirements between `@enonic/nextjs-adapter` (v4.x), Next.js (16+), React (19), and Enonic XP.
+6. Read `references/compatibility.md` to confirm version requirements between `@enonic/nextjs-adapter` (v5.x), Next.js (16+), React (19), Node.js (24+), and Enonic XP (7.x/8.x).
 
 **Step 3: Map content types to React components**
 1. Read `references/nextxp-reference.md` for the component registry API and mapping patterns.
@@ -43,7 +43,7 @@ metadata:
    b. Create a corresponding React component in `src/components/pages/`, `parts/`, or `layouts/`. Use `LayoutProps` for layouts and the named `RegionView` export for individual region rendering.
    c. Register using `ComponentRegistry.addPage()`, `ComponentRegistry.addPart()`, or `ComponentRegistry.addLayout()`.
 5. For layouts, use `LayoutProps` type and `RegionView` (singular, named export) for individual regions instead of `RegionsView`.
-6. Use `APP_NAME` and `APP_NAME_UNDERSCORED` imports from `@enonic/nextjs-adapter` to keep content type references dynamic.
+6. Use `APP_NAME`, `APP_NAME_UNDERSCORED`, and `APP_NAME_DASHED` imports from `@enonic/nextjs-adapter` to keep content type references dynamic.
 
 **Step 4: Configure Guillotine data fetching**
 1. Read `references/nextxp-reference.md` for the Guillotine query structure and variable passing.
@@ -53,7 +53,7 @@ metadata:
 5. For parts and configurable components, export a query object with `query(path, context, config)` and `variables(path, context, config)` functions.
 6. Use processors (optional async functions) to post-process query results before passing to the view.
 7. Use `ComponentRegistry.setCommonQuery()` for data shared across all page components. Remove the common query if not needed to optimize performance.
-8. Use `getUrl()` and `getAsset()` helper functions from the adapter for URL handling that works in both standalone and Content Studio preview modes.
+8. Use `getUrl()` helper function from the adapter for URL handling that works in both standalone and Content Studio preview modes.
 9. For macros in rich text, register them with `ComponentRegistry.addMacro()` before other components that use `RichTextView`. See `references/nextxp-reference.md` for the macro registration API.
 
 **Step 5: Enable Content Studio preview mode**

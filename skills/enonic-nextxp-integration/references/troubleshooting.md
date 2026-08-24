@@ -15,7 +15,6 @@ Common issues and diagnostic steps for the Next.js + Enonic XP integration (Next
 ### Preview works but links are broken
 1. Ensure all component links use `getUrl(path, meta)` from `@enonic/nextjs-adapter` instead of hardcoded paths.
 2. Content Studio uses different base paths (`/preview`, `/inline`, `/edit`); `getUrl()` handles this automatically.
-3. For static assets, use `getAsset(path, meta)` instead of direct path references.
 
 ### Draft content not visible in preview
 1. Preview mode should automatically query the `draft` branch. Verify the Next.XP proxy is active.
@@ -74,7 +73,7 @@ Common issues and diagnostic steps for the Next.js + Enonic XP integration (Next
 
 ### @enonic/nextjs-adapter import errors
 1. Run `npm install` to ensure the package is installed.
-2. Check `package.json` for `@enonic/nextjs-adapter` in dependencies (v4.x requires React 19 and Next.js 16).
+2. Check `package.json` for `@enonic/nextjs-adapter` in dependencies (v5.x requires React 19, Next.js 16, and Node.js ≥ 24.15.0).
 3. Verify the import path: some exports require subpath imports (e.g., `@enonic/nextjs-adapter/views/Region`, `@enonic/nextjs-adapter/server`, `@enonic/nextjs-adapter/client`).
 4. Server-side functions like `fetchContent` must be imported from `@enonic/nextjs-adapter/server`, not the main entry point.
 

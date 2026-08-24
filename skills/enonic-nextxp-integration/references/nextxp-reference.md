@@ -256,7 +256,6 @@ Key adapter imports:
 - `LayoutProps` — props type for layout components.
 - `MacroProps` — props type for macro components.
 - `getUrl(path, meta)` — resolves URLs for both standalone and preview modes.
-- `getAsset(path, meta)` — resolves static asset URLs.
 - `richTextQuery(fieldName)` — generates the GraphQL query fragment for HTML area input types.
 - `validateData(props)` — validates `FetchContentResult`, throws errors or `notFound()` for invalid data.
 - `I18n.localize(key)` — localized string lookup from phrase files.
@@ -264,11 +263,13 @@ Key adapter imports:
 - `I18n.setLocale(locale)` — sets the locale for the current request (called in layouts).
 - `APP_NAME` — fully qualified app name from env config.
 - `APP_NAME_UNDERSCORED` — app name with dots replaced by underscores for GraphQL introspection.
+- `APP_NAME_DASHED` — app name with dots replaced by dashes.
 - `PORTAL_COMPONENT_ATTRIBUTE` — HTML attribute for page editor component identification.
 - `CATCH_ALL` — wildcard content type name for debug/fallback views.
-- `richTextQuery(fieldName)` — generates GraphQL query fragment for rich text fields.
-- `validateData(data)` — validates `FetchContentResult` before rendering.
 - `getRequestLocaleInfo({contentPath, headers})` — extracts locale from request for middleware.
+- `sanitizeGraphqlName(name)` — converts a content type name to its GraphQL introspection name.
+- `getContentBranch()` — returns the current content branch (`draft` or `master`).
+- `encryptParams(params)` / `decryptParams(encrypted)` — encrypt/decrypt parameter data for secure transport.
 
 Server-side imports (from `@enonic/nextjs-adapter/server`):
 - `fetchContent(params)` — fetches content and resolves component mappings.
