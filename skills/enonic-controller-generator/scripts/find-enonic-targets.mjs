@@ -29,6 +29,7 @@ const resolvedRoot = resolve(workspaceRoot);
 // Markers that indicate an Enonic XP project
 const MARKERS = ['build.gradle', 'gradle.properties'];
 const SITE_BASE = join('src', 'main', 'resources', 'site');
+const CMS_BASE = join('src', 'main', 'resources', 'cms');
 const COMPONENT_DIRS = ['pages', 'parts', 'layouts', 'processors'];
 
 function findGradleRoots(dir, depth = 0) {
@@ -71,17 +72,22 @@ if (gradleRoots.length === 0) {
 
 const report = gradleRoots.map(root => {
   const siteDir = join(root, SITE_BASE);
+  const cmsDir = join(root, CMS_BASE);
   const hasSite = existsSync(siteDir);
+  const hasCms = existsSync(cmsDir);
+  const xpVersion = hasCms ? 8 : 7;
+  const baseDir = hasCms ? cmsDir : siteDir;
   const components = {};
-  if (hasSite) {
+  if (hasSite || hasCms) {
     for (const type of COMPONENT_DIRS) {
-      components[type] = listComponents(siteDir, type);
+      components[type] = listComponents(baseDir, type);
     }
   }
   return {
     projectRoot: root,
-    siteDirExists: hasSite,
-    sitePath: siteDir,
+    siteDirExists: hasSite || hasCms,
+    sitePath: hasCms ? cmsDir : siteDir,
+    xpVersion,
     components
   };
 });
