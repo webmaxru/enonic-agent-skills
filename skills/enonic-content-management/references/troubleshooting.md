@@ -1,5 +1,12 @@
 # Troubleshooting
 
+## Bulk Delete Considerations
+
+Published content is automatically unpublished before deletion when calling `contentLib.delete()`. This means:
+- You do not need to manually unpublish items before deleting them.
+- The operation may be slower than expected for published content because of the implicit unpublish step.
+- If deletion fails mid-batch, some items may have been unpublished but not deleted. Verify with a query on the `master` branch.
+
 ## Content Already Exists
 
 **Error:** `contentAlreadyExists` exception when calling `contentLib.create()`.

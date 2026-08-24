@@ -15,7 +15,7 @@ import contentLib from '/lib/xp/content';
 | `contentLib.query()` | Query content with NoQL, filters, aggregations |
 | `contentLib.create()` | Create a content item |
 | `contentLib.modify()` | Modify content via editor callback |
-| `contentLib.delete()` | Delete content by key (path or id) |
+| `contentLib.delete()` | Delete content by key (path or id); published content is automatically unpublished first |
 | `contentLib.move()` | Rename or relocate content |
 | `contentLib.publish()` | Push content from draft to master |
 | `contentLib.unpublish()` | Remove content from master branch |
@@ -23,6 +23,7 @@ import contentLib from '/lib/xp/content';
 | `contentLib.get()` | Fetch a single content item (supports `versionId` for historical versions) |
 | `contentLib.getChildren()` | Fetch children with pagination |
 | `contentLib.getOutboundDependencies()` | List outbound content references by key (XP 7.2+) |
+| `contentLib.duplicate()` | Duplicate content with optional reparenting (XP 7.12+); supports `variant`, `parent`, `name`, `includeChildren` |
 | `contentLib.archive()` | Archive content (XP 7.8+) |
 | `contentLib.restore()` | Restore archived content (XP 7.8+) |
 
@@ -129,11 +130,12 @@ const multiRepo = multiRepoConnect({
 | `repo.modify()` | Modify node via editor callback |
 | `repo.delete()` | Delete nodes by key |
 | `repo.move()` | Move or rename a node |
-| `repo.push()` | Push nodes to another branch; supports `exclude` to skip specific nodes |
+| `repo.push()` | Push nodes to another branch; supports `exclude` to skip specific nodes; returns `{ success[], failed[], deleted[] }` |
 | `repo.diff()` | Compare node versions across branches |
 | `repo.exists()` | Check node existence |
 | `repo.get()` | Fetch nodes by id or path |
 | `repo.findChildren()` | Fetch children with pagination; supports `recursive` (XP 7.7+) and `countOnly` options |
+| `repo.duplicate()` | Duplicate a node with optional `dataProcessor` callback, `parent`, `name`, and `refresh` options (XP 7.12+) |
 | `repo.findVersions()` | Fetch version history of a node |
 | `repo.refresh()` | Refresh indices after bulk updates |
 
