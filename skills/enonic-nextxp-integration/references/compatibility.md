@@ -6,13 +6,14 @@ Version requirements and compatibility notes for the Next.js + Enonic XP integra
 
 | Component | Minimum Version | Recommended |
 |-----------|----------------|-------------|
-| Node.js | 22.x (≥ 22.15.1) | Latest LTS |
+| Node.js | 24.x (≥ 24.15.0) | Latest LTS |
 | npm | 10.x (≥ 10.9.2) | Latest stable |
 | Next.js | 16.x (App Router) | Latest stable |
 | React | 19.x | Latest stable |
-| @enonic/nextjs-adapter | 4.x | Latest stable |
+| @enonic/nextjs-adapter | 5.x | Latest stable |
+| @enonic/react-components | 7.x (transitive dep) | Latest stable |
 | html-react-parser | 5.x (peer dep) | Latest stable |
-| Enonic XP | 7.x | Latest stable |
+| Enonic XP | 7.x / 8.x | Latest stable |
 | Guillotine app | Installed in XP | Latest from marketplace |
 | Next.XP app (preview) | Installed in XP | Latest from marketplace |
 
@@ -25,18 +26,20 @@ Version requirements and compatibility notes for the Next.js + Enonic XP integra
 - In Next.js 15+, `params` is a `Promise` and must be awaited: `const resolvedParams = await params;`.
 
 ### Enonic XP Version
-- Guillotine GraphQL API requires Enonic XP 7.x or later.
+- Guillotine GraphQL API requires Enonic XP 7.x or later. XP 8.x is also supported (adapter v5+ includes XP 8 compatibility mode).
 - Content Studio preview integration requires the Next.XP marketplace app.
 - The Guillotine app is automatically installed when creating a sandbox with `enonic project create`.
 
 ### @enonic/nextjs-adapter
-- Version 4.x requires React 19 and Next.js 16 as peer dependencies.
+- Version 5.x requires React 19 and Next.js 16 as peer dependencies and Node.js ≥ 24.15.0.
 - Provides `ComponentRegistry`, `FetchContentResult`, `PageProps`, `PartProps`, `LayoutProps`, `MacroProps`, and utility functions.
-- Exports `APP_NAME` and `APP_NAME_UNDERSCORED` derived from `ENONIC_APP_NAME` env variable.
+- Exports `APP_NAME`, `APP_NAME_UNDERSCORED`, and `APP_NAME_DASHED` derived from `ENONIC_APP_NAME` env variable.
+- Exports additional utilities: `sanitizeGraphqlName`, `getContentBranch`, `encryptParams`, `decryptParams`.
 - Handles draft/master branch switching automatically based on preview mode state.
 - Server-side functions (`fetchContent`, `fetchContentPathsForAllLocales`) are imported from `@enonic/nextjs-adapter/server`.
 - Client-side hooks (`useLocaleContext`) are imported from `@enonic/nextjs-adapter/client`.
-- Includes `@enonic/react-components` as a dependency for built-in view components.
+- Includes `@enonic/react-components` ^7.0.0 as a dependency for built-in view components.
+- Compatible with Enonic XP 7.x and XP 8.x.
 
 ### GraphQL Type Naming Convention
 - Content type names in GraphQL introspection follow: dots replaced with underscores, final segment capitalized.
