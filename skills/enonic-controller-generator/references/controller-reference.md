@@ -2,6 +2,8 @@
 
 ## Project File Layout
 
+### XP 7
+
 Controllers and descriptors live under `src/main/resources/site/`:
 
 ```
@@ -23,9 +25,35 @@ src/main/resources/site/
 └── site.xml                       # Site descriptor (declares processors)
 ```
 
+### XP 8
+
+In XP 8, CMS resources move to `src/main/resources/cms/` and descriptors use YAML:
+
+```
+src/main/resources/cms/
+├── pages/
+│   └── <page-name>/
+│       ├── <page-name>.yaml       # Page descriptor (YAML)
+│       └── <page-name>.ts         # HTTP function (or .js)
+├── parts/
+│   └── <part-name>/
+│       ├── <part-name>.yaml       # Part descriptor (YAML)
+│       └── <part-name>.ts         # HTTP function (or .js)
+├── layouts/
+│   └── <layout-name>/
+│       ├── <layout-name>.yaml     # Layout descriptor (YAML)
+│       └── <layout-name>.ts       # HTTP function (or .js)
+├── processors/
+│   └── <processor-name>.ts        # Response processor
+├── site.yaml                      # Site descriptor (mappings, processors)
+└── cms.yaml                       # CMS descriptor (mixins, app form)
+```
+
 ## HTTP Handler Conventions
 
-Controllers export named functions matching HTTP methods:
+Controllers export named functions matching HTTP methods.
+
+### XP 7 (lowercase)
 
 ```ts
 // TypeScript style
@@ -43,9 +71,27 @@ exports.delete = function (req) { ... };
 exports.patch = function (req) { ... };  // XP 7.15+
 ```
 
+### XP 8 (uppercase)
+
+```ts
+// TypeScript style
+export function GET(req) { ... }
+export function POST(req) { ... }
+export function DELETE(req) { ... }
+export function PATCH(req) { ... }
+```
+
+```js
+// JavaScript (CommonJS) style
+exports.GET = function (req) { ... };
+exports.POST = function (req) { ... };
+exports.DELETE = function (req) { ... };
+exports.PATCH = function (req) { ... };
+```
+
 A special `all` export handles any HTTP method not explicitly declared.
 
-Supported methods: `get`, `post`, `put`, `delete`, `head`, `options`, and `patch` (XP 7.15+).
+Supported methods: `get`/`GET`, `post`/`POST`, `put`/`PUT`, `delete`/`DELETE`, `head`/`HEAD`, `options`/`OPTIONS`, and `patch`/`PATCH` (XP 7.15+). Use lowercase in XP 7, uppercase in XP 8.
 
 The handler receives an HTTP Request object and must return an HTTP Response object:
 
@@ -76,6 +122,8 @@ export function get(req) {
 | `params` | object | Query/form parameters |
 | `headers` | object | HTTP request headers |
 | `cookies` | object | HTTP request cookies |
+| `contentPath` | string | Site service path of the content being rendered (XP 8+) |
+| `locales` | string[] | Locale strings from `Accept-Language` header, in decreasing preference order (XP 8+) |
 
 Since XP 7.12, the request object also exposes `getHeader(name)` — a case-insensitive header lookup function. Prefer it over accessing `headers` directly. Note: modifying the `headers` object does not affect the result of `getHeader(name)` calls.
 
@@ -117,9 +165,18 @@ cookies: {
 Import: `import portalLib from '/lib/xp/portal';` or use named imports.
 
 Add to `build.gradle`:
+
+XP 7:
 ```
 dependencies {
   include "com.enonic.xp:lib-portal:${xpVersion}"
+}
+```
+
+XP 8:
+```
+dependencies {
+  include xplibs.portal
 }
 ```
 
@@ -141,6 +198,10 @@ dependencies {
 | `imagePlaceholder({width, height})` | any | Generates a base64-encoded placeholder image URL |
 | `processHtml({value})` | any | Resolves internal links in HTML content. Supports `imageWidths` (XP 7.7+) and `imageSizes` (XP 7.8+) for responsive images |
 | `sanitizeHtml(html)` | any | Strips unsafe tags/attributes to protect against XSS |
+| `apiUrl({api, application})` | any | Generates URL to a Universal API (XP 8+) |
+| `baseUrl({type})` | any | Generates base URL for the current service mount (XP 8+) |
+| `csp()` | any | Returns the request-scoped Content Security Policy builder (XP 8.1.0+) |
+| `cspReportOnly()` | any | Returns the report-only CSP builder (XP 8.1.0+) |
 
 ### Example — getComponent() Return Value (Layout)
 
@@ -169,9 +230,18 @@ dependencies {
 Import: `import contentLib from '/lib/xp/content';`
 
 Add to `build.gradle`:
+
+XP 7:
 ```
 dependencies {
   include "com.enonic.xp:lib-content:${xpVersion}"
+}
+```
+
+XP 8:
+```
+dependencies {
+  include xplibs.content
 }
 ```
 
@@ -267,7 +337,7 @@ Duplicate contributions are automatically removed during the merge step. If the 
 
 ## Response Processors
 
-Place controller files at: `src/main/resources/site/processors/<name>.js`
+Place controller files at: `src/main/resources/site/processors/<name>.js` (XP 7) or `src/main/resources/cms/processors/<name>.ts` (XP 8)
 
 Export `responseProcessor`:
 ```js
@@ -285,7 +355,7 @@ Response processors run between component rendering and the contributions filter
 
 Execution order is determined by the `order` attribute (lower = higher priority) combined with app order on the site.
 
-Register in `site.xml`:
+Register in `site.xml` (XP 7):
 ```xml
 <site>
   <processors>
@@ -295,7 +365,15 @@ Register in `site.xml`:
 </site>
 ```
 
-## XML Descriptor Reference
+Register in `site.yaml` (XP 8):
+```yaml
+kind: "Site"
+processors:
+  - name: "tracker"
+    order: 10
+```
+
+## XML Descriptor Reference (XP 7)
 
 ### Page Descriptor
 
@@ -343,3 +421,44 @@ The `i18n` attribute on `<display-name>` is optional and specifies a localizatio
 ### Form Schema Elements
 
 Common input types for component forms: `TextLine`, `TextArea`, `HtmlArea`, `ImageSelector`, `ContentSelector`, `CheckBox`, `ComboBox`, `Date`, `DateTime`, `Long`, `Double`.
+
+## YAML Descriptor Reference (XP 8)
+
+In XP 8, descriptors use YAML with a `kind` property and `title` instead of `display-name`. Form items use `min`/`max` for occurrences (not `minimum`/`maximum`).
+
+### Page Descriptor
+
+```yaml
+kind: "Page"
+title: "My Page"
+description: "Front page"
+form: []
+regions:
+  - name: "main"
+```
+
+### Part Descriptor
+
+```yaml
+kind: "Part"
+title: "My Part"
+description: "Displays a hero banner"
+form:
+  - name: "heading"
+    type: "TextLine"
+    label: "Heading"
+    occurrences:
+      min: 1
+      max: 1
+```
+
+### Layout Descriptor
+
+```yaml
+kind: "Layout"
+title: "Two Column Layout"
+form: []
+regions:
+  - name: "left"
+  - name: "right"
+```
