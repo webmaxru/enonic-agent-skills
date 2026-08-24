@@ -105,13 +105,15 @@ Copies a sandbox with all content to a new sandbox.
 ## Create Command (Simplified Project Creation)
 
 ```
-enonic create [project-name] [-r <starter>] [-s <sandbox>] [--prod] [--skip-start] [-f]
+enonic create [project-name] [-r <starter>] [-b <branch>] [-c <checkout>] [-s <sandbox>] [--prod] [--skip-start] [-f]
 ```
 
 | Flag | Description |
 |------|-------------|
 | `project-name` | Project name (also used as folder name) |
 | `-r, --repo, --repository` | Starter repository: `<enonic-repo>`, `<org>/<repo>`, or full URL |
+| `-b, --branch` | Branch to checkout from the starter repository (ignored if `--checkout` is set) (CLI 4.1.1+) |
+| `-c, --checkout` | Specific commit hash to checkout from the starter repository (CLI 4.1.1+) |
 | `-s, --sandbox` | Existing sandbox name to link |
 | `--prod` | Run XP in non-development (production) mode |
 | `--skip-start` | Do not start sandbox after creation |
@@ -259,9 +261,12 @@ These commands require access to the XP management API (default: `localhost:4848
 
 ```
 enonic app install [--url <url>] [--file <path>] [--cred-file <path>] [--client-key <path>] [--client-cert <path>] [-f]
+enonic app list [--json] [--cred-file <path>] [--client-key <path>] [--client-cert <path>] [-f]
 enonic app start <app-key> [--cred-file <path>] [--client-key <path>] [--client-cert <path>] [-f]
 enonic app stop <app-key> [--cred-file <path>] [--client-key <path>] [--client-cert <path>] [-f]
 ```
+
+`enonic app list` (alias: `enonic app ls`) lists all installed applications on the running XP instance, showing key, name, version, state, and whether the app is locally deployed. Use `--json` for full application details in JSON format. (CLI 4.1.0+)
 
 ### System Info
 

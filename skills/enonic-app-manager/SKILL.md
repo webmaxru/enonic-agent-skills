@@ -40,10 +40,11 @@ metadata:
 5. If the request mentions Docker, use `-i <image>` (e.g., `enonic/xp:latest-sdk`) to back the sandbox with a Docker image instead of a downloaded XP distribution. Requires `docker` on `$PATH`.
 
 **Step 4: Project Scaffolding**
-1. For new project creation, use the simplified command: `enonic create <name> [-r <starter>] [-s <sandbox>] [-f]`
+1. For new project creation, use the simplified command: `enonic create <name> [-r <starter>] [-b <branch>] [-c <checkout>] [-s <sandbox>] [-f]`
 2. Common starters include `starter-vanilla`, `starter-headless`, and `starter-nextjs`. Read `references/cli-reference.md` for the full list of options.
-3. To link an existing project to a different sandbox: `enonic project sandbox <name>`
-4. Ensure the project folder contains `build.gradle` and `.enonic` configuration after creation.
+3. Use `-b <branch>` to check out a specific branch from the starter repository, or `-c <commit>` to pin to a specific commit hash (CLI 4.1.1+). If both are set, `--checkout` takes precedence.
+4. To link an existing project to a different sandbox: `enonic project sandbox <name>`
+5. Ensure the project folder contains `build.gradle` and `.enonic` configuration after creation.
 
 **Step 5: Development Workflow**
 1. Determine the appropriate development command:
@@ -62,6 +63,7 @@ metadata:
 2. Match the operation:
    - **Install from URL:** `enonic app install --url <jar-url>`
    - **Install from file:** `enonic app install --file <path-to-jar>`
+   - **List installed:** `enonic app list` (alias: `enonic app ls`; use `--json` for detailed output) (CLI 4.1.0+)
    - **Start app:** `enonic app start <app-key>`
    - **Stop app:** `enonic app stop <app-key>`
 3. Authentication is required for XP commands. Use `--cred-file <path>` (XP 7.15+), `--client-key <path>` + `--client-cert <path>` for mTLS (XP 7.15+), or set `ENONIC_CLI_REMOTE_USER` and `ENONIC_CLI_REMOTE_PASS` environment variables.
