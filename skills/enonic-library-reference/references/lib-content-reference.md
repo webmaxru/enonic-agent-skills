@@ -81,9 +81,9 @@ Creates a media content.
 
 **Returns:** `object` — Created media content.
 
-### modifyMedia
+### updateMedia
 
-Modifies a media content.
+Updates a media content. *(Renamed from `modifyMedia`, which is still exported for backward compatibility.)*
 
 **Parameters (object):**
 
@@ -92,20 +92,18 @@ Modifies a media content.
 | key | string | yes | Path or id of the media content |
 | name | string | yes | Name of the media content |
 | data | stream | yes | Media data stream |
-| mimeType | string | no | Mime-type of the data |
 | focalX | number | no | Focal point for X axis |
 | focalY | number | no | Focal point for Y axis |
 | caption | string | no | Caption |
 | artist | string/string[] | no | Artist |
 | copyright | string | no | Copyright |
 | tags | string/string[] | no | Tags |
-| workflowInfo | object | no | Workflow state (default: READY) |
 
-**Returns:** `object` — Modified media content.
+**Returns:** `object` — Updated media content, or null if not found.
 
-### delete
+### deleteContent
 
-Deletes a content. Published content is unpublished before deletion.
+Deletes a content. Published content is unpublished before deletion. *(Renamed from `delete` to avoid the JavaScript reserved word; the old `delete` export is still available.)*
 
 **Parameters (object):**
 
@@ -264,9 +262,9 @@ Returns all registered content types.
 
 **Returns:** `ContentType[]` — Array of all content types.
 
-### modify
+### update
 
-Modifies a content. Properties starting with `_` cannot be modified (use `move` to rename).
+Updates a content. Properties starting with `_` cannot be modified (use `move` to rename). *(Renamed from `modify`, which is still exported for backward compatibility.)*
 
 **Parameters (object):**
 
@@ -277,6 +275,32 @@ Modifies a content. Properties starting with `_` cannot be modified (use `move` 
 | requireValid | boolean | no | true | Content must be valid to be updated |
 
 **Returns:** `object` — Modified content as JSON.
+
+### updateMetadata
+
+Updates metadata (`owner` and `variantOf`) for a content. Applied to both master and draft branches.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or id to the content |
+| editor | function | yes | Editor callback to modify metadata (receives `{ source, owner, variantOf }`) |
+
+**Returns:** `object` — The updated content wrapped in a `content` property.
+
+### updateWorkflow
+
+Updates the workflow state of a content. Applied to the draft branch only.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or id to the content |
+| editor | function | yes | Editor callback to modify workflow (receives object with `source` and writable `state`) |
+
+**Returns:** `object` — The updated content wrapped in a `content` property.
 
 ### move
 
@@ -366,22 +390,63 @@ Restores a content from the archive. *(XP 7.8.0+)*
 
 **Returns:** `string[]` — List with ids of restored contents.
 
-### setPermissions
+### getActiveVersions
 
-Sets permissions on a content.
+Returns the active content version for each specified branch.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or id of the content |
+| branches | string[] | yes | Branch names to get active versions for |
+
+**Returns:** `object` — Object with branch names as keys and content versions as values.
+
+### getVersions
+
+Returns content versions with cursor-based pagination.
 
 **Parameters (object):**
 
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | key | string | yes | | Path or id of the content |
-| inheritPermissions | boolean | no | false | Inherit permissions |
-| overwriteChildPermissions | boolean | no | false | Overwrite child permissions |
-| permissions | PermissionsParams[] | no | | Array of permissions |
+| count | number | no | 10 | Number of versions to fetch |
+| cursor | string | no | | Cursor for pagination |
 
-**PermissionsParams:** `{ principal: string, allow: string[], deny: string[] }`
+**Returns:** `object` — `{ total, count, cursor, hits[] }` with version entries.
 
-**Returns:** `boolean` — `true` if successful.
+### patch
+
+Patches a content. Restricted to `admin` or `cms.admin` roles.
+
+**Parameters (object):**
+
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| key | string | yes | | Path or id to the content |
+| patcher | function | yes | | Patcher callback function |
+| branches | string[] | no | [] | Branches to patch |
+| skipSync | boolean | no | | Skip synchronization in child layers |
+
+**Returns:** `object` — Patch result.
+
+### applyPermissions
+
+Applies permissions on a content. If the content is published, permissions are applied to the published content as well without republishing.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or id of the content |
+| permissions | AccessControlEntry[] | no | Overwrite current permissions (cannot combine with add/remove) |
+| addPermissions | AccessControlEntry[] | no | Permissions to add (cannot combine with `permissions`) |
+| removePermissions | AccessControlEntry[] | no | Permissions to remove (cannot combine with `permissions`) |
+| scope | string | no | `SINGLE`, `TREE`, or `SUBTREE` |
+
+**Returns:** `object` — Applied permissions result.
 
 ### unpublish
 

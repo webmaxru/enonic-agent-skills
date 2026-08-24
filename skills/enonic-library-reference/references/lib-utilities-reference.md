@@ -260,74 +260,211 @@ Refreshes indices in the current repository.
 
 ### createSchema
 
-Creates a dynamic schema (content type, mixin, or x-data).
+Creates a dynamic schema in a virtual application.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| name | string | yes | Schema name |
+| type | string | yes | `CONTENT_TYPE`, `FORM_FRAGMENT`, or `MIXIN` |
+| resource | string | yes | Schema resource value (YAML) |
+
+**Returns:** `object` — The created schema.
 
 ### getSchema
 
-Fetches a specific schema by name and type.
+Fetches a schema from an application.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| name | string | yes | Schema name |
+| type | string | yes | `CONTENT_TYPE`, `FORM_FRAGMENT`, or `MIXIN` |
+
+**Returns:** `object` — The schema, or null.
 
 ### listSchemas
 
 Lists schemas of a given type for a specified application.
 
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| application | string | yes | Application key |
+| type | string | yes | `CONTENT_TYPE`, `FORM_FRAGMENT`, or `MIXIN` |
+
+**Returns:** `object[]` — Array of schemas.
+
 ### updateSchema
 
 Updates a dynamic schema in a virtual application.
 
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| name | string | yes | Schema name |
+| type | string | yes | `CONTENT_TYPE`, `FORM_FRAGMENT`, or `MIXIN` |
+| resource | string | yes | Updated schema resource value (YAML) |
+
+**Returns:** `object` — The modified schema.
+
 ### deleteSchema
 
-Deletes a dynamic schema.
+Removes a schema from a virtual application.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| name | string | yes | Schema name |
+| type | string | yes | `CONTENT_TYPE`, `FORM_FRAGMENT`, or `MIXIN` |
+
+**Returns:** `boolean` — `true` if deleted.
 
 ### createComponent
 
-Creates a dynamic component (page, part, or layout).
+Creates a dynamic component (page, part, or layout) in a virtual application.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Component key |
+| type | string | yes | `PAGE`, `PART`, or `LAYOUT` |
+| resource | string | yes | Component resource value (YAML) |
+
+**Returns:** `object` — The created component descriptor.
 
 ### getComponent
 
-Fetches a specific component by key and type.
+Fetches a component descriptor from an application.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Component key |
+| type | string | yes | `PAGE`, `PART`, or `LAYOUT` |
+
+**Returns:** `object` — Component descriptor, or null.
 
 ### listComponents
 
 Lists components of a given type for a specified application.
 
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| application | string | yes | Application key |
+| type | string | yes | `PAGE`, `PART`, or `LAYOUT` |
+
+**Returns:** `object[]` — Array of component descriptors.
+
 ### updateComponent
 
 Updates a dynamic component in a virtual application.
 
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Component key |
+| type | string | yes | `PAGE`, `PART`, or `LAYOUT` |
+| resource | string | yes | Updated resource value (YAML) |
+
+**Returns:** `object` — The modified component descriptor.
+
 ### deleteComponent
 
-Deletes a dynamic component.
+Deletes a dynamic component from a virtual application.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Component key |
+| type | string | yes | `PAGE`, `PART`, or `LAYOUT` |
+
+**Returns:** `boolean` — `true` if deleted.
 
 ### createStyles
 
 Creates dynamic styles for an application.
 
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| application | string | yes | Application key |
+| resource | string | yes | Styles resource value (YAML) |
+
+**Returns:** `object` — The created styles descriptor.
+
 ### getStyles
 
 Gets dynamic styles for an application.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| application | string | yes | Application key |
+
+**Returns:** `object` — Styles descriptor, or null.
 
 ### updateStyles
 
 Updates dynamic styles in a virtual application.
 
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| application | string | yes | Application key |
+| resource | string | yes | Updated styles resource value (YAML) |
+
+**Returns:** `object` — The modified styles descriptor.
+
 ### deleteStyles
 
 Deletes dynamic styles for an application.
 
-### createSite
+**Parameters (object):**
 
-Creates a dynamic site descriptor for an application.
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| application | string | yes | Application key |
+
+**Returns:** `boolean` — `true` if deleted.
 
 ### getSite
 
 Gets a dynamic site descriptor for an application.
 
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| application | string | yes | Application key |
+
+**Returns:** `object` — Site descriptor, or null.
+
 ### updateSite
 
 Updates a dynamic site descriptor.
 
-### deleteSite
+**Parameters (object):**
 
-Deletes a dynamic site descriptor.
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| application | string | yes | Application key |
+| resource | string | yes | Updated site resource value (YAML) |
+
+**Returns:** `object` — The modified site descriptor.
 
 > For full parameter details, consult the official documentation at https://developer.enonic.com/docs/xp/7.x/api/lib-schema

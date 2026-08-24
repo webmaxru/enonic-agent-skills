@@ -7,6 +7,21 @@
 
 ## Functions
 
+### apiUrl
+
+Generates a URL pointing to a Universal API endpoint.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| api | string | yes | Descriptor key in `app:api` form |
+| type | string | no | URL type: `server`, `absolute`, or `websocket` (default: `server`) |
+| path | string/string[] | no | Path appended after the API segment |
+| params | object | no | Query parameters |
+
+**Returns:** `string` — Generated URL.
+
 ### assetUrl
 
 Generates URL to a static file. *(Deprecated in XP 7.15.0 — use lib-asset or lib-static instead)*
@@ -19,6 +34,22 @@ Generates URL to a static file. *(Deprecated in XP 7.15.0 — use lib-asset or l
 Generates URL to an attachment. Uses `name` first, then `label` for lookup.
 
 **Parameters:** `{ id, name?, label?, download?, ... }` — Input parameters.
+**Returns:** `string` — Generated URL.
+
+### baseUrl
+
+Generates a base URL.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| type | string | no | URL type: `server`, `absolute`, or `websocket` (default: `server`) |
+| id | string | no | ID of the content |
+| path | string | no | Path to the content |
+| project | string | no | Project name for URL resolution |
+| branch | string | no | Branch name for URL resolution |
+
 **Returns:** `string` — Generated URL.
 
 ### componentUrl
@@ -181,3 +212,15 @@ Generates URL to a resource.
 
 **Parameters:** `{ path: string, params?: object }` — Input parameters.
 **Returns:** `string` — Generated URL.
+
+### csp
+
+Returns the request-scoped enforced Content Security Policy builder for the current portal request. Its directives compose the `Content-Security-Policy` header. Takes no arguments. *(XP 8.1.0+)*
+
+**Returns:** `object` — CSP builder.
+
+### cspReportOnly
+
+Returns the request-scoped report-only Content Security Policy builder, emitted as the `Content-Security-Policy-Report-Only` header. Takes no arguments. *(XP 8.1.0+)*
+
+**Returns:** `object` — Report-only CSP builder.
