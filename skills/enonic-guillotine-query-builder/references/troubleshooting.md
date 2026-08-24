@@ -23,7 +23,7 @@ GraphQL type names use underscores, not the original descriptor format. Addition
 
 ## Deprecated Query Fields
 
-**Warning**: `query` and `queryConnection` fields are deprecated in Guillotine 6 Update 1.
+**Warning**: `query` and `queryConnection` fields were deprecated in Guillotine 6 Update 1 and **removed in Guillotine 8**.
 
 Replace:
 ```graphql
@@ -79,6 +79,13 @@ queryDsl(
 | Custom field not appearing | In Guillotine 7, use `exports.extensions` in `guillotine/guillotine.js`. For 6.x, verify the `creationCallbacks` key matches the exact generated type name. Use Query Playground introspection to confirm. |
 | Type not found in dictionary | Ensure `context.dictionary` is passed to `createSchema` (6.x only). In Guillotine 7, types are registered through the Extensions API. |
 
+## Guillotine 8 Migration Issues
+
+| Symptom | Fix |
+|---|---|
+| `query` or `queryConnection` field not found | These fields were removed in Guillotine 8. Migrate to `queryDsl` / `queryDslConnection` with DSL syntax. See `references/compatibility.md`. |
+| Requires XP 8 | Guillotine 8 is only compatible with XP 8.0+. Use Guillotine 7.x for XP 7.14.0+. |
+
 ## Guillotine 7 Migration Issues
 
 | Symptom | Fix |
@@ -92,8 +99,8 @@ queryDsl(
 
 | Symptom | Fix |
 |---|---|
-| Cross-origin request blocked | CORS is enabled by default in Guillotine 7.2.0+. Verify `cors.enabled=true` in `com.enonic.app.guillotine.cfg`. Set `cors.origin` to the allowed origins if needed. |
-| Query rejected with token limit error | The query exceeds `maxQueryTokens` (default `15000`, configurable in v7.3.0+). Simplify the query or increase the limit in `com.enonic.app.guillotine.cfg`. |
+| Cross-origin request blocked | In Guillotine 7.2.0+/8.x, set `cors.origin` in `com.enonic.app.guillotine.cfg` to allowed origins. Supports `*` (all origins) and `~`-prefixed regex patterns (e.g. `~https://.*\.example\.com`). Omit `cors.origin` to disable CORS. |
+| Query rejected with token limit error | The query exceeds `maxQueryTokens` (default `15000`, configurable in v7.3.0+/8.x). Simplify the query or increase the limit in `com.enonic.app.guillotine.cfg`. |
 
 ## Debugging Steps
 
