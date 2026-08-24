@@ -164,19 +164,19 @@ Fetches children of a node.
 
 **Returns:** `object` — `{ total, count, hits[] }`.
 
-### findVersions
+### getVersions
 
-Fetches versions of a node.
+Fetches versions of a node with cursor-based pagination.
 
 **Parameters (object):**
 
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | key | string | yes | | Path or ID |
-| start | number | no | 0 | Start index |
 | count | number | no | 10 | Number to fetch |
+| cursor | string | no | | Cursor for pagination |
 
-**Returns:** `object` — `{ total, count, hits[] }` with `versionId`, `nodeId`, `nodePath`, `timestamp`.
+**Returns:** `object` — `{ total, count, cursor, hits[] }` with `versionId`, `nodeId`, `nodePath`, `timestamp`.
 
 ### get
 
@@ -227,9 +227,9 @@ Returns a node version commit. *(XP 7.7.0+)*
 
 **Returns:** `object` — `{ id, message, committer, timestamp }`.
 
-### modify
+### update
 
-Modifies a node.
+Updates a node. *(Renamed from `modify`, which is still exported for backward compatibility.)*
 
 **Parameters (object):**
 
@@ -239,6 +239,20 @@ Modifies a node.
 | editor | function | Editor callback |
 
 **Returns:** `object` — Modified node.
+
+### patch
+
+Applies a patch to a node. Low-level function — use with caution.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or ID |
+| editor | function | yes | Patcher callback |
+| branches | string[] | no | Branches to patch (default: current branch) |
+
+**Returns:** `object` — Patch result.
 
 ### move
 
@@ -299,6 +313,35 @@ Refreshes indices.
 |------|------|---------|-------------|
 | mode | string | ALL | ALL, SEARCH, or STORAGE |
 
+### sort
+
+Sorts the children of a node by changing the parent's `_childOrder`. When set to manual ordering, children are reordered by `_manualOrderValue`.
+
+**Parameters (object):**
+
+| Name | Type | Description |
+|------|------|-------------|
+| key | string | Path or ID of the parent |
+| childOrder | string | New child order expression |
+
+**Returns:** `object` — The updated parent node and array of `reorderedNodes`.
+
+### applyPermissions
+
+Applies permissions on a node.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or ID |
+| permissions | AccessControlEntry[] | no | Overwrite current permissions (cannot combine with add/remove) |
+| addPermissions | AccessControlEntry[] | no | Permissions to add |
+| removePermissions | AccessControlEntry[] | no | Permissions to remove |
+| scope | string | no | `SINGLE`, `TREE`, or `SUBTREE` |
+
+**Returns:** `object` — Applied permissions result.
+
 ### setActiveVersion
 
 Sets the active version of a node.
@@ -311,32 +354,6 @@ Sets the active version of a node.
 | versionID | string | Version to set as active |
 
 **Returns:** `boolean`
-
-### setChildOrder
-
-Sets the order of a node's children.
-
-**Parameters (object):**
-
-| Name | Type | Description |
-|------|------|-------------|
-| key | string | Path or ID |
-| childOrder | string | Children order expression |
-
-**Returns:** `object` — Updated node.
-
-### setRootPermissions
-
-Sets root node permissions and inheritance.
-
-**Parameters (object):**
-
-| Name | Type | Description |
-|------|------|-------------|
-| _permissions | object | The permissions |
-| _inheritsPermissions | boolean | Inherit to children |
-
-**Returns:** `object` — Updated root node.
 
 ## Type Definitions
 

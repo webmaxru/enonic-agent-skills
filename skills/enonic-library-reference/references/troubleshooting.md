@@ -60,12 +60,12 @@ try {
 2. Verify the query string syntax matches Enonic's query DSL.
 3. Check `contentTypes` filter matches the actual content type name.
 
-### modify() not saving changes
+### update() not saving changes
 
 **Cause:** The editor function must return the modified content object.
 **Fix:** Always return the content from the editor:
 ```ts
-modify({
+update({
     key: '/path/to/content',
     editor: (c) => {
         c.data.myField = 'new value';
@@ -118,9 +118,14 @@ modify({
 | archive / restore | 7.8.0 |
 | login scope NONE | 7.8.0 |
 | processHtml imageSizes | 7.8.0 |
+| lib-grid (shared maps) | 7.10.0 |
 | publish sourceBranch/targetBranch not in use | 7.12.0 |
 | duplicate (content) | 7.12.0 |
 | duplicate (node) | 7.12.0 |
 | getDefaultFromEmail | 7.14.1 |
 | assetUrl deprecated | 7.15.0 |
 | User.hasPassword | 7.15.0 |
+| lib-sse (Server-Sent Events) | 7.x |
+| apiUrl (portal) | 7.x |
+| baseUrl (portal) | 7.x |
+| csp / cspReportOnly (portal) | 8.1.0 |

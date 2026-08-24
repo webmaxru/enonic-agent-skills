@@ -107,7 +107,7 @@ const result = repo.query({
 });
 
 // Modify a node
-repo.modify({
+repo.update({
     key: node._id,
     editor: (n) => { n.myField = 'updated'; return n; }
 });
