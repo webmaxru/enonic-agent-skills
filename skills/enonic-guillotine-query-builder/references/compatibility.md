@@ -2,7 +2,31 @@
 
 Version differences and migration notes between major Guillotine releases.
 
-## Guillotine 7.x (Current Stable)
+## Guillotine 8.x (Current Stable)
+
+Requires **XP 8.0.0** or higher. Guillotine 8 is a compatibility release aligning Guillotine with XP 8.
+
+### Key Changes from 7.x
+
+- **XP 8 compatibility**: Guillotine 8 is compatible with Enonic XP version 8. The GraphQL API surface remains the same as 7.x.
+- **Resilient schema generation**: The GraphQL schema stays available even if an individual content type schema generation fails.
+- **`query` / `queryConnection` fully removed**: The deprecated string-based query fields from 6.x are no longer documented or supported. Only `queryDsl` / `queryDslConnection` remain.
+- **Query Playground config**: New `queryplayground.ui.mode` option in `com.enonic.app.guillotine.cfg`. Values: `on` (default for SDK) or `off` (default for server distributions).
+- **Updated CORS configuration**:
+  - `cors.enabled` removed — CORS is now enabled by configuring `cors.origin`. Omit `cors.origin` to disable CORS.
+  - `cors.origin` supports regex patterns via `~`-prefix (e.g. `~https://.*\.example\.com`) and `*` for all origins.
+  - `cors.exposedHeaders` added — extra response headers to expose beyond the CORS safelist.
+  - `cors.methods` default changed to `GET, HEAD, POST` (was `POST, OPTIONS` in 7.x).
+
+### Breaking Changes in 8.0
+
+| Change | Impact | Migration |
+|---|---|---|
+| Requires XP 8 | Not compatible with XP 7.x | Upgrade to XP 8.0.0+ before upgrading Guillotine |
+| `cors.enabled` removed | CORS toggle changed | Set `cors.origin` to enable CORS; omit it to disable |
+| `cors.methods` default changed | Default now includes `GET, HEAD, POST` | Review CORS config if relying on previous `POST, OPTIONS` default |
+
+## Guillotine 7.x
 
 Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript to Java.
 

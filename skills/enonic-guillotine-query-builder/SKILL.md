@@ -4,7 +4,7 @@ description: Composes, debugs, and optimizes Guillotine GraphQL queries for Enon
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.5"
+  version: "1.6"
 ---
 
 # Enonic Guillotine Query Builder
@@ -14,7 +14,7 @@ metadata:
 **Step 1: Scan the workspace for existing Guillotine usage**
 1. Execute `node scripts/find-guillotine-targets.mjs .` to inventory files containing Guillotine markers (query strings, library imports, endpoint references).
 2. If a Node runtime is unavailable, search the workspace manually for `guillotine`, `queryDsl`, `queryDslConnection`, or `/lib/guillotine` in `.ts`, `.js`, `.graphql`, and `.gql` files.
-3. Note the Guillotine version in use: if `query(query: "...")` string-based fields are found, the project uses the deprecated 5.x-style API; if `queryDsl` / `queryDslConnection` are found, the project uses 6.x+ DSL. Check for `exports.extensions` in `guillotine/guillotine.js` to detect Guillotine 7 Extensions API usage.
+3. Note the Guillotine version in use: if `query(query: "...")` string-based fields are found, the project uses the deprecated 5.x-style API; if `queryDsl` / `queryDslConnection` are found, the project uses 6.x+ DSL. Check for `exports.extensions` in `guillotine/guillotine.js` to detect Guillotine 7+ Extensions API usage. Check `gradle.properties` or `build.gradle` for `com.enonic.app.guillotine` version to distinguish between 7.x (XP 7.14+) and 8.x (XP 8+).
 4. If both styles coexist, flag the deprecated usage for migration.
 
 **Step 2: Load the Guillotine API reference**
