@@ -2,7 +2,7 @@
 
 Canonical reference for the Next.js + Enonic XP integration framework (Next.XP). Covers adapter configuration, component registry, rendering modes, Guillotine queries, preview architecture, and deployment.
 
-Source: https://developer.enonic.com/learn/next.xp/stable
+Source: https://developer.enonic.com/docs/next.xp/stable (Next.XP 5)
 
 ## Architecture Overview
 
@@ -257,28 +257,28 @@ Key adapter imports:
 - `MacroProps` — props type for macro components.
 - `getUrl(path, meta)` — resolves URLs for both standalone and preview modes.
 - `getAsset(path, meta)` — resolves static asset URLs.
+- `getContentApiUrl(context)` — returns the Guillotine URL for the context's project and branch.
 - `richTextQuery(fieldName)` — generates the GraphQL query fragment for HTML area input types.
+- `sanitizeGraphqlName(text)` — converts text into a valid GraphQL name.
 - `validateData(props)` — validates `FetchContentResult`, throws errors or `notFound()` for invalid data.
 - `I18n.localize(key)` — localized string lookup from phrase files.
 - `I18n.getLocale()` — returns current locale in server-side components.
 - `I18n.setLocale(locale)` — sets the locale for the current request (called in layouts).
 - `APP_NAME` — fully qualified app name from env config.
+- `APP_NAME_DASHED` — app name with dots replaced by dashes for descriptor-safe usage.
 - `APP_NAME_UNDERSCORED` — app name with dots replaced by underscores for GraphQL introspection.
 - `PORTAL_COMPONENT_ATTRIBUTE` — HTML attribute for page editor component identification.
+- `PORTAL_REGION_ATTRIBUTE` — HTML attribute for page editor region identification.
 - `CATCH_ALL` — wildcard content type name for debug/fallback views.
-- `richTextQuery(fieldName)` — generates GraphQL query fragment for rich text fields.
-- `validateData(data)` — validates `FetchContentResult` before rendering.
 - `getRequestLocaleInfo({contentPath, headers})` — extracts locale from request for middleware.
+- `RENDER_MODE_HEADER`, `PROJECT_ID_HEADER`, `XP_BASE_URL_HEADER`, `JSESSIONID_HEADER` — header names shared with the XP preview proxy.
 
 Server-side imports (from `@enonic/nextjs-adapter/server`):
-- `fetchContent(params)` — fetches content and resolves component mappings.
-- `fetchContentPathsForAllLocales(basePath)` — generates paths for SSG across all locales.
-- `fetchContentPathsForLocale(basePath, locale)` — generates paths for SSG for a single locale.
+- `fetchContent(context)` — fetches content and resolves component mappings. Takes `{contentPath, headers?, locale?}`.
+- `fetchContentPathsForAllLocales(query?, countPerLocale?)` — generates paths for SSG across all locales. Default count: 999.
+- `fetchContentPathsForLocale(mapping, query?, count?)` — generates paths for SSG for a single locale mapping.
 - `fetchGuillotine(contentApiUrl, options?)` — makes a custom request to Guillotine; used internally by `fetchContent()`.
-- `fetchFromApi(apiUrl, body, options?)` — lower-level HTTP POST to any API endpoint.
-- `getLocaleMapping(locale)` — resolves locale to project/site mapping from `ENONIC_MAPPINGS`.
-- `getLocaleMappingByLocale(locale)` — alias for `getLocaleMapping`.
-- `getLocaleMappingByProjectId(projectId)` — resolves project ID to its locale mapping.
+- `fetchFromApi(apiUrl, options?)` — lower-level HTTP POST to any API endpoint.
 
 Client-side imports (from `@enonic/nextjs-adapter/client`):
 - `useLocaleContext()` — React hook returning `{locale, localize}` for client-side components.
@@ -296,13 +296,15 @@ Additional types and utilities:
 - `LocaleContextType` — type for the value returned by `useLocaleContext`.
 - `Replacer` — type for custom element replacement functions used with `RichTextView`'s `customReplacer` prop.
 - `RENDER_MODE` — enum-like constant for render mode detection (`NEXT`, `INLINE`, `EDIT`, `PREVIEW`, `LIVE`, `ADMIN`).
-- `UrlProcessor` — URL processing class; use `UrlProcessor.setSiteKey(key)` to set the site key for URL resolution.
+- `IS_DEV_MODE` — whether the current mode is `development`.
+- `XP_COMPONENT_TYPE`, `XP_REQUEST_TYPE` — normalized page-component kinds and fetch request kinds.
+- `UrlProcessor` — URL processing class with `process()`, `processSrcSet()`, `isMediaLink()`, and `isContentImage()` methods.
 
 ## Page Components with Regions
 
 Pages define regions where editors can add parts, layouts, and text components:
 
-Enonic page definition (`src/main/resources/site/pages/main/main.xml`):
+Enonic page definition (`src/main/resources/site/pages/main/main.xml` for XP 7, or YAML in `src/main/resources/cms/` for XP 8):
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <page xmlns="urn:enonic:xp:model:1.0">
@@ -532,7 +534,7 @@ export async function generateMetadata({params}: { params: Promise<PageProps> })
 }
 
 export async function generateStaticParams(props: { params: PageProps }): Promise<any[]> {
-    return await fetchContentPathsForAllLocales('\${site}/');
+    return await fetchContentPathsForAllLocales();
 }
 ```
 

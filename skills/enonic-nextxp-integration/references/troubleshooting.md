@@ -12,6 +12,10 @@ Common issues and diagnostic steps for the Next.js + Enonic XP integration (Next
 5. Check the Next.js server console for errors during the preview request.
 6. Verify the `/api/preview/route.ts` API route exists in the Next.js project.
 
+### Content Studio preview returns 407
+1. The token sent by XP does not match `ENONIC_API_TOKEN`, or the token is absent.
+2. Compare it with the `nextjs.<name>.secret` value in the Next.XP app configuration.
+
 ### Preview works but links are broken
 1. Ensure all component links use `getUrl(path, meta)` from `@enonic/nextjs-adapter` instead of hardcoded paths.
 2. Content Studio uses different base paths (`/preview`, `/inline`, `/edit`); `getUrl()` handles this automatically.
@@ -74,7 +78,7 @@ Common issues and diagnostic steps for the Next.js + Enonic XP integration (Next
 
 ### @enonic/nextjs-adapter import errors
 1. Run `npm install` to ensure the package is installed.
-2. Check `package.json` for `@enonic/nextjs-adapter` in dependencies (v4.x requires React 19 and Next.js 16).
+2. Check `package.json` for `@enonic/nextjs-adapter` in dependencies (v5.x requires React 19, Next.js 16, and Node.js 24.15.0+).
 3. Verify the import path: some exports require subpath imports (e.g., `@enonic/nextjs-adapter/views/Region`, `@enonic/nextjs-adapter/server`, `@enonic/nextjs-adapter/client`).
 4. Server-side functions like `fetchContent` must be imported from `@enonic/nextjs-adapter/server`, not the main entry point.
 
@@ -93,6 +97,15 @@ Common issues and diagnostic steps for the Next.js + Enonic XP integration (Next
 1. Content must be published (moved from `draft` to `master` branch) to be visible on the public site.
 2. In Content Studio: select content → "Mark as ready" → "Publish".
 3. Verify `ENONIC_MAPPINGS` includes the correct project and site path for the deployment.
+
+### Locale route loops or rewrites assets
+1. Ensure `src/proxy.ts` excludes configured locales, API routes, Next.js internals, and all top-level public asset paths.
+2. When adding a top-level folder under `public/`, add it to the matcher exclusion so asset requests are not interpreted as content routes.
+
+### Published changes remain cached
+1. Confirm the site uses Next.XP and the XP master node subscribed successfully.
+2. Verify `/api/revalidate` is reachable from the XP host and the shared token matches.
+3. In a cluster, confirm which XP node is master because only that node sends revalidation events.
 
 ### Vercel deployment shows errors
 1. Check Vercel function logs for runtime errors.
