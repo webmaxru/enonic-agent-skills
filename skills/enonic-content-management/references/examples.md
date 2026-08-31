@@ -521,3 +521,65 @@ contextLib.run({
   });
 });
 ```
+
+## Bulk Duplicate: Clone Content Tree to New Parent (XP 7.12+)
+
+Duplicate a set of content items into a different parent path, useful for creating staging copies or content variants.
+
+```typescript
+import contentLib from '/lib/xp/content';
+import contextLib from '/lib/xp/context';
+import { executeFunction, progress } from '/lib/xp/task';
+
+exports.run = function () {
+  executeFunction({
+    description: 'Bulk duplicate articles to staging',
+    func: () => {
+      contextLib.run({
+        branch: 'draft',
+        principals: ['role:system.admin']
+      }, () => {
+        const result = contentLib.query({
+          count: 500,
+          query: "type = 'com.example.myapp:article' AND _path LIKE '/content/my-site/articles/*'",
+          sort: '_path ASC'
+        });
+
+        const total = result.total;
+        let duplicated = 0;
+        let failed = 0;
+
+        progress({ info: 'Starting bulk duplicate', current: 0, total });
+
+        result.hits.forEach((hit) => {
+          try {
+            contentLib.duplicate({
+              contentId: hit._id,
+              includeChildren: false,
+              parent: '/my-site/staging-articles'
+            });
+            duplicated++;
+          } catch (e) {
+            log.error('Failed to duplicate %s: %s', hit._path, e.message);
+            failed++;
+          }
+
+          if ((duplicated + failed) % 50 === 0) {
+            progress({
+              info: `Duplicated: ${duplicated}, Failed: ${failed}`,
+              current: duplicated + failed,
+              total
+            });
+          }
+        });
+
+        progress({
+          info: `Complete. Duplicated: ${duplicated}, Failed: ${failed}`,
+          current: total,
+          total
+        });
+      });
+    }
+  });
+};
+```
