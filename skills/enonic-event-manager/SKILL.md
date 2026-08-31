@@ -4,7 +4,7 @@ description: Sets up Enonic XP event listeners, webhook configurations, and exte
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.6"
+  version: "1.7"
 ---
 
 # Enonic Event Manager
@@ -28,7 +28,7 @@ metadata:
 3. Use the `type` parameter with a pattern matching the target node events (e.g., `node.pushed`, `node.created`, `node.updated`, `node.deleted`).
 4. Filter events by path within the callback by checking `event.data.nodes[].path` to restrict processing to the intended content tree.
 5. When the listener must call an external HTTP endpoint, use lib-httpClient's `request()` function inside the callback or delegate to a background task.
-6. For long-running processing, delegate work from the event callback to a background task using lib-task's `executeFunction()` to avoid blocking the event thread.
+6. For long-running processing, delegate work from the event callback to a background task. For XP 8.1+, use named tasks with `submitTask()`. For older XP versions, `executeFunction()` from lib-task can be used but is deprecated.
 7. Read `references/examples.md` for complete integration patterns including CDN invalidation, search reindexing, and notification dispatch.
 
 **Step 4: Configure outbound webhooks (if applicable)**
@@ -50,9 +50,11 @@ metadata:
 9. When inbound payloads trigger content creation or modification, use lib-content or lib-node APIs within a context run to ensure proper permissions. Never pass unsanitized external values as content names, paths, or keys.
 
 **Step 6: Wire async processing with lib-task (if applicable)**
-1. When event handling or webhook processing requires heavy or time-consuming work, wrap it in `executeFunction()` from lib-task.
-2. Report progress from long-running tasks using `progress()` to allow monitoring.
-3. Read `references/event-reference.md` for the task event lifecycle (`task.submitted`, `task.updated`, `task.finished`, `task.failed`).
+1. When event handling or webhook processing requires heavy or time-consuming work, prefer named tasks submitted with `submitTask()` over inline `executeFunction()`.
+2. `executeFunction()` is deprecated since XP 8.1.0 and unsupported on the GraalJS engine. For new projects, always use named tasks. For existing projects still on Nashorn, `executeFunction()` works but should be migrated.
+3. To create a named task: add a descriptor at `src/main/resources/tasks/<taskName>/<taskName>.yaml` and a controller at `src/main/resources/tasks/<taskName>/<taskName>.ts` that exports a `run(params, taskId)` function.
+4. Report progress from long-running tasks using `progress()` to allow monitoring.
+5. Read `references/event-reference.md` for the task event lifecycle (`task.submitted`, `task.updated`, `task.removed`, `task.finished`, `task.failed`).
 
 **Step 7: Validate the integration**
 1. Execute `node scripts/find-enonic-targets.mjs .` to confirm the project still resolves correctly.

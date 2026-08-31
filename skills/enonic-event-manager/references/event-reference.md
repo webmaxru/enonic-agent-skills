@@ -8,15 +8,19 @@ Add to `build.gradle`:
 
 ```groovy
 dependencies {
-  include "com.enonic.xp:lib-event:${xpVersion}"
+  include xplibs.event
 }
 ```
+
+> **Legacy format:** Older projects may use `include "com.enonic.xp:lib-event:${xpVersion}"`. Both forms work; the `xplibs.event` shorthand is preferred for new projects.
 
 Import in controller:
 
 ```typescript
-import eventLib from '/lib/xp/event';
+import {listener, send} from '/lib/xp/event';
 ```
+
+> **Default import:** `import eventLib from '/lib/xp/event'` also works. Named imports are the style used in the current official docs.
 
 ### listener(params)
 
@@ -139,17 +143,23 @@ const masterNodes = nodes.filter(n => n.branch === 'master');
 
 ```groovy
 dependencies {
-  include "com.enonic.xp:lib-task:${xpVersion}"
+  include xplibs.task
 }
 ```
+
+> **Legacy format:** Older projects may use `include "com.enonic.xp:lib-task:${xpVersion}"`. Both forms work; the `xplibs.task` shorthand is preferred for new projects.
 
 Import:
 
 ```typescript
-import taskLib from '/lib/xp/task';
+import {executeFunction, submitTask, progress, list, get, isRunning, sleep} from '/lib/xp/task';
 ```
 
+> **Default import:** `import taskLib from '/lib/xp/task'` also works. Named imports are the style used in the current official docs.
+
 ### executeFunction(params)
+
+> **Deprecated since XP 8.1.0.** `executeFunction()` will be removed together with the Nashorn engine. It is also unsupported on the GraalJS preview engine. Use named tasks with `submitTask()` instead. See the Named Task Structure section below for how to convert inline functions to named tasks.
 
 Executes a function asynchronously in the background.
 
@@ -190,19 +200,21 @@ const taskId = taskLib.submitTask({
 
 Named tasks are defined by a descriptor and a controller placed in `src/main/resources/tasks/<taskName>/`:
 
-- **Descriptor:** `<taskName>.xml` — defines the task description and an optional parameter form schema.
+- **Descriptor:** `<taskName>.yaml` — defines the task description and an optional parameter form schema.
 
-```xml
-<task>
-  <description>Background job</description>
-  <form>
-    <input type="Long" name="count">
-      <label>Number of items to process</label>
-      <occurrences minimum="1" maximum="1"/>
-    </input>
-  </form>
-</task>
+```yaml
+kind: "Task"
+description: "Background job"
+form:
+- type: "Long"
+  name: "count"
+  label: "Number of items to process"
+  occurrences:
+    min: 1
+    max: 1
 ```
+
+> **Legacy XML format:** Older projects may use `<taskName>.xml` with XML schema syntax. The YAML descriptor format shown above is the current convention.
 
 - **Controller:** `<taskName>.js` (or `.ts`) — exports a `run` function. Since XP 7.13.0, `taskId` is provided as a second argument.
 
@@ -254,6 +266,7 @@ Causes the current execution thread to sleep for the specified number of millise
 |----------------|---------------------|
 | task.submitted | Task was submitted  |
 | task.updated   | Task was updated    |
+| task.removed   | Task was removed    |
 | task.finished  | Task completed      |
 | task.failed    | Task failed         |
 
