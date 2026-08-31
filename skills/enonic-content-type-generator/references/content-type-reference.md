@@ -13,6 +13,8 @@ The directory name **must** match the file name (minus the `.xml` extension).
 <content-type>
   <display-name i18n="localization.key">Human-Readable Name</display-name>
   <display-name-label i18n="localization.label.key">Override placeholder</display-name-label>   <!-- optional; since XP 7.1 -->
+  <display-name-expression>${first_name} ${last_name}</display-name-expression>                  <!-- optional -->
+  <display-name-list-expression>${displayName} (${data.email})</display-name-list-expression>    <!-- optional -->
   <description>Short description</description>                     <!-- optional -->
   <super-type>base:structured</super-type>                         <!-- required -->
   <is-abstract>false</is-abstract>                                 <!-- optional, default false -->
@@ -28,6 +30,8 @@ The directory name **must** match the file name (minus the `.xml` extension).
 
 - `display-name` (required): Human-readable name of the content type. The optional `i18n` attribute maps to a localization key in the application's resource bundle.
 - `display-name-label` (optional; since v7.1): Overrides the default `<Display Name>` placeholder shown in the content form when editors create new content of this type.
+- `display-name-expression` (optional): Auto-composes and persists the `displayName` from form field values while content is edited. Use `${field_name}` placeholders referencing input names; for nested sets use dotted paths (e.g., `${address.city}`). Empty fields resolve to nothing, HTML tags are stripped, and `HtmlArea` inputs are ignored.
+- `display-name-list-expression` (optional): Overrides how items of this type appear in Content Studio list views only (navigator, selector dropdowns). May reference `${displayName}` and stored form values via `${data.field_name}`. Does **not** modify the stored `displayName`.
 - `form` (required): The custom form definition containing inputs, item-sets, option-sets, field-sets, and mixin references.
 
 > **Note:** `allow-child-content-type` has no effect if `allow-child-content` is set to `false`.
@@ -223,8 +227,11 @@ Complete list of available editor tools:
 | Type | Value Type | Description |
 |---|---|---|
 | `Date` | LocalDate | Date only (no time) |
-| `DateTime` | LocalDateTime / Instant | Date and time (local by default; timezone via config) |
+| `DateTime` | LocalDateTime | Date and time without timezone |
+| `Instant` | Instant | Date and time with timezone |
 | `Time` | LocalTime | Time only |
+
+> **Note:** In earlier XP versions, `DateTime` accepted a `<timezone>true</timezone>` config to produce an `Instant` value. This has been replaced by the dedicated `Instant` input type. Use `Instant` when timezone-aware storage is needed and `DateTime` for local (timezone-less) values.
 
 ### Date Config
 
@@ -242,15 +249,24 @@ Complete list of available editor tools:
 ```xml
 <input name="mydatetime" type="DateTime">
   <label>My DateTime</label>
-  <config>
-    <timezone>true</timezone>
-  </config>
-  <default>2011-09-12</default>
+  <default>2011-09-12T12:00</default>
 </input>
 ```
 
-- `timezone` — set to `true` to store value with timezone (produces `Instant`); default is `false` (produces `LocalDateTime`)
-- `default` supports ISO 8601 format (`yyyy-MM-ddThh:mm`, with optional timezone offset like `+01:00` or `Z`) or relative expressions (e.g., `+1year -12hours`, `now`)
+- `DateTime` always stores values without timezone (produces `LocalDateTime`). For timezone-aware storage, use the `Instant` input type instead.
+- `default` supports ISO 8601 format without timezone (`yyyy-MM-ddThh:mm`) or relative expressions (e.g., `+1year -12hours`, `now`)
+
+#### Instant Config
+
+```xml
+<input name="myinstant" type="Instant">
+  <label>My Instant</label>
+  <default>2025-06-15T12:00:00+01:00</default>
+</input>
+```
+
+- `Instant` stores date and time with timezone, producing an `Instant` value (e.g., `2025-06-15T11:00:00Z`).
+- `default` supports ISO 8601 format with timezone offset (`yyyy-MM-ddThh:mm±hh:mm` or `Z` suffix) or relative expressions (e.g., `+1year -12hours`, `now`)
 
 **Relative expression unit strings:**
 
@@ -324,15 +340,16 @@ A relative expression is one or more offsets (e.g., `+3days -2hours`). The keywo
 <input name="mycustomselector" type="CustomSelector">
   <label>My Custom Selector</label>
   <config>
-    <service>my-custom-selector</service>
+    <extension>my-extension</extension>
     <param value="genre">classic</param>
     <galleryMode>true</galleryMode>
   </config>
 </input>
 ```
 
-- `service` — name of a JavaScript service at `/resources/services/[name]/[name].js`; can reference another app with `com.myapp:servicename`
-- `param` — optional name-value parameters passed to the service as query params (repeatable)
+- `extension` — name of an extension that provides the options; can reference another app with `com.myapp:my-extension`
+- `service` — **Deprecated.** Name of a JavaScript service at `/resources/services/[name]/[name].js`. Use `extension` instead.
+- `param` — optional name-value parameters passed to the extension as query params (repeatable)
 - `galleryMode` — `true` displays options as a three-column image gallery
 
 #### CustomSelector Service Request
@@ -403,7 +420,7 @@ Each hit must have `id` and `displayName`. Optional fields: `description`, `icon
 ### Common Input Attributes
 
 ```xml
-<input name="fieldName" type="InputType">
+<input name="field_name" type="InputType">
   <label i18n="key">Display Label</label>        <!-- required -->
   <help-text>Explanation for editors</help-text>   <!-- optional -->
   <occurrences minimum="0" maximum="1"/>           <!-- optional; defaults 0..1 -->
@@ -413,6 +430,15 @@ Each hit must have `id` and `displayName`. Optional fields: `description`, `icon
   </config>
 </input>
 ```
+
+> **Naming convention:** Use `snake_case` (lowercase with underscores) for all `name` attributes. Capital letters are flattened during indexing, which can cause unexpected query behavior. The `snake_case` convention also produces clean field names in the GraphQL API.
+>
+> ```xml
+> <!-- Recommended -->
+> <input name="my_field_name" type="TextLine">
+> <!-- Avoid — capitals are flattened in the index -->
+> <input name="myFieldName" type="TextLine">
+> ```
 
 **Occurrences rules:**
 - `minimum="0"` — field is optional
@@ -747,10 +773,10 @@ Field sets do **not** need a `name` attribute since they are only visual and do 
 
 ## Documentation Links
 
-- Content Types: https://developer.enonic.com/docs/xp/7.x/cms/content-types
-- Input Types: https://developer.enonic.com/docs/xp/7.x/cms/schemas/input-types
-- Option Sets: https://developer.enonic.com/docs/xp/7.x/cms/schemas/option-set
-- Item Sets: https://developer.enonic.com/docs/xp/7.x/cms/schemas/item-set
-- Mixins: https://developer.enonic.com/docs/xp/7.x/cms/schemas/mixins
-- X-Data: https://developer.enonic.com/docs/xp/7.x/cms/x-data
-- Schema System: https://developer.enonic.com/docs/xp/7.x/cms/schemas
+- Content Types: https://developer.enonic.com/docs/cms/stable/content/content-types
+- Input Types (Form Items): https://developer.enonic.com/docs/cms/stable/schemas/form-items
+- Option Sets: https://developer.enonic.com/docs/cms/stable/schemas/form-items/option-set
+- Item Sets: https://developer.enonic.com/docs/cms/stable/schemas/form-items/item-set
+- Mixins: https://developer.enonic.com/docs/cms/stable/content/mixins
+- Schema System: https://developer.enonic.com/docs/cms/stable/schemas
+- Source (GitHub): https://github.com/enonic/doc-cms

@@ -5,6 +5,7 @@
     xsi:schemaLocation="urn:enonic:xp:model:1.0 https://raw.githubusercontent.com/enonic/xp/master/modules/core/core-api/src/main/resources/META-INF/xsd/model.xsd">
   <display-name>DISPLAY_NAME</display-name>
   <description>DESCRIPTION</description>
+  <!-- <display-name-expression>${field_one} ${field_two}</display-name-expression> -->
   <super-type>base:structured</super-type>
   <is-abstract>false</is-abstract>
   <is-final>true</is-final>

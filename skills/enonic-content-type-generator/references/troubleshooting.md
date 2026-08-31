@@ -51,6 +51,7 @@
 - `RadioButton` (not `radiobutton`)
 - `CheckBox` (not `checkbox`)
 - `DateTime` (not `datetime` or `Datetime`)
+- `Instant` (not `instant`)
 - `GeoPoint` (not `geopoint`)
 - `AttachmentUploader` (not `attachmentuploader`)
 - `MediaSelector` (not `mediaselector`)
@@ -116,11 +117,12 @@ The directory name and file name (without `.xml`) must match exactly.
 
 **Symptom:** DateTime values lose timezone information when saved, or API returns `LocalDateTime` instead of `Instant`.
 
-**Fix:** By default DateTime stores values without timezone. Add `<timezone>true</timezone>` in the config to store timezone-aware values:
+**Fix:** `DateTime` always stores values without timezone (as `LocalDateTime`). If you need timezone-aware storage, use the `Instant` input type instead:
 ```xml
-<config>
-  <timezone>true</timezone>
-</config>
+<input name="published_at" type="Instant">
+  <label>Published At</label>
+  <occurrences minimum="1" maximum="1"/>
+</input>
 ```
 
 ### ImageSelector `allowContentType` Ignored
