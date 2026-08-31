@@ -432,24 +432,3 @@ Fetch content matching any of several category values using `in` with `stringVal
 }
 ```
 
-## 15. Scaled Image URL for Media Content
-
-Query image content and generate a scaled, absolute URL:
-
-```graphql
-{
-  guillotine {
-    queryDsl(query: {
-      term: {
-        field: "type"
-        value: { string: "media:image" }
-      }
-    }, first: 10) {
-      displayName
-      ... on media_Image {
-        imageUrl(scale: "block(800,200)", type: absolute)
-      }
-    }
-  }
-}
-```

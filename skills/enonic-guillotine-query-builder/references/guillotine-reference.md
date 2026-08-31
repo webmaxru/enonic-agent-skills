@@ -3,7 +3,7 @@
 Condensed reference for composing Guillotine queries against Enonic XP.
 Source: https://developer.enonic.com/docs/guillotine/stable
 
-Guillotine 7.x is the current stable release (requires XP 7.14.0+).
+Guillotine 8.x is the current stable release (requires XP 8.0.0+). Guillotine 7.x requires XP 7.14.0+.
 
 ## Entry Point
 

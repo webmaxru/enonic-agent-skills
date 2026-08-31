@@ -79,6 +79,15 @@ queryDsl(
 | Custom field not appearing | In Guillotine 7, use `exports.extensions` in `guillotine/guillotine.js`. For 6.x, verify the `creationCallbacks` key matches the exact generated type name. Use Query Playground introspection to confirm. |
 | Type not found in dictionary | Ensure `context.dictionary` is passed to `createSchema` (6.x only). In Guillotine 7, types are registered through the Extensions API. |
 
+## Guillotine 8 Migration Issues
+
+| Symptom | Fix |
+|---|---|
+| Guillotine app fails on XP 8 | Upgrade to Guillotine 8.0.0+ which is compatible with XP 8. Guillotine 7.x does not support XP 8. |
+| `cors.enabled` config no longer works | In Guillotine 8, CORS is enabled by configuring `cors.origin`. Omit `cors.origin` to disable CORS. The `cors.enabled` property is removed. |
+| `query` / `queryConnection` fields not found | These deprecated fields are fully removed in Guillotine 8. Migrate to `queryDsl` / `queryDslConnection` with DSL syntax. See `references/compatibility.md`. |
+| Query Playground not accessible | Configure `queryplayground.ui.mode=on` in `com.enonic.app.guillotine.cfg`. Default is `on` for SDK, `off` for server distributions. |
+
 ## Guillotine 7 Migration Issues
 
 | Symptom | Fix |
@@ -92,7 +101,7 @@ queryDsl(
 
 | Symptom | Fix |
 |---|---|
-| Cross-origin request blocked | CORS is enabled by default in Guillotine 7.2.0+. Verify `cors.enabled=true` in `com.enonic.app.guillotine.cfg`. Set `cors.origin` to the allowed origins if needed. |
+| Cross-origin request blocked | In Guillotine 8+, configure `cors.origin` in `com.enonic.app.guillotine.cfg` (supports `*`, literal origins, and `~`-prefixed regex patterns). In Guillotine 7.2.0+, verify `cors.enabled=true`. |
 | Query rejected with token limit error | The query exceeds `maxQueryTokens` (default `15000`, configurable in v7.3.0+). Simplify the query or increase the limit in `com.enonic.app.guillotine.cfg`. |
 
 ## Debugging Steps
