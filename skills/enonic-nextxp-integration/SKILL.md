@@ -4,7 +4,7 @@ description: Guides setup, development, and troubleshooting of the Next.js and E
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.5"
+  version: "1.6"
 ---
 
 # Next.js + Enonic XP Headless Integration (Next.XP)
@@ -27,8 +27,8 @@ metadata:
    - `ENONIC_API` — base URL for the Guillotine API endpoint (e.g., `http://127.0.0.1:8080/site/`).
 3. Install the `@enonic/nextjs-adapter` package if not already present: `npm install @enonic/nextjs-adapter`.
 4. Import `@enonic/nextjs-adapter/baseMappings` at the top of `src/components/_mappings.ts` to register built-in component renderers.
-5. Verify the Next.js project was scaffolded from the `nextxp-template` or contains the expected file structure: `src/components/_mappings.ts`, `src/app/[locale]/[[...contentPath]]/page.tsx`, and API routes under `src/app/api/`.
-6. Read `references/compatibility.md` to confirm version requirements between `@enonic/nextjs-adapter` (v4.x), Next.js (16+), React (19), and Enonic XP.
+5. Verify the Next.js project was scaffolded from `starter-nextjs` or contains the expected file structure: `src/components/_mappings.ts`, `src/app/[locale]/[[...contentPath]]/page.tsx`, and API routes under `src/app/api/`.
+6. Read `references/compatibility.md` to confirm version requirements between `@enonic/nextjs-adapter` (v5.x), Next.js (16+), React (19), Node.js (24.15.0+), and Enonic XP (8.x).
 
 **Step 3: Map content types to React components**
 1. Read `references/nextxp-reference.md` for the component registry API and mapping patterns.
@@ -39,11 +39,11 @@ metadata:
    c. Create a React view component in `src/components/views/` that accepts `FetchContentResult` props and renders the fetched data. Use `RichTextView` from `@enonic/nextjs-adapter/views/RichTextView` for HTML area fields.
    d. Register both in `src/components/_mappings.ts` using `ComponentRegistry.addContentType()`.
 4. For page components (pages, parts, layouts):
-   a. Define the component XML in the Enonic app under `src/main/resources/site/pages/`, `parts/`, or `layouts/`.
+   a. Define the component in the Enonic app under `src/main/resources/cms/` using YAML schema format (Enonic XP 8).
    b. Create a corresponding React component in `src/components/pages/`, `parts/`, or `layouts/`. Use `LayoutProps` for layouts and the named `RegionView` export for individual region rendering.
    c. Register using `ComponentRegistry.addPage()`, `ComponentRegistry.addPart()`, or `ComponentRegistry.addLayout()`.
 5. For layouts, use `LayoutProps` type and `RegionView` (singular, named export) for individual regions instead of `RegionsView`.
-6. Use `APP_NAME` and `APP_NAME_UNDERSCORED` imports from `@enonic/nextjs-adapter` to keep content type references dynamic.
+6. Use `APP_NAME`, `APP_NAME_DASHED`, and `APP_NAME_UNDERSCORED` imports from `@enonic/nextjs-adapter` to keep content type references dynamic.
 
 **Step 4: Configure Guillotine data fetching**
 1. Read `references/nextxp-reference.md` for the Guillotine query structure and variable passing.
