@@ -2,7 +2,9 @@
 
 ## Project File Layout
 
-Controllers and descriptors live under `src/main/resources/site/`:
+Controllers and descriptors live under `src/main/resources/site/` (XP 7) or `src/main/resources/cms/` (XP 8+):
+
+### XP 7.x Layout
 
 ```
 src/main/resources/site/
@@ -23,9 +25,33 @@ src/main/resources/site/
 └── site.xml                       # Site descriptor (declares processors)
 ```
 
+### XP 8+ Layout
+
+```
+src/main/resources/cms/
+├── pages/
+│   └── <page-name>/
+│       ├── <page-name>.yaml       # Page descriptor (YAML)
+│       └── <page-name>.ts         # HTTP function (or .js)
+├── parts/
+│   └── <part-name>/
+│       ├── <part-name>.yaml       # Part descriptor (YAML)
+│       └── <part-name>.ts         # HTTP function (or .js)
+├── layouts/
+│   └── <layout-name>/
+│       ├── <layout-name>.yaml     # Layout descriptor (YAML)
+│       └── <layout-name>.ts       # HTTP function (or .js)
+├── processors/
+│   └── <processor-name>.ts        # Response processor
+├── cms.yaml                       # CMS descriptor (mixins, app-level form)
+└── site.yaml                      # Site descriptor (mappings, processors, APIs)
+```
+
 ## HTTP Handler Conventions
 
-Controllers export named functions matching HTTP methods:
+Controllers export named functions matching HTTP methods.
+
+### XP 7.x (lowercase exports)
 
 ```ts
 // TypeScript style
@@ -37,10 +63,27 @@ export function patch(req: Request): Response { ... }  // XP 7.15+
 
 ```js
 // JavaScript (CommonJS) style
+var lib = require('/lib/xp/portal');
 exports.get = function (req) { ... };
 exports.post = function (req) { ... };
 exports.delete = function (req) { ... };
 exports.patch = function (req) { ... };  // XP 7.15+
+```
+
+### XP 8+ (uppercase exports)
+
+```ts
+// TypeScript style
+export function GET(req: Request): Response { ... }
+export function POST(req: Request): Response { ... }
+export function DELETE(req: Request): Response { ... }
+export function PATCH(req: Request): Response { ... }
+```
+
+```js
+// JavaScript (CommonJS) style
+exports.GET = function (req) { ... };
+exports.POST = function (req) { ... };
 ```
 
 A special `all` export handles any HTTP method not explicitly declared.
@@ -78,6 +121,13 @@ export function get(req) {
 | `cookies` | object | HTTP request cookies |
 
 Since XP 7.12, the request object also exposes `getHeader(name)` — a case-insensitive header lookup function. Prefer it over accessing `headers` directly. Note: modifying the `headers` object does not affect the result of `getHeader(name)` calls.
+
+**Additional properties in XP 8+:**
+
+| Property | Type | Description |
+|---|---|---|
+| `contentPath` | string | Site service: path of the content being rendered. Assigning it in a site mapping filter re-routes rendering to another content. |
+| `locales` | string[] | Locale strings from `Accept-Language` header in decreasing preference order. Falls back to server default locale if the header is absent. |
 
 ### Response Object Properties
 
@@ -267,6 +317,8 @@ Duplicate contributions are automatically removed during the merge step. If the 
 
 ## Response Processors
 
+### XP 7.x
+
 Place controller files at: `src/main/resources/site/processors/<name>.js`
 
 Export `responseProcessor`:
@@ -295,7 +347,32 @@ Register in `site.xml`:
 </site>
 ```
 
-## XML Descriptor Reference
+### XP 8+
+
+Place files at: `src/main/resources/cms/processors/<name>.ts`
+
+```ts
+exports.responseProcessor = (req, res) => {
+  const trackingScript = '<script src="https://cdn.example.com/tracker.js"></script>';
+  if (!res.pageContributions.bodyEnd) {
+    res.pageContributions.bodyEnd = [];
+  }
+  res.pageContributions.bodyEnd.push(trackingScript);
+  return res;
+};
+```
+
+Register in `cms/site.yaml`:
+```yaml
+kind: "Site"
+processors:
+  - name: "tracker"
+    order: 10
+```
+
+**XP 8.1+:** Components can pass data to processors via custom context attributes. A part calls `context.setCustomLocalAttribute('com.example.myapp.needsLib', true)` (from `lib-context`), and the processor reads it back from `context.get().attributes['custom.com.example.myapp.needsLib']`. This is the supported way to conditionally load assets only on pages that use them.
+
+## XML Descriptor Reference (XP 7.x)
 
 ### Page Descriptor
 
@@ -343,3 +420,52 @@ The `i18n` attribute on `<display-name>` is optional and specifies a localizatio
 ### Form Schema Elements
 
 Common input types for component forms: `TextLine`, `TextArea`, `HtmlArea`, `ImageSelector`, `ContentSelector`, `CheckBox`, `ComboBox`, `Date`, `DateTime`, `Long`, `Double`.
+
+## YAML Descriptor Reference (XP 8+)
+
+In XP 8, all descriptors use YAML. The folder is `src/main/resources/cms/` instead of `site/`. Each descriptor has a `kind:` field.
+
+### Page Descriptor
+
+```yaml
+kind: "Page"
+title: "My Page"
+description: "Front page"
+form: []
+regions:
+  - name: "main"
+```
+
+### Part Descriptor
+
+```yaml
+kind: "Part"
+title: "My Part"
+description: "Displays a hero banner"
+form:
+  - name: "heading"
+    type: "TextLine"
+    label: "Heading"
+    occurrences:
+      min: 1
+      max: 1
+```
+
+Note: In YAML descriptors, `occurrences` uses `min`/`max`. The runtime JSON (from `lib-content` `getType()`) still uses `minimum`/`maximum`.
+
+### Layout Descriptor
+
+```yaml
+kind: "Layout"
+title: "Two Column Layout"
+form: []
+regions:
+  - name: "left"
+  - name: "right"
+```
+
+### Form Items
+
+Common form item types (same in both versions): `TextLine`, `TextArea`, `HtmlArea`, `ImageSelector`, `ContentSelector`, `CheckBox`, `ComboBox`, `Date`, `DateTime`, `Long`, `Double`. In YAML, input-specific settings sit directly on the item (no `<config>` wrapper).
+
+Source: https://developer.enonic.com/docs/code/stable/schemas, https://developer.enonic.com/docs/cms/xp8/schemas/form-items
