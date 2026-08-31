@@ -23,7 +23,7 @@ A typical blog post with title, author reference, publish date, rich-text body, 
         <allowContentType>${app}:author</allowContentType>
       </config>
     </input>
-    <input name="publishDate" type="DateTime">
+    <input name="publish_date" type="Instant">
       <label>Publish Date</label>
       <occurrences minimum="1" maximum="1"/>
     </input>
@@ -35,7 +35,7 @@ A typical blog post with title, author reference, publish date, rich-text body, 
       <label>Tags</label>
       <occurrences minimum="0" maximum="0"/>
     </input>
-    <input name="featuredImage" type="ImageSelector">
+    <input name="featured_image" type="ImageSelector">
       <label>Featured Image</label>
       <occurrences minimum="0" maximum="1"/>
     </input>
