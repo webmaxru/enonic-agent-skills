@@ -23,6 +23,7 @@ import contentLib from '/lib/xp/content';
 | `contentLib.get()` | Fetch a single content item (supports `versionId` for historical versions) |
 | `contentLib.getChildren()` | Fetch children with pagination |
 | `contentLib.getOutboundDependencies()` | List outbound content references by key (XP 7.2+) |
+| `contentLib.duplicate()` | Duplicate content with optional reparenting and variant support (XP 7.12+) |
 | `contentLib.archive()` | Archive content (XP 7.8+) |
 | `contentLib.restore()` | Restore archived content (XP 7.8+) |
 
@@ -94,6 +95,19 @@ contentLib.publish({
     to: '2025-12-31T23:59:59Z'
   }
 });
+```
+
+### Duplicate Pattern (XP 7.12+)
+
+```typescript
+contentLib.duplicate({
+  contentId: 'content-id',
+  includeChildren: true,          // Duplicate descendants (default: true; ignored if variant=true)
+  variant: false,                 // Create as variant (default: false)
+  parent: '/new-parent-path',     // Optional: reparent the duplicate
+  name: 'new-name'                // Optional: rename the duplicate
+});
+// Returns: { contentName, sourceContentPath, duplicatedContents }
 ```
 
 ## Node API (lib-node) Quick Reference
@@ -206,6 +220,64 @@ data.category LIKE "*"          // exists
 publish.first NOT LIKE "*"      // does not exist
 ```
 
+### Query DSL (JSON format, XP 7.9+)
+
+As an alternative to NoQL strings, queries can be expressed as JSON DSL objects:
+
+```typescript
+// Boolean query with term and range
+contentLib.query({
+  count: 50,
+  query: {
+    boolean: {
+      must: [
+        { term: { field: 'type', value: 'com.example.myapp:article' } },
+        { range: { field: 'modifiedTime', gt: '2024-01-01T00:00:00Z', type: 'dateTime' } }
+      ]
+    }
+  },
+  sort: { field: 'modifiedTime', direction: 'DESC' }
+});
+
+// Exists expression (XP 7.11+)
+contentLib.query({
+  count: 50,
+  query: {
+    exists: { field: 'data.category' }
+  }
+});
+
+// Boolean with non-scoring filter (XP 7.11+)
+contentLib.query({
+  count: 50,
+  query: {
+    boolean: {
+      must: { fulltext: { fields: 'data.body', query: 'migration guide', operator: 'AND' } },
+      filter: { term: { field: 'type', value: 'com.example.myapp:article' } }
+    }
+  }
+});
+```
+
+### Sort DSL (JSON format, XP 7.9+)
+
+```typescript
+// Single field sort
+contentLib.query({
+  query: "type = 'app:article'",
+  sort: { field: 'modifiedTime', direction: 'DESC' }
+});
+
+// Multiple sort criteria
+contentLib.query({
+  query: "type = 'app:article'",
+  sort: [
+    { field: 'data.priority', direction: 'DESC' },
+    { field: '_name', direction: 'ASC' }
+  ]
+});
+```
+
 ### Sort Expressions
 
 ```
@@ -272,6 +344,24 @@ aggregations: {
     }
   }
 }
+```
+
+### Min / Max / Value Count Aggregations (XP 7.7+)
+
+```typescript
+aggregations: {
+  minPrice: {
+    min: { field: 'data.price' }
+  },
+  maxPrice: {
+    max: { field: 'data.price' }
+  },
+  uniqueCategories: {
+    valueCount: { field: 'data.category' }
+  }
+}
+// min/max return: { value }
+// valueCount returns: { value } (number of values)
 ```
 
 ### Nested Aggregation (terms + sub-aggregation)
