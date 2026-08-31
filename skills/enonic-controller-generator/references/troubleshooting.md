@@ -67,3 +67,22 @@
    - Fix: Ensure `<input name="heading">` in the XML matches `config.heading` in the controller.
 2. The form field has `minimum="0"` and the editor did not fill it in.
    - Fix: Add a null check or default: `config.heading || 'Default Heading'`.
+
+## XP 7 → 8 Migration Issues
+
+**Symptoms:** Controllers that worked on XP 7 fail on XP 8.
+
+**Common causes:**
+
+1. Files are still under `src/main/resources/site/` instead of `src/main/resources/cms/`.
+   - Fix: Move all component directories to the `cms/` folder.
+2. Descriptors are still XML (`.xml`) instead of YAML (`.yaml`).
+   - Fix: Rewrite descriptors in YAML. Use `kind:` field (`"Page"`, `"Part"`, `"Layout"`). Replace `<display-name>` with `title:`. Use `min`/`max` in occurrences instead of `minimum`/`maximum`.
+3. HTTP method exports are lowercase (`exports.get`) instead of uppercase (`exports.GET`).
+   - Fix: Rename all method exports to uppercase: `GET`, `POST`, `DELETE`, `PATCH`, etc.
+4. `site.xml` still references processors or site config.
+   - Fix: Split into `cms/site.yaml` (for mappings, processors, APIs) and `cms/cms.yaml` (for mixins and app-level form). Use YAML syntax with `kind: "Site"` and `kind: "CMS"`.
+5. Code references "mixins" meaning reusable form pieces.
+   - Fix: In XP 8, reusable form pieces are called "form fragments". The term "mixin" now refers to what XP 7 called "x-data".
+
+Source: https://developer.enonic.com/docs/xp/stable/release (XP 8 release notes), https://developer.enonic.com/docs/code/stable/upgrade
