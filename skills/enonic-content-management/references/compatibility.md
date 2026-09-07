@@ -30,6 +30,21 @@
 | `contextLib.run()` `attributes` | 7.8 | Custom attributes in run context |
 | `repo.getCommit()` | 7.7 | Get commit info for a node version commit |
 | `multiRepoConnect()` | 7.0 | Connect to multiple repositories for cross-repo queries |
+| `contentLib.query()` `parent` / `recursive` | 8.1 | Restrict query to children/descendants of a given content; replaces `getChildren()` |
+| `contentLib.query()` `returns` | 8.1 | Control hit shape: `'contents'` (default), `'ids'`, or a list of field names — avoids reading full content |
+| `contentLib.update()` (renamed `modify`) | 8.0 | `modify()` still exported for backward compatibility |
+| `contentLib.deleteContent()` (renamed `delete`) | 8.0 | `delete()` still exported for backward compatibility |
+| `contentLib.patch()` | 8.0 | Low-level multi-branch content patching; restricted to `admin`/`cms.admin` roles |
+| `contentLib.getChildren()` deprecated | 8.1 | Use `contentLib.query()` with `parent` instead |
+| `contentLib.publish()` `excludeDescendantsOf` | 8.0 | Replaces deprecated `excludeChildrenIds`; adds `message` parameter |
+| `contentLib.publish()` removes `sourceBranch`/`targetBranch` | 8.0 | Parameters removed entirely (were ignored since 7.12) |
+| `repo.query()` `parent` / `recursive` / `returns` | 8.1 | Same as content query; replaces `findChildren()` |
+| `repo.findChildren()` deprecated | 8.1 | Use `repo.query()` with `parent` instead |
+| `taskLib.executeFunction()` deprecated | 8.1 | Use `taskLib.submitTask()` with named tasks instead. Unsupported on GraalJS |
+| `exportLib.exportNodes()` `batchSize` deprecated | 8.1 | Parameter ignored — exports read one version at a time |
+| `exportLib.importNodes()` `nodeSkipped` callback | 8.0 | Reports skipped nodes during import |
+| `exportLib.importNodes()` `versionAttributes` | 8.0 | Attributes attached to every imported node version |
+| `exportLib.list()` | 8.0 | Lists available node exports |
 
 ## Branch Handling
 

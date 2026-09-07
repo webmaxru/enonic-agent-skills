@@ -26,7 +26,7 @@ metadata:
 
 **Step 2: Select the API layer and context**
 1. Read `references/migration-reference.md` for query DSL patterns, batch processing strategies, and branch handling rules.
-2. Choose `lib-content` when the operation works with CMS content and needs publish/unpublish, content-type validation, and the content domain abstraction.
+2. Choose `lib-content` when the operation works with CMS content and needs publish/unpublish, content-type validation, and the content domain abstraction. On XP 8.0+, use `update()` instead of `modify()` and `deleteContent()` instead of `delete()` (old names still work for backward compatibility).
 3. Choose `lib-node` when the operation needs low-level node manipulation, custom repositories, or bypasses content-type validation for raw data migration.
 4. Determine the required context:
    - Use `lib-context` to run operations in `draft` branch for modifications and `master` branch for reading published content.
@@ -55,12 +55,13 @@ metadata:
 
 **Step 5: Handle branch operations and publishing**
 1. Run content modifications in the `draft` branch context.
-2. After modifications complete, publish changed items to `master` using `contentLib.publish()`. On XP < 7.12, pass `sourceBranch: 'draft'` and `targetBranch: 'master'`. On XP 7.12+, these parameters are ignored (publish always goes draft→master).
+2. After modifications complete, publish changed items to `master` using `contentLib.publish()`. On XP < 7.12, pass `sourceBranch: 'draft'` and `targetBranch: 'master'`. On XP 7.12+, these parameters are ignored (publish always goes draft→master). On XP 8.0+, these parameters are removed entirely.
 3. Set `includeDependencies: false` when publishing bulk-updated items to avoid unintended dependency publishing.
 4. For operations comparing draft and master state, use `repo.diff()` from `lib-node` with `target: 'master'` and `includeChildren: true`.
+5. On XP 8.0+, use `excludeDescendantsOf` instead of the deprecated `excludeChildrenIds`. Note that publishing is all-or-nothing: any item with `valid: false` or `workflow.state` other than `READY` aborts the entire batch.
 
 **Step 6: Wrap long-running operations in a task controller**
-1. Use `taskLib.executeFunction()` for inline task functions or `taskLib.submitTask()` for named task descriptors.
+1. Use `taskLib.executeFunction()` for inline task functions or `taskLib.submitTask()` for named task descriptors. On XP 8.1+, prefer `submitTask()` with named tasks — `executeFunction()` is deprecated and unsupported on the GraalJS engine.
 2. Report progress using `taskLib.progress({ info, current, total })` at regular intervals during batch processing.
 3. Read `assets/task-migration.template.ts` for the reusable task controller template with progress reporting.
 4. Check for existing running instances with `taskLib.isRunning()` before starting a duplicate operation.

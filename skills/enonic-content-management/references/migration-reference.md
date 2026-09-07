@@ -21,10 +21,11 @@ import contentLib from '/lib/xp/content';
 | `contentLib.unpublish()` | Remove content from master branch |
 | `contentLib.exists()` | Check if content exists at path or id |
 | `contentLib.get()` | Fetch a single content item (supports `versionId` for historical versions) |
-| `contentLib.getChildren()` | Fetch children with pagination |
+| `contentLib.getChildren()` | Fetch children with pagination. **Deprecated XP 8.1** — use `contentLib.query()` with `parent` instead |
 | `contentLib.getOutboundDependencies()` | List outbound content references by key (XP 7.2+) |
 | `contentLib.archive()` | Archive content (XP 7.8+) |
 | `contentLib.restore()` | Restore archived content (XP 7.8+) |
+| `contentLib.patch()` | Low-level multi-branch content patching (XP 8.0+). Restricted to `admin`/`cms.admin` roles |
 
 ### Query Parameters
 
@@ -37,7 +38,10 @@ contentLib.query({
   sort: '',          // Sort expression or DSL
   aggregations: {},  // Aggregation definitions
   contentTypes: [],  // Content type filter array
-  highlight: {}      // Highlighting config (field-level hit highlighting)
+  highlight: {},     // Highlighting config (field-level hit highlighting)
+  parent: '',        // Path or id — restrict to direct children (XP 8.1+)
+  recursive: false,  // true to match all descendants of parent (XP 8.1+)
+  returns: 'contents' // 'contents' (default), 'ids', or field name list (XP 8.1+)
 });
 ```
 
@@ -64,7 +68,9 @@ contentLib.create({
 });
 ```
 
-### Modify Pattern
+### Modify / Update Pattern
+
+> **XP 8.0+ rename:** `modify()` is renamed to `update()`. The old `modify` export is still available for backward compatibility. Use `update` in new code.
 
 ```typescript
 contentLib.modify({
@@ -80,15 +86,19 @@ contentLib.modify({
 
 ### Publish Pattern
 
-> **XP 7.12+ change:** `sourceBranch` and `targetBranch` are no longer in use. Publish always pushes from `draft` to `master`. These parameters are silently ignored on XP 7.12+. Keep them for backward compatibility with XP < 7.12.
+> **XP 7.12+ change:** `sourceBranch` and `targetBranch` are no longer in use. Publish always pushes from `draft` to `master`. These parameters are silently ignored on XP 7.12+ and removed entirely in XP 8.0.
+>
+> **XP 8.0 changes:** `excludeChildrenIds` is deprecated — use `excludeDescendantsOf` instead. New `message` parameter for publish messages. Publishing is all-or-nothing: if any item has `valid: false` or `workflow.state` other than `READY`, the entire publish is abandoned.
 
 ```typescript
 contentLib.publish({
   keys: ['/site/page1', 'content-id-2'],
-  sourceBranch: 'draft',              // Ignored on XP 7.12+
-  targetBranch: 'master',             // Ignored on XP 7.12+
+  sourceBranch: 'draft',              // Ignored on XP 7.12+; removed in XP 8.0
+  targetBranch: 'master',             // Ignored on XP 7.12+; removed in XP 8.0
   includeDependencies: false,          // Set false for bulk to avoid cascade
-  excludeChildrenIds: ['id-3'],        // Exclude descendants of specific items (XP 7.12+)
+  excludeChildrenIds: ['id-3'],        // Deprecated — use excludeDescendantsOf (XP 8.0+)
+  excludeDescendantsOf: ['id-3'],      // Exclude descendants of specific items (XP 8.0+)
+  message: 'Bulk update publish',      // Optional publish message (XP 8.0+)
   schedule: {                          // Optional scheduling
     from: new Date().toISOString(),
     to: '2025-12-31T23:59:59Z'
@@ -133,7 +143,7 @@ const multiRepo = multiRepoConnect({
 | `repo.diff()` | Compare node versions across branches |
 | `repo.exists()` | Check node existence |
 | `repo.get()` | Fetch nodes by id or path |
-| `repo.findChildren()` | Fetch children with pagination; supports `recursive` (XP 7.7+) and `countOnly` options |
+| `repo.findChildren()` | Fetch children with pagination; supports `recursive` (XP 7.7+) and `countOnly` options. **Deprecated XP 8.1** — use `repo.query()` with `parent` instead |
 | `repo.findVersions()` | Fetch version history of a node |
 | `repo.refresh()` | Refresh indices after bulk updates |
 
@@ -364,6 +374,8 @@ const published = contextLib.run({
 
 ### Inline Task with Progress
 
+> **XP 8.1 deprecation:** `executeFunction()` is deprecated and will be removed together with the Nashorn engine. Use named tasks with `submitTask()` instead. On GraalJS (preview engine in XP 8.1), `executeFunction()` is unsupported.
+
 ```typescript
 import { executeFunction, progress } from '/lib/xp/task';
 
@@ -424,6 +436,13 @@ For environment-level migration (moving content between XP instances), use the d
 import exportLib from '/lib/xp/export';
 ```
 
+### List Exports (XP 8.0+)
+
+```typescript
+const result = exportLib.list();
+// result.exports === [{ name: 'export-1' }, { name: 'export-2' }]
+```
+
 ### Export Nodes
 
 ```typescript
@@ -432,6 +451,7 @@ exportLib.exportNodes({
   exportName: 'my-export',
   includeNodeIds: true,
   includeVersions: false,
+  // batchSize: 100,          // Deprecated XP 8.1 — ignored
   nodeResolved: (count) => {
     log.info('Nodes to export: %s', count);
   },
@@ -453,13 +473,17 @@ exportLib.importNodes({
   xsltParams: { key: 'value' },  // Optional parameters for XSLT
   includeNodeIds: true,           // Preserve original IDs (default: false)
   includePermissions: true,       // Preserve permissions (default: false)
+  versionAttributes: {},          // Optional attributes attached to every imported node version (XP 8.0+)
   nodeResolved: (count) => {
     log.info('Nodes to import: %s', count);
   },
   nodeImported: (count) => {
     log.info('Imported so far: %s', count);
+  },
+  nodeSkipped: (count) => {       // XP 8.0+
+    log.info('Skipped so far: %s', count);
   }
 });
-// Returns: { addedNodes, updatedNodes, importedBinaries, importErrors }
+// Returns: { addedNodes, updatedNodes, skippedNodes, importedBinaries, importErrors }
 // importErrors entries contain: { exception, message, stacktrace }
 ```
