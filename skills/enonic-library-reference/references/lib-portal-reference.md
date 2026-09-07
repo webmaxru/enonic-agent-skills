@@ -7,6 +7,13 @@
 
 ## Functions
 
+### apiUrl
+
+Generates URL to a Universal API endpoint.
+
+**Parameters:** `{ api: string, application?: string, type?: string, params?: object }` — Input parameters.
+**Returns:** `string` — Generated URL.
+
 ### assetUrl
 
 Generates URL to a static file. *(Deprecated in XP 7.15.0 — use lib-asset or lib-static instead)*
@@ -20,6 +27,13 @@ Generates URL to an attachment. Uses `name` first, then `label` for lookup.
 
 **Parameters:** `{ id, name?, label?, download?, ... }` — Input parameters.
 **Returns:** `string` — Generated URL.
+
+### baseUrl
+
+Returns the base URL for the current site/content path. Useful for constructing URLs relative to the site root.
+
+**Parameters:** `{ id?: string, path?: string, type?: string }` — Input parameters.
+**Returns:** `string` — Generated base URL.
 
 ### componentUrl
 
@@ -170,7 +184,7 @@ Sanitizes an HTML string by stripping potentially unsafe tags and attributes. Us
 
 ### serviceUrl
 
-Generates URL to a service.
+Generates URL to a service. *(Deprecated in XP 8 — use `apiUrl` with Universal APIs instead. Retained for backward compatibility with legacy services.)*
 
 **Parameters:** `{ service: string, params?: object }` — Input parameters.
 **Returns:** `string` — Generated URL.

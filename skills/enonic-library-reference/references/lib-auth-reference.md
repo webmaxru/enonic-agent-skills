@@ -293,6 +293,28 @@ Removes members from a principal (group or role).
 
 **Returns:** void
 
+### createIdProvider
+
+Creates an ID provider.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| name | string | yes | ID provider name |
+| displayName | string | no | Display name |
+| description | string | no | Description |
+| idProviderConfig | object | no | ID provider configuration |
+| permissions | object[] | no | ID provider permissions |
+
+**Returns:** `object` — The created ID provider.
+
+### getIdProviders
+
+Returns all ID providers. No parameters.
+
+**Returns:** `object[]` — Array of ID provider objects.
+
 ## Type Definitions
 
 ### User

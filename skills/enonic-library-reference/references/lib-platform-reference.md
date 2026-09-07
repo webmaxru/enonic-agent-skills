@@ -51,6 +51,56 @@ Retrieves the URL to an administrative tool within an application.
 
 **Returns:** `string`
 
+### extensionUrl
+
+Returns the URL for an admin extension.
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| application | string | yes | Application key that provides the extension |
+| extension | string | yes | Name of the extension |
+| type | string | no | `server` (default) or `absolute` |
+| params | object | no | Custom query parameters |
+
+**Returns:** `string`
+
+### setTopic
+
+Sets the state of an admin events topic owned by this application. *(XP 8.1.0+)*
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| name | string | yes | Local topic name (1-255 chars, no `:`, no whitespace) |
+| allow | string/string[] | yes | Principal keys allowed to subscribe. Empty array clears registration |
+
+**Returns:** `string` — Canonical topic name (`<application-key>:<name>`).
+
+### sendToTopic
+
+Publishes a message to an admin events topic owned by this application. *(XP 8.1.0+)*
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| name | string | yes | Local topic name |
+| message | any | no | JSON-serializable data. Defaults to empty object |
+
+**Returns:** void
+
+### widgetUrl
+
+> **Deprecated** — use `extensionUrl` instead. Will be removed in future versions.
+
+Returns the URL for a widget. Equivalent to calling `extensionUrl` with `extension` set to the widget name.
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| application | string | yes | Application key |
+| widget | string | yes | Widget name |
+| type | string | no | `server` or `absolute` |
+| params | object | no | Custom query parameters |
+
+**Returns:** `string`
+
 ---
 
 ## lib-app

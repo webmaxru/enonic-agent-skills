@@ -116,3 +116,97 @@ Returns the number of sockets in a group. *(XP 7.6.0+)*
 | group | string | Group name |
 
 **Returns:** `number`
+
+---
+
+## lib-sse
+
+**Import:** `import sseLib from '/lib/xp/sse';`
+**Gradle:** `include "com.enonic.xp:lib-sse:${xpVersion}"`
+
+> Server-Sent Events functions. Unlike `lib-websocket`, every function in this library takes a single object parameter.
+
+### Message shape
+
+The `send` and `sendToGroup` functions accept a `message` object with these optional fields:
+
+| Name | Type | Description |
+|------|------|-------------|
+| event | string | Event name |
+| data | string | Event payload |
+| id | string | Event id for `Last-Event-ID` reconnection tracking |
+| comment | string | SSE comment line (ignored by clients, useful for keep-alive) |
+
+### send
+
+Sends a message to a specific SSE connection.
+
+| Name | Type | Description |
+|------|------|-------------|
+| params.clientId | string | Client id from the `open` event |
+| params.message | object | Message to send |
+
+**Returns:** void
+
+### sendToGroup
+
+Sends a message to all connections in a named group.
+
+| Name | Type | Description |
+|------|------|-------------|
+| params.group | string | Group name |
+| params.message | object | Message to send |
+
+**Returns:** void
+
+### close
+
+Closes an SSE connection.
+
+| Name | Type | Description |
+|------|------|-------------|
+| params.clientId | string | Client id |
+
+**Returns:** void
+
+### isOpen
+
+Checks whether an SSE connection is still open.
+
+| Name | Type | Description |
+|------|------|-------------|
+| params.clientId | string | Client id |
+
+**Returns:** `boolean`
+
+### addToGroup
+
+Adds a connection to a named group.
+
+| Name | Type | Description |
+|------|------|-------------|
+| params.group | string | Group name |
+| params.clientId | string | Client id |
+
+**Returns:** void
+
+### removeFromGroup
+
+Removes a connection from a named group.
+
+| Name | Type | Description |
+|------|------|-------------|
+| params.group | string | Group name |
+| params.clientId | string | Client id |
+
+**Returns:** void
+
+### getGroupSize
+
+Returns the number of connections in a group.
+
+| Name | Type | Description |
+|------|------|-------------|
+| params.group | string | Group name |
+
+**Returns:** `number`

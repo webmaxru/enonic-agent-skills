@@ -1,6 +1,6 @@
 ---
 name: enonic-library-reference
-description: Enonic XP server-side JavaScript/TypeScript API reference for all /lib/xp/* libraries. Provides function signatures, parameters, return types, and usage examples for lib-content, lib-node, lib-auth, lib-portal, lib-context, lib-event, lib-task, lib-repo, lib-io, lib-mail, lib-schema, lib-project, lib-export, lib-scheduler, lib-value, lib-i18n, lib-websocket, lib-admin, lib-app, lib-auditlog, lib-cluster, lib-common, lib-grid, and lib-vhost. Use when looking up Enonic XP library functions, parameter shapes, return types, or usage examples. Do not use for Guillotine GraphQL queries, content type schema definitions, Enonic CLI commands, or non-Enonic JavaScript APIs.
+description: Enonic XP server-side JavaScript/TypeScript API reference for all /lib/xp/* libraries. Provides function signatures, parameters, return types, and usage examples for lib-content, lib-node, lib-auth, lib-portal, lib-context, lib-event, lib-task, lib-repo, lib-io, lib-mail, lib-schema, lib-project, lib-export, lib-scheduler, lib-value, lib-i18n, lib-websocket, lib-sse, lib-admin, lib-app, lib-auditlog, lib-cluster, lib-common, lib-grid, and lib-vhost. Use when looking up Enonic XP library functions, parameter shapes, return types, or usage examples. Do not use for Guillotine GraphQL queries, content type schema definitions, Enonic CLI commands, or non-Enonic JavaScript APIs.
 license: MIT
 metadata:
   author: webmaxru
@@ -25,7 +25,7 @@ metadata:
    | lib-context, lib-event, lib-task | `references/lib-context-reference.md` |
    | lib-io, lib-mail, lib-repo, lib-schema | `references/lib-utilities-reference.md` |
    | lib-project, lib-export, lib-scheduler, lib-value | `references/lib-cms-reference.md` |
-   | lib-i18n, lib-websocket | `references/lib-web-reference.md` |
+   | lib-i18n, lib-websocket, lib-sse | `references/lib-web-reference.md` |
    | lib-admin, lib-app, lib-auditlog, lib-cluster, lib-common, lib-grid, lib-vhost | `references/lib-platform-reference.md` |
 
 3. If the query spans multiple libraries or asks for a usage pattern, read `references/examples.md`.

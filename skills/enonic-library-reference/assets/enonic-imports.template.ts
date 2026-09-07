@@ -52,6 +52,9 @@
 // WebSocket messaging
 // import webSocketLib from '/lib/xp/websocket';
 
+// Server-Sent Events
+// import sseLib from '/lib/xp/sse';
+
 // Admin tool URLs, locales, and metadata
 // import adminLib from '/lib/xp/admin';
 

@@ -46,6 +46,28 @@ Runs a function inside a custom context. Commonly used for accessing repositorie
 }
 ```
 
+### setCustomLocalAttribute
+
+Stores a value as a custom attribute in the local scope of the current context. *(XP 8.1.0+)*
+
+Useful for passing data between unrelated code within one request (e.g., page implementation to response processor). All custom attributes are stored with the `custom.` prefix and can be read via `get().attributes['custom.<name>']`.
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| name | string | Attribute name (stored as `custom.<name>`) |
+| value | any | JSON-like value to store. `null`/`undefined` removes the attribute |
+
+**Returns:** void
+
+```ts
+import {get, setCustomLocalAttribute} from '/lib/xp/context';
+
+setCustomLocalAttribute('my-data', {values: ['one', 'two']});
+const data = get().attributes['custom.my-data'];
+```
+
 ---
 
 ## lib-event
@@ -166,6 +188,8 @@ Pauses execution for the specified milliseconds. Only works inside a task.
 ### executeFunction
 
 Executes a function in the background. Returns immediately.
+
+> **Deprecated** as of XP 8.1.0 and will be removed together with the Nashorn engine. Submit a named task with `submitTask()` instead.
 
 **Parameters (object):**
 

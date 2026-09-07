@@ -184,6 +184,8 @@ Creates a branch.
 
 Deletes a repository.
 
+> **Note:** Renamed to `deleteRepo` in the latest docs to avoid the JavaScript reserved word. The old `delete` export is still available for backward compatibility.
+
 **Parameters:**
 
 | Name | Type | Description |
@@ -224,6 +226,32 @@ Retrieves a repository.
 Retrieves all repositories.
 
 **Returns:** `object[]` — Array of `{ id, branches[], settings }`.
+
+### modify
+
+Updates a repository.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| id | string | yes | Repository ID |
+| editor | function | yes | Editor callback. Receives the current repository and must return the modified repository |
+
+**Returns:** `object` — The updated repository.
+
+### getBinary
+
+Returns a data stream for a repository attachment.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| repoId | string | yes | Repository ID |
+| binaryReference | string | yes | Reference to the binary |
+
+**Returns:** `stream` — Binary data stream.
 
 ### refresh
 

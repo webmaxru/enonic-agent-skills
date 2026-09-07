@@ -26,11 +26,13 @@ Creates a new Content Project.
 | id | string | yes | Unique project id (alphanumeric and hyphens) |
 | displayName | string | yes | Project display name |
 | parent | string | no | Parent project id for Content Layer inheritance *(XP 7.6.0+)* |
+| parents | string[] | no | Parent project ids for Content Layer inheritance (replaces `parent` in latest docs) |
 | description | string | no | Project description |
 | language | string | no | Default project language |
 | siteConfig | object[] | no | Applications with optional configurations |
 | permissions | object | no | Project permissions by role (`owner`, `editor`, `author`, `contributor`, `viewer`) → principal arrays |
 | readAccess | object | no | Read access settings with a `public` boolean property |
+| publicRead | boolean | no | `true` to grant READ to `system.everyone` (replaces `readAccess` in latest docs) |
 
 **Returns:** `object` — The created Content Project.
 
@@ -56,23 +58,24 @@ Returns all Content Projects accessible to the current user. No parameters.
 
 ### modify
 
-Modifies an existing Content Project.
+Modifies an existing Content Project. Uses an `editor` callback function.
 
 **Parameters (object):**
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | id | string | yes | Unique project identifier |
-| displayName | string | no | Project display name |
-| description | string | no | Project description |
-| language | string | no | Default project language |
-| siteConfig | object[] | no | Applications with optional configurations |
+| editor | function | yes | Editor callback receiving the current project; mutates and returns it |
+
+> **Note:** In the latest docs, `modify` uses an `editor` callback pattern instead of flat field parameters. The editor receives the current project and returns the modified version.
 
 **Returns:** `object` — The modified project.
 
 ### delete
 
 Deletes an existing Content Project and its repository with all data.
+
+> **Note:** Renamed to `deleteProject` in the latest docs to avoid the JavaScript reserved word. The old `delete` export is still available for backward compatibility.
 
 **Parameters (object):**
 
@@ -112,6 +115,8 @@ Removes permissions from an existing Content Project.
 
 Toggles public/private READ access for a Content Project.
 
+> **Note:** Renamed to `setPublicRead` in the latest docs.
+
 **Parameters (object):**
 
 | Name | Type | Required | Description |
@@ -120,6 +125,19 @@ Toggles public/private READ access for a Content Project.
 | readAccess | object | yes | Object with a `public` boolean property |
 
 **Returns:** `object` — `{ id, readAccess }` with the current state.
+
+### setPublicRead
+
+Toggles public/private READ access for a Content Project. Replaces `modifyReadAccess`.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| id | string | yes | Unique project identifier |
+| publicRead | boolean | yes | `true` to grant READ to `system.everyone` |
+
+**Returns:** `boolean` — Resulting public-read state.
 
 ### getAvailableApplications
 
@@ -178,6 +196,12 @@ Imports nodes from an export in the exports directory or from application resour
 
 **Returns:** `object` — `{ addedNodes[], updatedNodes[], importedBinaries[], importErrors[] }`.
 
+### list
+
+Lists the available node exports. No parameters.
+
+**Returns:** `object` — `{ exports: [{ name: string }] }` — names of all available exports.
+
 ---
 
 ## lib-scheduler
@@ -207,9 +231,10 @@ Creates a new scheduled job.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| value | string | yes | Schedule value (CRON expression, or ISO instant for `ONE_TIME`) |
-| type | string | yes | `CRON` or `ONE_TIME` |
+| value | string | yes | Schedule value (CRON expression, ISO instant for `ONE_TIME`, or ISO-8601 duration for `FIXED_RATE`) |
+| type | string | yes | `CRON`, `ONE_TIME`, or `FIXED_RATE` *(XP 8.1.0+)* |
 | timeZone | string | yes for CRON | Timezone identifier (e.g. `GMT+02:00`) |
+| deleteAfterRun | boolean | no | Whether the job deletes itself after running *(XP 8.1.0+, ONE_TIME only)* |
 
 **Returns:** `ScheduledJob` — The created job.
 
@@ -247,6 +272,8 @@ Updates an existing scheduled job.
 ### delete
 
 Removes a scheduled job.
+
+> **Note:** Renamed to `deleteJob` in the latest docs to avoid the JavaScript reserved word. The old `delete` export is still available for backward compatibility.
 
 **Parameters (object):**
 
