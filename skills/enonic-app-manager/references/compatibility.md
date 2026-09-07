@@ -4,6 +4,7 @@
 
 | CLI Feature | Minimum CLI Version | Notes |
 |-------------|-------------------|-------|
+| App list (`enonic app list`) | 4.1.0+ | Requires XP 7.6+; use `--json` for scripting |
 | Docker-backed sandboxes (`--image`) | 4.0.0+ | Requires `docker` on `$PATH` |
 | Cloud commands (`enonic cloud`) | 4.0.0+ | Login, app install to Enonic Cloud |
 | XP 8 dump/snapshot task APIs | 4.0.0+ | Use `--compat 7` for XP 7 servers |
