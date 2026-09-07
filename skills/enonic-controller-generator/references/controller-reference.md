@@ -132,8 +132,8 @@ dependencies {
 | `getSite()` | page, part, layout | Returns the parent site as JSON |
 | `getSiteConfig()` | page, part, layout | Returns the site config for the current app |
 | `assetUrl({path})` | any | Generates URL to a static asset — **deprecated in XP 7.15**, use `lib-asset` or `lib-static` instead (see lib-asset section below) |
-| `attachmentUrl({id, name})` | any | Generates URL to a content attachment |
-| `imageUrl({id, scale})` | any | Generates URL to an image |
+| `attachmentUrl({id, name?, label?, download?})` | any | Generates URL to a content attachment. Uses `name` first, then `label` for lookup. Set `download: true` to force download. |
+| `imageUrl({id, scale, filter?})` | any | Generates URL to an image. `filter` applies image filters (e.g., `rounded(5);sharpen()`). |
 | `pageUrl({path})` | any | Generates URL to a content page |
 | `componentUrl({component})` | any | Generates URL to a page component |
 | `serviceUrl({service})` | any | Generates URL to a service (type can be `server`, `absolute`, or `websocket`) |
@@ -343,3 +343,51 @@ The `i18n` attribute on `<display-name>` is optional and specifies a localizatio
 ### Form Schema Elements
 
 Common input types for component forms: `TextLine`, `TextArea`, `HtmlArea`, `ImageSelector`, `ContentSelector`, `CheckBox`, `ComboBox`, `Date`, `DateTime`, `Long`, `Double`.
+
+#### Input Configuration Options
+
+**TextLine / TextArea:**
+```xml
+<input name="phone" type="TextLine">
+  <label>Phone</label>
+  <config>
+    <max-length>20</max-length>
+    <show-counter>true</show-counter>
+    <regexp>\d{3}-\d{4}</regexp>
+  </config>
+</input>
+```
+- `max-length` — maximum allowed characters (default: unlimited)
+- `show-counter` — show text length counter (default: hidden)
+- `regexp` — regular expression for validation (TextLine only)
+
+**HtmlArea:**
+```xml
+<input name="body" type="HtmlArea">
+  <label>Body</label>
+  <config>
+    <exclude>*</exclude>
+    <include>Bold Italic | BulletedList NumberedList</include>
+    <allowHeadings>h2 h3</allowHeadings>
+  </config>
+</input>
+```
+- `exclude` — remove tools from toolbar (use `*` to remove all)
+- `include` — add tools to toolbar (separate with space, group with `|`)
+- `allowHeadings` — space-separated list of allowed heading tags (`h1` through `h6`; all allowed by default)
+
+**ContentSelector:**
+```xml
+<input name="article" type="ContentSelector">
+  <label>Article</label>
+  <config>
+    <allowContentType>${app}:article</allowContentType>
+    <allowPath>${site}/*</allowPath>
+    <treeMode>true</treeMode>
+  </config>
+</input>
+```
+- `allowContentType` — restrict selectable content types (repeatable; supports `${app}:name` shorthand)
+- `allowPath` — restrict content by path (repeatable; supports `${site}/*`, `./*`, `../*`)
+- `treeMode` — show content tree instead of flat list (default: `false`)
+- `hideToggleIcon` — hide the flat/tree toggle icon (default: `false`)
