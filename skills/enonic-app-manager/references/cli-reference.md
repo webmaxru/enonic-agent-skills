@@ -259,9 +259,16 @@ These commands require access to the XP management API (default: `localhost:4848
 
 ```
 enonic app install [--url <url>] [--file <path>] [--cred-file <path>] [--client-key <path>] [--client-cert <path>] [-f]
+enonic app list [--json] [--cred-file <path>] [--client-key <path>] [--client-cert <path>] [-f]
 enonic app start <app-key> [--cred-file <path>] [--client-key <path>] [--client-cert <path>] [-f]
 enonic app stop <app-key> [--cred-file <path>] [--client-key <path>] [--client-cert <path>] [-f]
 ```
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Print full application details as JSON instead of a table (for `app list`) |
+
+> **Note:** `enonic app list` requires XP 7.6 or later (CLI 4.1.0+). The table output goes to stdout and progress messages to stderr, so `enonic app list 2>/dev/null` gives a clean list for piping.
 
 ### System Info
 
