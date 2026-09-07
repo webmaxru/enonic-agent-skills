@@ -27,6 +27,7 @@ const GUILLOTINE_MARKERS = [
   "getChildrenConnection",
   "/lib/guillotine",
   "guillotineLib",
+  "Mixin_",
 ];
 
 const SCAN_EXTENSIONS = new Set([

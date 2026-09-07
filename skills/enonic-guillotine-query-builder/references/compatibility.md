@@ -2,7 +2,34 @@
 
 Version differences and migration notes between major Guillotine releases.
 
-## Guillotine 7.x (Current Stable)
+## Guillotine 8.x (Current Stable)
+
+Requires **XP 8.0.0** or higher. Guillotine 8 will **not** install on XP 7.x.
+
+### Key Changes from 7.x
+
+- **New Content fields**: `displayNameExpression`, `displayNameListExpression`, `displayNamePlaceholder`, `displayNamePlaceholderI18nKey`, `titleI18nKey`, `descriptionI18nKey` added to the Content type.
+- **ContentType `title` field**: New `title` field on `ContentType` replaces the deprecated `displayName` field. `displayName` is kept for backward compatibility but will be removed in a future release.
+- **`Long` input type fix**: Form items of type `Long` now return `Long` instead of `String`. Client code that parsed long values as strings must be updated.
+- **CORS rework**: `cors.enabled` property removed. CORS is now enabled by setting `cors.origin` and disabled when `cors.origin` is omitted. Multiple comma-separated origins, `*` wildcard, and `~`-prefixed regex patterns are supported. New `cors.exposedHeaders` option for `Access-Control-Expose-Headers`.
+- **XData type renaming**: Generated types for X-data configs renamed from `XData_*` to `Mixin_*` (e.g. `XData_base_gpsInfo_DataConfig` → `Mixin_base_gpsInfo_DataConfig`).
+
+### Breaking Changes in 8.0
+
+| Change | Impact | Migration |
+|---|---|---|
+| Requires XP 8.0.0+ | Will not install on XP 7.x | Upgrade XP to 8.0.0 first |
+| `hasChildren` removed | Field no longer exists on Content types | Use `children` or `childrenConnection` and check if result is empty |
+| `inheritsPermissions` removed | Field no longer exists on `Permissions` type | Remove from queries |
+| `contentDisplayNameScript` removed | Field no longer exists on `ContentType` | Remove from queries (always returned null) |
+| `ContentType.displayName` deprecated | Use `title` instead | Replace `displayName` with `title` on `ContentType` queries |
+| XData types renamed | `XData_*` → `Mixin_*` | Update inline fragments and `creationCallbacks` referencing old names |
+| `Long` returns `Long` not `String` | Client parsers expecting strings will break | Remove `parseInt`/`parseFloat` wrappers for Long fields |
+| CORS `cors.enabled` removed | CORS disabled unless `cors.origin` is set | Set `cors.origin` explicitly to enable CORS |
+| CORS `cors.methods` default changed | Default is now `GET, HEAD, POST` (was `POST, OPTIONS`) | Set explicitly if relying on old default |
+| CORS `cors.allowedHeaders` default changed | Reflects request headers when unset (was `Content-Type`) | Set explicitly to keep previous behavior |
+
+## Guillotine 7.x
 
 Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript to Java.
 
@@ -38,6 +65,12 @@ Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript
 ### Guillotine 7 Update 3
 
 - **`maxQueryTokens` config** (v7.3.0): Configurable maximum number of raw tokens the parser accepts per query. Defaults to `15000`. Set via `maxQueryTokens` in `com.enonic.app.guillotine.cfg`.
+
+### Guillotine 7.3.1 – 7.3.4
+
+- **v7.3.1**: Fixed execution failure when grammar tokens exceed `maxQueryTokens` limit.
+- **v7.3.2**: Fixed string index out of range error.
+- **v7.3.3 / v7.3.4**: GraphQL schema remains available even if content type schema generation fails, improving resilience.
 
 ## Guillotine 6.x
 
