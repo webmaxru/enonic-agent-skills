@@ -117,8 +117,8 @@ if (info) {
 ```typescript
 const result = contentLib.publish({
   keys: contentIds,
-  sourceBranch: 'draft',
-  targetBranch: 'master',
+  sourceBranch: 'draft',           // Ignored XP 7.12+; removed XP 8.0+
+  targetBranch: 'master',          // Ignored XP 7.12+; removed XP 8.0+
   includeDependencies: false
 });
 
@@ -126,6 +126,8 @@ if (result.failedContents.length > 0) {
   log.warning('Failed to publish: %s', JSON.stringify(result.failedContents));
 }
 ```
+
+> **XP 8.0+ note:** Publishing is all-or-nothing. If any item has `valid: false` or `workflow.state` other than `READY`, the entire publish is abandoned — `pushedContents` is empty, all ids land in `failedContents`, and no exception is thrown.
 
 ## Node Push Failures
 
