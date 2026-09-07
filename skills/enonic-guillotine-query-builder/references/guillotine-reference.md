@@ -3,7 +3,7 @@
 Condensed reference for composing Guillotine queries against Enonic XP.
 Source: https://developer.enonic.com/docs/guillotine/stable
 
-Guillotine 7.x is the current stable release (requires XP 7.14.0+).
+Guillotine 8.x is the current stable release (requires XP 8.0.0+). Guillotine 7.x (requires XP 7.14.0+) remains supported on XP 7.
 
 ## Entry Point
 
@@ -75,7 +75,7 @@ All content types share these fields. Custom content types add a `data` field.
 | `modifiedTime` | `String` | ISO datetime |
 | `language` | `String` | Language code |
 | `valid` | `Boolean` | Content validity |
-| `hasChildren` | `Boolean` | Has children |
+| `hasChildren` | `Boolean` | Has children (removed in Guillotine 8; use `children` or `childrenConnection` instead) |
 | `dataAsJson` | `JSON` | Raw data as JSON |
 | `xAsJson` | `JSON` | Extra data as JSON |
 | `pageAsJson(resolveTemplate: Boolean, resolveFragment: Boolean)` | `JSON` | Page specific information |
@@ -329,6 +329,8 @@ The `ContentType` type returned by `getType` and `getTypes` includes utility fie
 | `getInstances(offset, first, query, sort)` | `[Content]` | Contents of this type |
 | `getInstanceConnection(after, first, query, sort)` | `ContentConnection` | Contents of this type as a connection |
 | `formAsJson` | `JSON` | Content type form schema as JSON |
+| `title` | `String` | Content type title (Guillotine 8+; replaces deprecated `displayName`) |
+| `displayName` | `String` | Deprecated in Guillotine 8 — use `title` instead |
 
 ## Media Type URL Fields
 
