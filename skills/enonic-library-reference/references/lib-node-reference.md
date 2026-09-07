@@ -168,6 +168,8 @@ Fetches children of a node.
 
 Fetches versions of a node.
 
+> **Note:** Renamed to `getVersions` in the latest docs. The old `findVersions` export is still available for backward compatibility.
+
 **Parameters (object):**
 
 | Name | Type | Required | Default | Description |
@@ -230,6 +232,8 @@ Returns a node version commit. *(XP 7.7.0+)*
 ### modify
 
 Modifies a node.
+
+> **Note:** Renamed to `update` in the latest docs. The old `modify` export is still available for backward compatibility.
 
 **Parameters (object):**
 
@@ -316,6 +320,8 @@ Sets the active version of a node.
 
 Sets the order of a node's children.
 
+> **Note:** Renamed to `sort` in the latest docs. The old `setChildOrder` export is still available for backward compatibility.
+
 **Parameters (object):**
 
 | Name | Type | Description |
@@ -329,6 +335,8 @@ Sets the order of a node's children.
 
 Sets root node permissions and inheritance.
 
+> **Note:** Replaced by `applyPermissions` in the latest docs.
+
 **Parameters (object):**
 
 | Name | Type | Description |
@@ -337,6 +345,37 @@ Sets root node permissions and inheritance.
 | _inheritsPermissions | boolean | Inherit to children |
 
 **Returns:** `object` — Updated root node.
+
+### patch
+
+Patches node fields selectively without a full editor function. *(XP 7.14.0+)*
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or ID |
+| data | object | no | Fields to merge |
+| _indexConfig | object | no | Index config to merge |
+| _permissions | object | no | Permissions to merge |
+
+**Returns:** `object` — Patched node.
+
+### applyPermissions
+
+Sets permissions on a node and optionally its descendants.
+
+**Parameters (object):**
+
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| key | string | yes | | Path or ID |
+| permissions | object[] | no | | Array of permission entries |
+| inheritPermissions | boolean | no | false | Inherit permissions from parent |
+| overwriteChildPermissions | boolean | no | false | Overwrite child permissions |
+| scope | string | no | | Scope: SINGLE, CHILDREN, or TREE |
+
+**Returns:** `object` — Result with applied node keys.
 
 ## Type Definitions
 

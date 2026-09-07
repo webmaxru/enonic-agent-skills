@@ -85,6 +85,8 @@ Creates a media content.
 
 Modifies a media content.
 
+> **Note:** Renamed to `updateMedia` in the latest docs. The old `modifyMedia` export is still available for backward compatibility.
+
 **Parameters (object):**
 
 | Name | Type | Required | Description |
@@ -103,9 +105,11 @@ Modifies a media content.
 
 **Returns:** `object` — Modified media content.
 
-### delete
+### deleteContent
 
 Deletes a content. Published content is unpublished before deletion.
+
+> **Note:** Renamed from `delete` to `deleteContent` to avoid the JavaScript reserved word. The old `delete` export is still available for backward compatibility.
 
 **Parameters (object):**
 
@@ -268,6 +272,8 @@ Returns all registered content types.
 
 Modifies a content. Properties starting with `_` cannot be modified (use `move` to rename).
 
+> **Note:** Renamed to `update` in the latest docs. The old `modify` export is still available for backward compatibility.
+
 **Parameters (object):**
 
 | Name | Type | Required | Default | Description |
@@ -370,6 +376,8 @@ Restores a content from the archive. *(XP 7.8.0+)*
 
 Sets permissions on a content.
 
+> **Note:** Renamed to `applyPermissions` in the latest docs. The old `setPermissions` export is still available for backward compatibility.
+
 **Parameters (object):**
 
 | Name | Type | Required | Default | Description |
@@ -394,6 +402,74 @@ Unpublishes content from the master branch.
 | keys | string[] | yes | Content keys to unpublish |
 
 **Returns:** `string[]` — List with ids of unpublished contents.
+
+### getVersions
+
+Returns version history for a content.
+
+**Parameters (object):**
+
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| key | string | yes | | Path or id of the content |
+| start | number | no | 0 | Start index for paging |
+| count | number | no | 10 | Number of versions to fetch |
+
+**Returns:** `object` — `{ total, count, hits[] }` with `versionId`, `displayName`, `modifier`, `timestamp` per hit.
+
+### getActiveVersions
+
+Returns the active version of a content across branches.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or id of the content |
+
+**Returns:** `object[]` — Active version info per branch.
+
+### updateMetadata
+
+Updates metadata of a content without replacing the data field.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or id of the content |
+| editor | function | yes | Editor callback receiving current metadata |
+
+**Returns:** `object` — Updated content.
+
+### updateWorkflow
+
+Updates the workflow state of a content.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or id of the content |
+| workflow | object | yes | New workflow state |
+
+**Returns:** `object` — Updated content.
+
+### patch
+
+Patches content fields selectively without a full editor function. Merges the provided fields into the existing content.
+
+**Parameters (object):**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| key | string | yes | Path or id of the content |
+| data | object | no | Fields to merge into content data |
+| x | object | no | Extra data fields to merge |
+| workflow | object | no | Workflow state to set |
+| requireValid | boolean | no | Content must be valid after patch |
+
+**Returns:** `object` — Patched content.
 
 ## Type Definitions
 

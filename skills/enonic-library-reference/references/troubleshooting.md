@@ -124,3 +124,10 @@ modify({
 | getDefaultFromEmail | 7.14.1 |
 | assetUrl deprecated | 7.15.0 |
 | User.hasPassword | 7.15.0 |
+| lib-sse (Server-Sent Events) | 7.x |
+| executeFunction deprecated | 8.1.0 |
+| setCustomLocalAttribute (context) | 8.1.0 |
+| setTopic / sendToTopic (admin) | 8.1.0 |
+| scheduler FIXED_RATE type | 8.1.0 |
+| scheduler deleteAfterRun (ONE_TIME) | 8.1.0 |
+| serviceUrl deprecated | 8.0.0 |
