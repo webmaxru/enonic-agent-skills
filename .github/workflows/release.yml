@@ -49,23 +49,27 @@ jobs:
   release-preview:
     if: github.event_name == 'pull_request'
     permissions:
+      actions: write
       contents: write
+      issues: write
       pull-requests: read
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@main
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@webmaxru-automation-auto-release
     with:
       bump: auto
       dry_run: true
       debounce_minutes: 0
-      hub_ref: main
+      hub_ref: webmaxru-automation-auto-release
 
   release-publish:
     if: github.event_name != 'pull_request' && (github.event_name == 'workflow_dispatch' || vars.AUTO_RELEASE != 'false')
     permissions:
+      actions: write
       contents: write
+      issues: write
       pull-requests: read
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@main
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@webmaxru-automation-auto-release
     with:
       bump: ${{ inputs.bump || 'auto' }}
       dry_run: ${{ inputs.dry_run || false }}
       debounce_minutes: ${{ github.event_name == 'push' && 5 || inputs.debounce_minutes || 0 }}
-      hub_ref: main
+      hub_ref: webmaxru-automation-auto-release
