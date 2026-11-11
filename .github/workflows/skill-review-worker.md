@@ -15,7 +15,6 @@ permissions:
   pull-requests: read
 engine: copilot
 tools:
-  web-fetch:
   edit:
   bash:
     - node
