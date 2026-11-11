@@ -184,8 +184,9 @@ Submits a named task to be executed in the background.
 
 | Name | Type | Description |
 |------|------|-------------|
-| descriptor | string | Task descriptor (e.g., `job42` or `com.enonic.app.myapp:work`) |
-| config | object | Task configuration |
+| descriptor | string | Task descriptor, relative to the current app (e.g., `job42`) or fully qualified (`com.enonic.app.myapp:work`) |
+| name | string | Optional. Task name shown in task info; defaults to the descriptor name |
+| config | object | Optional. Task configuration; must match the schema in the task descriptor XML |
 
 **Returns:** `string` — Task id.
 
