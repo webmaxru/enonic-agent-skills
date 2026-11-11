@@ -19,8 +19,8 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-ship.yml@webmaxru-automation-auto-release
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-ship.yml@562d47231f750e1ea857591d83bda052a89098cb
     with:
-      hub_ref: webmaxru-automation-auto-release
+      hub_ref: 562d47231f750e1ea857591d83bda052a89098cb
       merge_method: squash
       release_workflow: release.yml

@@ -5,9 +5,9 @@ This repository calls the shared workflows maintained by [webmaxru/ai-native-dev
 ## Repository settings
 
 - `AUTO_SHIP`: set to `false` to disable review-approved skill-update merges; enabled when unset.
-- `AUTO_RELEASE`: set to `false` to disable push and scheduled releases; manual dispatch remains available. Enabled when unset.
+- `AUTO_RELEASE`: set to `false` to disable push, scheduled, and automatic post-ship releases; a manually dispatched release remains available. Enabled when unset.
 - `COPILOT_GITHUB_TOKEN`: required by the shared GH-AW worker. `secrets: inherit` was confirmed by Enonic test runs `43060261560` and `43060304822`; both reached agent execution before failing on the retired model below.
-- `GH_AW_MODEL_AGENT_COPILOT`: currently set to `claude-opus-4.6`; both the legacy local worker and current hub worker read this override. Cross-repo runs proved the model is retired, so keep the value until the hub model fix and legacy-worker removal are verified.
+- `GH_AW_MODEL_AGENT_COPILOT`: set to `auto`; the previous value `claude-opus-4.6` failed because the model is retired. Keep `auto` to match the shared worker while the legacy local workflow is retained for rollback.
 
 ## Enonic-specific notes
 

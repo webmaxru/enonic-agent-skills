@@ -33,6 +33,11 @@ on:
         required: false
         default: 0
         type: number
+      auto_ship:
+        description: Identifies automatic post-ship release dispatches
+        required: false
+        default: false
+        type: boolean
   pull_request:
     paths:
       - skills/**
@@ -53,23 +58,27 @@ jobs:
       contents: write
       issues: write
       pull-requests: read
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@webmaxru-automation-auto-release
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@562d47231f750e1ea857591d83bda052a89098cb
     with:
       bump: auto
       dry_run: true
       debounce_minutes: 0
-      hub_ref: webmaxru-automation-auto-release
+      hub_ref: 562d47231f750e1ea857591d83bda052a89098cb
 
   release-publish:
-    if: github.event_name != 'pull_request' && (github.event_name == 'workflow_dispatch' || vars.AUTO_RELEASE != 'false')
+    if: >-
+      (github.event_name == 'workflow_dispatch' &&
+      (!(inputs.auto_ship || github.actor == 'github-actions[bot]') || vars.AUTO_RELEASE != 'false')) ||
+      ((github.event_name == 'push' || github.event_name == 'schedule') &&
+      vars.AUTO_RELEASE != 'false')
     permissions:
       actions: write
       contents: write
       issues: write
       pull-requests: read
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@webmaxru-automation-auto-release
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@562d47231f750e1ea857591d83bda052a89098cb
     with:
       bump: ${{ inputs.bump || 'auto' }}
       dry_run: ${{ inputs.dry_run || false }}
       debounce_minutes: ${{ github.event_name == 'push' && 5 || inputs.debounce_minutes || 0 }}
-      hub_ref: webmaxru-automation-auto-release
+      hub_ref: 562d47231f750e1ea857591d83bda052a89098cb
