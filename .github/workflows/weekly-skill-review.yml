@@ -147,6 +147,9 @@ jobs:
        needs.ensure-skill-update-label.result == 'failure' ||
        needs.run-skill-update-prompts.result == 'failure' ||
        needs.supersede-skill-update-prs.result == 'failure')
+    concurrency:
+      group: skill-update-failure-${{ github.repository }}
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     permissions:
       issues: write
