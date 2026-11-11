@@ -75,6 +75,7 @@ jobs:
     permissions:
       actions: read
       contents: write
+      issues: write
       pull-requests: write
     uses: webmaxru/ai-native-dev/.github/workflows/skill-update-worker.lock.yml@webmaxru-automation-weekly-update-fix
     with:
