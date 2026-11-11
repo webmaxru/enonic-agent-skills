@@ -86,5 +86,6 @@ jobs:
     if: always()
     permissions:
       contents: write
+      issues: write
       pull-requests: write
     uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-update-supersede.yml@webmaxru-automation-weekly-update-fix
