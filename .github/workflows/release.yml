@@ -1,0 +1,71 @@
+name: Skill Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - skills/**
+      - .claude-plugin/plugin.json
+      - .github/plugin/plugin.json
+      - package.json
+  schedule:
+    - cron: "0 10 * * 1"
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Semver bump override
+        required: false
+        default: auto
+        type: choice
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+      dry_run:
+        description: Preview without committing or publishing
+        required: false
+        default: false
+        type: boolean
+      debounce_minutes:
+        description: Wait for related merges before releasing (0 disables)
+        required: false
+        default: 0
+        type: number
+  pull_request:
+    paths:
+      - skills/**
+      - .github/workflows/release.yml
+      - .claude-plugin/plugin.json
+      - .github/plugin/plugin.json
+      - package.json
+
+concurrency:
+  group: skill-release-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  release-preview:
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: write
+      pull-requests: read
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@main
+    with:
+      bump: auto
+      dry_run: true
+      debounce_minutes: 0
+      hub_ref: main
+
+  release-publish:
+    if: github.event_name != 'pull_request' && (github.event_name == 'workflow_dispatch' || vars.AUTO_RELEASE != 'false')
+    permissions:
+      contents: write
+      pull-requests: read
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@main
+    with:
+      bump: ${{ inputs.bump || 'auto' }}
+      dry_run: ${{ inputs.dry_run || false }}
+      debounce_minutes: ${{ github.event_name == 'push' && 5 || inputs.debounce_minutes || 0 }}
+      hub_ref: main

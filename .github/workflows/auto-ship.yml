@@ -1,0 +1,25 @@
+name: Auto Ship Approved Skill Updates
+
+on:
+  pull_request_review:
+    types:
+      - submitted
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auto-ship-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  ship-approved-skill-update:
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-ship.yml@main
+    with:
+      hub_ref: main
+      merge_method: squash
+      release_workflow: release.yml
