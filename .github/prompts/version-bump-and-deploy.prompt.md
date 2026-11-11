@@ -7,6 +7,8 @@ agent: "agent"
 
 Scan skills and saved prompts to detect whether a version bump is needed, perform it if so, commit, push, and deploy.
 
+CI now releases skill changes automatically after an approved skill-update PR is merged; use this prompt as the manual fallback.
+
 **Scope constraint:** Only scan the following two repository-root directories. Do NOT scan any other locations (e.g., `apm_modules/`, `.github/skills/`, `.github/prompts/`, or any nested skill/prompt directories elsewhere in the tree):
 
 - `/skills` — skill directories
