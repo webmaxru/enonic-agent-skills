@@ -58,17 +58,17 @@ jobs:
       contents: write
       issues: write
       pull-requests: read
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@cc1388ab79a680fec0607e9d27f0226c440ece45
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@406c8e08f20eb5b4642c714e8adf9f8e4d54acab
     with:
       bump: auto
       dry_run: true
       debounce_minutes: 0
-      hub_ref: cc1388ab79a680fec0607e9d27f0226c440ece45
+      hub_ref: 406c8e08f20eb5b4642c714e8adf9f8e4d54acab
 
   release-publish:
     if: >-
       (github.event_name == 'workflow_dispatch' &&
-      (!(inputs.auto_ship || github.actor == 'github-actions[bot]') || vars.AUTO_RELEASE != 'false')) ||
+      (!(inputs.auto_ship || github.event.sender.type != 'User') || vars.AUTO_RELEASE != 'false')) ||
       ((github.event_name == 'push' || github.event_name == 'schedule') &&
       vars.AUTO_RELEASE != 'false')
     permissions:
@@ -76,9 +76,9 @@ jobs:
       contents: write
       issues: write
       pull-requests: read
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@cc1388ab79a680fec0607e9d27f0226c440ece45
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@406c8e08f20eb5b4642c714e8adf9f8e4d54acab
     with:
       bump: ${{ inputs.bump || 'auto' }}
       dry_run: ${{ inputs.dry_run || false }}
       debounce_minutes: ${{ github.event_name == 'push' && 5 || inputs.debounce_minutes || 0 }}
-      hub_ref: cc1388ab79a680fec0607e9d27f0226c440ece45
+      hub_ref: 406c8e08f20eb5b4642c714e8adf9f8e4d54acab
