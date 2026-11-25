@@ -46,10 +46,6 @@ on:
       - .github/plugin/plugin.json
       - package.json
 
-concurrency:
-  group: skill-release-${{ github.repository }}
-  cancel-in-progress: false
-
 jobs:
   release-preview:
     if: github.event_name == 'pull_request'
