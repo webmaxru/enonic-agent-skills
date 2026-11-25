@@ -4,7 +4,7 @@ description: Enonic XP server-side JavaScript/TypeScript API reference for all /
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.4"
+  version: "1.5"
 ---
 
 # Enonic XP Server-Side Library Reference
