@@ -52,7 +52,7 @@ metadata:
 **Step 6: Wire async processing with lib-task (if applicable)**
 1. When event handling or webhook processing requires heavy or time-consuming work, wrap it in `executeFunction()` from lib-task.
 2. Report progress from long-running tasks using `progress()` to allow monitoring.
-3. Read `references/event-reference.md` for the task event lifecycle (`task.submitted`, `task.updated`, `task.finished`, `task.failed`).
+3. Read `references/event-reference.md` for the task event lifecycle (`task.submitted`, `task.updated`, `task.removed`, `task.finished`, `task.failed`).
 
 **Step 7: Validate the integration**
 1. Execute `node scripts/find-enonic-targets.mjs .` to confirm the project still resolves correctly.
