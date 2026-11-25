@@ -28,7 +28,7 @@ metadata:
 3. Install the `@enonic/nextjs-adapter` package if not already present: `npm install @enonic/nextjs-adapter`.
 4. Import `@enonic/nextjs-adapter/baseMappings` at the top of `src/components/_mappings.ts` to register built-in component renderers.
 5. Verify the Next.js project was scaffolded from the `nextxp-template` or contains the expected file structure: `src/components/_mappings.ts`, `src/app/[locale]/[[...contentPath]]/page.tsx`, and API routes under `src/app/api/`.
-6. Read `references/compatibility.md` to confirm version requirements between `@enonic/nextjs-adapter` (v4.x), Next.js (16+), React (19), and Enonic XP.
+6. Read `references/compatibility.md` to confirm version requirements between `@enonic/nextjs-adapter` (v6.x), Next.js (16+), React (19), and Enonic XP.
 
 **Step 3: Map content types to React components**
 1. Read `references/nextxp-reference.md` for the component registry API and mapping patterns.
