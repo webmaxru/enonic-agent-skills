@@ -46,10 +46,6 @@ on:
       - .github/plugin/plugin.json
       - package.json
 
-concurrency:
-  group: skill-release-${{ github.repository }}
-  cancel-in-progress: false
-
 jobs:
   release-preview:
     if: github.event_name == 'pull_request'
@@ -58,12 +54,12 @@ jobs:
       contents: write
       issues: write
       pull-requests: read
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@406c8e08f20eb5b4642c714e8adf9f8e4d54acab
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@main
     with:
       bump: auto
       dry_run: true
       debounce_minutes: 0
-      hub_ref: 406c8e08f20eb5b4642c714e8adf9f8e4d54acab
+      hub_ref: main
 
   release-publish:
     if: >-
@@ -76,9 +72,9 @@ jobs:
       contents: write
       issues: write
       pull-requests: read
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@406c8e08f20eb5b4642c714e8adf9f8e4d54acab
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@main
     with:
       bump: ${{ inputs.bump || 'auto' }}
       dry_run: ${{ inputs.dry_run || false }}
-      debounce_minutes: ${{ github.event_name == 'push' && 5 || inputs.debounce_minutes || 0 }}
-      hub_ref: 406c8e08f20eb5b4642c714e8adf9f8e4d54acab
+      debounce_minutes: ${{ github.event_name == 'push' && 5 || fromJSON(format('{0}', inputs.debounce_minutes || 0)) }}
+      hub_ref: main
