@@ -15,6 +15,6 @@ jobs:
       contents: read
       issues: write
       pull-requests: read
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-repo-health.yml@406c8e08f20eb5b4642c714e8adf9f8e4d54acab
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-repo-health.yml@main
     with:
-      hub_ref: 406c8e08f20eb5b4642c714e8adf9f8e4d54acab
+      hub_ref: main
