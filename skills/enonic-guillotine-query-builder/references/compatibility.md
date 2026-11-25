@@ -2,7 +2,11 @@
 
 Version differences and migration notes between major Guillotine releases.
 
-## Guillotine 7.x (Current Stable)
+## Guillotine 8.x and 9.x
+
+The official documentation's stable version is Guillotine 9.x, with a release page ("What's new in Guillotine 9") and an upgrade guide for moving from Guillotine 8: https://developer.enonic.com/docs/guillotine/stable/release and https://developer.enonic.com/docs/guillotine/stable/upgrade. Consult them for 8.x/9.x changes; the notes in this file below cover 7.x and earlier.
+
+## Guillotine 7.x
 
 Requires **XP 7.14.0** or higher. Guillotine 7 is a full rewrite from JavaScript to Java.
 
