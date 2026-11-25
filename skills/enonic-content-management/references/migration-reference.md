@@ -436,7 +436,8 @@ exportLib.exportNodes({
     log.info('Nodes to export: %s', count);
   },
   nodeExported: (count) => {
-    log.info('Exported so far: %s', count);
+    // count = nodes exported since the last call (not cumulative)
+    log.info('Exported since last call: %s', count);
   }
 });
 // Export is written to the server's exports directory
@@ -457,7 +458,8 @@ exportLib.importNodes({
     log.info('Nodes to import: %s', count);
   },
   nodeImported: (count) => {
-    log.info('Imported so far: %s', count);
+    // count = nodes imported since the last call (not cumulative)
+    log.info('Imported since last call: %s', count);
   }
 });
 // Returns: { addedNodes, updatedNodes, importedBinaries, importErrors }

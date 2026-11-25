@@ -441,6 +441,7 @@ exports.run = function () {
         principals: ['role:system.admin']
       }, () => {
         let totalNodes = 0;
+        let processed = 0;
 
         // Export content subtree
         const exportResult = exportLib.exportNodes({
@@ -450,10 +451,13 @@ exports.run = function () {
           includeVersions: false,
           nodeResolved: (count) => {
             totalNodes = count;
+            processed = 0;
             progress({ info: `Exporting ${count} nodes`, current: 0, total: count });
           },
+          // Called with the number of nodes exported since the last call
           nodeExported: (count) => {
-            progress({ info: `Exported ${count}/${totalNodes}`, current: count, total: totalNodes });
+            processed += count;
+            progress({ info: `Exported ${processed}/${totalNodes}`, current: processed, total: totalNodes });
           }
         });
 
@@ -472,10 +476,13 @@ exports.run = function () {
           includePermissions: true,
           nodeResolved: (count) => {
             totalNodes = count;
+            processed = 0;
             progress({ info: `Importing ${count} nodes`, current: 0, total: count });
           },
+          // Called with the number of nodes imported since the last call
           nodeImported: (count) => {
-            progress({ info: `Imported ${count}/${totalNodes}`, current: count, total: totalNodes });
+            processed += count;
+            progress({ info: `Imported ${processed}/${totalNodes}`, current: processed, total: totalNodes });
           }
         });
 
