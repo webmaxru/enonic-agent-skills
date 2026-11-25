@@ -30,6 +30,9 @@ The directory name **must** match the file name (minus the `.xml` extension).
 - `display-name-label` (optional; since v7.1): Overrides the default `<Display Name>` placeholder shown in the content form when editors create new content of this type.
 - `form` (required): The custom form definition containing inputs, item-sets, option-sets, field-sets, and mixin references.
 
+- `is-abstract`: if `true`, content cannot be created with this type. `is-final`: if `true`, no other content type can extend it.
+- `allow-child-content-type` (since v7.7.0): when set, only matching content types may be created or moved under content of this type.
+
 > **Note:** `allow-child-content-type` has no effect if `allow-child-content` is set to `false`.
 
 > **Note:** The optional `i18n` attribute on `<display-name>`, `<display-name-label>`, `<label>`, and `<help-text>` holds a key to a localization phrase defined in the application's resource bundle.
@@ -71,6 +74,8 @@ Add these attributes to `<content-type>` for editor validation:
 | `base:media` | Abstract base for uploaded files |
 
 Always use `base:structured` unless the content type has a specific reason to inherit from another.
+
+`base:structured` and `base:media` are abstract; `base:shortcut` and `base:unstructured` are final. `base:media` does not allow child content. Built-in `media:*` types (e.g. `media:image`, `media:document`) extend `base:media`; `portal:site`, `portal:page-template`, and `portal:fragment` extend `base:structured`.
 
 ## Input Types Catalog
 
@@ -586,6 +591,7 @@ Group repeatable nested form fields into a property set.
 - `name` — used as the property key in persisted data
 - `<items>` — contains input types, nested item-sets, or option-sets
 - Item sets can be nested inside other item sets
+- Output is a property set: a single object for one occurrence, an array when several occurrences exist
 
 ## Option Sets
 
@@ -650,6 +656,9 @@ Present a set of mutually exclusive or multi-select options, each with optional 
 </option-set>
 ```
 
+- `options/@minimum` and `options/@maximum` are required; they bound how many options may be selected per instance
+- `option/@name` must be unique within the option set
+- Persisted output includes a `_selected` property listing the selected option name(s)
 - `options/@maximum` > 1 — multi-select mode
 - `<expanded>true</expanded>` — shows all options expanded by default
 - `<default>true</default>` on an option — pre-selects it
@@ -690,7 +699,7 @@ The mixin fields are merged inline at the position of `<mixin name="..."/>`.
 
 ## X-Data
 
-Extra data schemas that can be attached to any content type.
+Extra data schemas that can be attached to any content type. X-data fields appear in a separate step of the content form; to inject fields inside the content type's own form, use a mixin instead.
 
 Location: `src/main/resources/site/x-data/[name]/[name].xml`
 
