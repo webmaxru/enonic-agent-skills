@@ -141,6 +141,9 @@ dependencies {
 | `imagePlaceholder({width, height})` | any | Generates a base64-encoded placeholder image URL |
 | `processHtml({value})` | any | Resolves internal links in HTML content. Supports `imageWidths` (XP 7.7+) and `imageSizes` (XP 7.8+) for responsive images |
 | `sanitizeHtml(html)` | any | Strips unsafe tags/attributes to protect against XSS |
+| `getIdProviderKey()` | any | Returns the key of the current ID provider |
+| `idProviderUrl()` / `loginUrl()` / `logoutUrl()` | any | Generate URLs to the ID provider, login and logout endpoints |
+| `getMultipartForm()` / `getMultipartItem(name)` / `getMultipartText(name)` / `getMultipartStream(name)` | any | Read multipart form data from the current request |
 
 ### Example — getComponent() Return Value (Layout)
 
