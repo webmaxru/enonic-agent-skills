@@ -17,8 +17,17 @@ Enonic XP supports both TypeScript and JavaScript controllers.
 
 - File extension: `.ts`
 - Use ES module syntax: `import ... from '...';` and `export function get(req) { ... }`
-- Requires TypeScript to be configured in the project. Refer to the [TypeScript documentation](https://developer.enonic.com/docs/xp/7.x/development/typescript).
+- Requires TypeScript to be configured in the project. Refer to the [TypeScript documentation](https://developer.enonic.com/docs/platform/7.x/development/typescript).
 - Type definitions available via `@enonic-types/core` and `@enonic-types/lib-portal`.
+- Install types for each library used with `npm i --save-dev @enonic-types/lib-portal @enonic-types/global`.
+- `@enonic-types/global` is not placed under `node_modules/@types`, so list it in `tsconfig.json`:
+  ```json
+  { "compilerOptions": { "types": ["@enonic-types/global"] } }
+  ```
+- Both `const lib = require('/lib/xp/portal')` and ES-style `import` work. For ES-style imports transpiled with plain `tsc`, map library paths so they are preserved in the output:
+  ```json
+  { "compilerOptions": { "baseUrl": "./", "paths": { "/lib/xp/portal": ["node_modules/@enonic-types/lib-portal"] } } }
+  ```
 
 ### JavaScript Controllers
 
