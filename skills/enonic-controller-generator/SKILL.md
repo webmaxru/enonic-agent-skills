@@ -4,7 +4,7 @@ description: Generates Enonic XP controller files (TypeScript/JavaScript) and pa
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.4"
+  version: "1.5"
 ---
 
 # Enonic XP Controller Generator
