@@ -224,7 +224,7 @@ Reports progress from inside a running task.
 
 ### list(params?)
 
-Returns running tasks. Optional filter by `name` (string pattern) and `state` (`WAITING`, `RUNNING`, `FINISHED`, `FAILED`).
+Returns running tasks (an aggregated list on clustered environments). Optional filter by `name` (string pattern) and `state` (`WAITING`, `RUNNING`, `FINISHED`, `FAILED`).
 
 ### get(taskId)
 
@@ -254,6 +254,7 @@ Causes the current execution thread to sleep for the specified number of millise
 |----------------|---------------------|
 | task.submitted | Task was submitted  |
 | task.updated   | Task was updated    |
+| task.removed   | Task was removed    |
 | task.finished  | Task completed      |
 | task.failed    | Task failed         |
 
